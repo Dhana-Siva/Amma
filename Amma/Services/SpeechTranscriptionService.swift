@@ -1,9 +1,20 @@
 import Speech
 
-enum SpeechTranscriptionError: Error {
+enum SpeechTranscriptionError: LocalizedError {
     case notAuthorized
     case recognizerUnavailable
     case emptyResult
+
+    var errorDescription: String? {
+        switch self {
+        case .notAuthorized:
+            return "Amma needs speech recognition access to hear you."
+        case .recognizerUnavailable:
+            return "Speech recognition isn't available for this language on this device."
+        case .emptyResult:
+            return "Couldn't understand that — try again."
+        }
+    }
 }
 
 /// Guards against SFSpeechRecognizer's completion handler firing more than once.

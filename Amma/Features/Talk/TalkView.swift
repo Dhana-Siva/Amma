@@ -15,6 +15,9 @@ struct TalkView: View {
     @State private var statusMessage: String?
     @StateObject private var recorder = AudioRecorderService()
     @StateObject private var playback = AudioPlaybackService()
+    #if targetEnvironment(simulator)
+    @State private var debugTranscript = ""
+    #endif
 
     private let familyId = FamilyContext.shared.familyId
 
@@ -48,6 +51,18 @@ struct TalkView: View {
                         .foregroundStyle(.secondary)
                         .padding(.bottom, 4)
                 }
+
+                #if targetEnvironment(simulator)
+                HStack {
+                    TextField("Type a message (Simulator only — Speech doesn't work here)", text: $debugTranscript)
+                        .textFieldStyle(.roundedBorder)
+                        .onSubmit(sendDebugTranscript)
+                    Button("Send", action: sendDebugTranscript)
+                        .disabled(debugTranscript.isEmpty || phase == .transcribing || phase == .sending)
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 8)
+                #endif
 
                 talkButton
                     .padding(.bottom, 24)
@@ -109,12 +124,23 @@ struct TalkView: View {
                 await send(transcript: transcript)
             } catch {
                 await MainActor.run {
-                    statusMessage = "Couldn't understand that — try again."
+                    statusMessage = error.localizedDescription
                     phase = .idle
                 }
             }
         }
     }
+
+    #if targetEnvironment(simulator)
+    private func sendDebugTranscript() {
+        let transcript = debugTranscript
+        guard !transcript.isEmpty else { return }
+        debugTranscript = ""
+        statusMessage = nil
+        phase = .sending
+        Task { await send(transcript: transcript) }
+    }
+    #endif
 
     private func send(transcript: String) async {
         do {

@@ -21,6 +21,8 @@
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>whatsapp</string>
+		<string>tel</string>
+		<string>telprompt</string>
 	</array>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Amma looks for your TV and speakers on your home network so it can cast for you.</string>

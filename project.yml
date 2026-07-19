@@ -22,6 +22,8 @@ targets:
         NSLocalNetworkUsageDescription: "Amma looks for your TV and speakers on your home network so it can cast for you."
         LSApplicationQueriesSchemes:
           - whatsapp
+          - tel
+          - telprompt
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.dhana.amma
