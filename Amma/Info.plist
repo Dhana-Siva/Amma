@@ -24,12 +24,15 @@
 		<string>tel</string>
 		<string>telprompt</string>
 	</array>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Amma looks for your TV and speakers on your home network so it can cast for you.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Amma listens when you tap to talk, so it can send your message.</string>
-	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Amma can turn what you say into a message, if you turn on voice commands.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -8,8 +8,6 @@ private enum TalkPhase {
 }
 
 struct TalkView: View {
-    @AppStorage("languageCode") private var languageCode = "en"
-
     @State private var log: [InteractionLog] = []
     @State private var phase: TalkPhase = .idle
     @State private var statusMessage: String?
@@ -97,17 +95,8 @@ struct TalkView: View {
 
     private func startRecording() {
         statusMessage = nil
-        Task {
-            let authorized = await SpeechTranscriptionService.shared.requestAuthorization()
-            guard authorized else {
-                await MainActor.run { statusMessage = "Amma needs speech recognition access to hear you." }
-                return
-            }
-            await MainActor.run {
-                recorder.startRecording()
-                phase = .recording
-            }
-        }
+        recorder.startRecording()
+        phase = .recording
     }
 
     private func stopRecordingAndSend() {
@@ -119,12 +108,12 @@ struct TalkView: View {
         phase = .transcribing
         Task {
             do {
-                let transcript = try await SpeechTranscriptionService.shared.transcribe(fileURL: fileURL, languageCode: languageCode)
+                let transcript = try await APIClient.shared.transcribeAudio(fileURL: fileURL)
                 await MainActor.run { phase = .sending }
                 await send(transcript: transcript)
             } catch {
                 await MainActor.run {
-                    statusMessage = error.localizedDescription
+                    statusMessage = "Couldn't transcribe that — check your connection and try again."
                     phase = .idle
                 }
             }

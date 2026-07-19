@@ -18,7 +18,6 @@
 		401A06AE5BAC9BA452C2B223 /* AudioPlaybackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BD30F99FA1F7757DED3606 /* AudioPlaybackService.swift */; };
 		40E2A4C857F5096A0B452D5A /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8945E38F255ACC953E8F07FF /* OnboardingView.swift */; };
 		8E628BC16C109546F2E4C52E /* ConsentRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62B058BA0F5CDACAF5FDD79 /* ConsentRecord.swift */; };
-		911B4DEF54BA1E8C156AC56C /* SpeechTranscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85481AB68333F196BD6F0A46 /* SpeechTranscriptionService.swift */; };
 		964401713C38A590B877B749 /* BehaviorProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560DA8E2D418C45DBD89C94D /* BehaviorProfile.swift */; };
 		A5D508C78FF4F90E1AB2008C /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3FF6775D877A307C7423243 /* Device.swift */; };
 		B828AAEAEF4A5CFCC29140A3 /* AmmaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B91A6BAB06578E8F7A15FF /* AmmaApp.swift */; };
@@ -34,7 +33,6 @@
 		44916104B6F7D978106C8446 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		53BD30F99FA1F7757DED3606 /* AudioPlaybackService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlaybackService.swift; sourceTree = "<group>"; };
 		560DA8E2D418C45DBD89C94D /* BehaviorProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorProfile.swift; sourceTree = "<group>"; };
-		85481AB68333F196BD6F0A46 /* SpeechTranscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechTranscriptionService.swift; sourceTree = "<group>"; };
 		8945E38F255ACC953E8F07FF /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		93FC45E7919E84E3329A402B /* VoiceSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceSetupView.swift; sourceTree = "<group>"; };
 		947E6B852239AD840E1D23BD /* AudioRecorderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderService.swift; sourceTree = "<group>"; };
@@ -59,7 +57,6 @@
 				947E6B852239AD840E1D23BD /* AudioRecorderService.swift */,
 				9D92FB1AD40C1BC7EB87E1A3 /* CommandExecutor.swift */,
 				A17ED20D5AE5462FE605A246 /* FamilyContext.swift */,
-				85481AB68333F196BD6F0A46 /* SpeechTranscriptionService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -195,6 +192,10 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					50B135409FE91CFBB4BE9C85 = {
+						DevelopmentTeam = H72SV43N57;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = DAAE2584AF8404BE3B38766C /* Build configuration list for PBXProject "Amma" */;
@@ -245,7 +246,6 @@
 				FBDA5C345E3BB791FA94C348 /* Family.swift in Sources */,
 				32820243DCF976F30A370D58 /* FamilyContext.swift in Sources */,
 				40E2A4C857F5096A0B452D5A /* OnboardingView.swift in Sources */,
-				911B4DEF54BA1E8C156AC56C /* SpeechTranscriptionService.swift in Sources */,
 				066B0BFF9A8862B1A1886184 /* TalkView.swift in Sources */,
 				0A15C2004882E3CF70BC71D5 /* VoiceSample.swift in Sources */,
 				3A0811110F68ACB3B6F2547F /* VoiceSetupView.swift in Sources */,
@@ -317,7 +317,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = H72SV43N57;
 				INFOPLIST_FILE = Amma/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -337,7 +339,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = H72SV43N57;
 				INFOPLIST_FILE = Amma/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

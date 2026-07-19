@@ -42,6 +42,10 @@ private struct VoiceSampleResponse: Decodable {
     }
 }
 
+private struct TranscribeResponse: Decodable {
+    var transcript: String
+}
+
 private struct FamilySetupRequestBody: Encodable {
     var familyId: String
     var parentName: String
@@ -61,7 +65,7 @@ private struct FamilySetupRequestBody: Encodable {
 final class APIClient {
     static let shared = APIClient()
 
-    private let baseURL = URL(string: "http://localhost:8000")!
+    private let baseURL = URL(string: "http://192.168.86.38:8000")!
 
     private init() {}
 
@@ -116,6 +120,27 @@ final class APIClient {
 
         let (data, _) = try await URLSession.shared.data(for: request)
         return try JSONDecoder().decode(VoiceSampleResponse.self, from: data).voiceId
+    }
+
+    func transcribeAudio(fileURL: URL) async throws -> String {
+        let url = baseURL.appendingPathComponent("v1/transcribe")
+        let boundary = UUID().uuidString
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+
+        var body = Data()
+        let audioData = try Data(contentsOf: fileURL)
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"audio\"; filename=\"recording.m4a\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: audio/m4a\r\n\r\n".data(using: .utf8)!)
+        body.append(audioData)
+        body.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
+
+        request.httpBody = body
+
+        let (data, _) = try await URLSession.shared.data(for: request)
+        return try JSONDecoder().decode(TranscribeResponse.self, from: data).transcript
     }
 
     func setupFamily(familyId: UUID, parentName: String, childName: String, language: String, childPhoneNumber: String? = nil) async throws {

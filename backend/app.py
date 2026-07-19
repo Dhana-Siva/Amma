@@ -242,6 +242,26 @@ async def upload_voice_sample(family_id: str = Form(...), audio: UploadFile = Fi
     return {"voice_id": voice_id}
 
 
+@app.post("/v1/transcribe")
+async def transcribe_audio(audio: UploadFile = File(...)) -> dict:
+    if not ELEVENLABS_API_KEY:
+        raise HTTPException(status_code=503, detail="ELEVENLABS_API_KEY is not configured on the server")
+
+    audio_bytes = await audio.read()
+    response = requests.post(
+        f"{ELEVENLABS_BASE}/speech-to-text",
+        headers={"xi-api-key": ELEVENLABS_API_KEY},
+        data={"model_id": "scribe_v1"},
+        files={"file": (audio.filename or "recording.m4a", audio_bytes, audio.content_type or "audio/m4a")},
+        timeout=60,
+    )
+    if response.status_code >= 400:
+        raise HTTPException(status_code=502, detail=f"ElevenLabs transcription failed: {response.text}")
+
+    transcript = response.json().get("text", "")
+    return {"transcript": transcript}
+
+
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok"}
