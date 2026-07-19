@@ -1,0 +1,5 @@
+fastapi
+uvicorn
+anthropic
+requests
+python-multipart
