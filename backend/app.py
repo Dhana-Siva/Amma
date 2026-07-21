@@ -1,3 +1,4 @@
+import json
 import os
 import uuid
 from collections import defaultdict
@@ -18,15 +19,42 @@ MAX_HISTORY_TURNS = 10
 
 ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY")
 ELEVENLABS_BASE = "https://api.elevenlabs.io/v1"
+# Premade ElevenLabs voice ("Rachel") used until the family clones their own
+# via the Voice tab, so replies are spoken from first use instead of only
+# after voice setup is complete.
+DEFAULT_VOICE_ID = os.environ.get("ELEVENLABS_DEFAULT_VOICE_ID", "21m00Tcm4TlvDq8ikWAM")
 
 MEDIA_DIR = Path(__file__).parent / "media"
 MEDIA_DIR.mkdir(exist_ok=True)
 app.mount("/media", StaticFiles(directory=MEDIA_DIR), name="media")
 
-# In-memory per-family state. Fine for a single-instance MVP; move to a real
-# store before this needs to survive a restart or run on more than one box.
+# Per-family state, kept in memory and mirrored to a JSON file on every write
+# so a backend restart doesn't lose voice clones, consent, or family setup.
+# Fine for a single-instance MVP; move to a real database before this needs
+# to run on more than one box or handle concurrent writers.
 conversations: dict[str, list[dict]] = defaultdict(list)
 families: dict[str, dict] = {}
+
+STATE_FILE = Path(__file__).parent / "state.json"
+
+
+def load_state() -> None:
+    if not STATE_FILE.exists():
+        return
+    try:
+        data = json.loads(STATE_FILE.read_text())
+    except (json.JSONDecodeError, OSError):
+        return
+    families.update(data.get("families", {}))
+    for family_id, history in data.get("conversations", {}).items():
+        conversations[family_id] = history
+
+
+def save_state() -> None:
+    STATE_FILE.write_text(json.dumps({"families": families, "conversations": conversations}))
+
+
+load_state()
 
 
 class InteractionRequest(BaseModel):
@@ -50,8 +78,8 @@ class ConsentRequest(BaseModel):
 
 class FamilySetupRequest(BaseModel):
     family_id: str
-    parent_name: str
-    child_name: str
+    parent_name: str | None = None
+    child_name: str | None = None
     language: str = "en"
     child_phone_number: str | None = None
 
@@ -180,15 +208,15 @@ def create_interaction(req: InteractionRequest, request: Request) -> Interaction
         }
 
     history.append({"role": "assistant", "content": reply_text})
+    save_state()
 
     reply_audio_url = None
-    voice_id = family.get("voice_id")
-    if voice_id:
-        audio_bytes = synthesize_speech(voice_id, reply_text)
-        if audio_bytes:
-            filename = f"{uuid.uuid4()}.mp3"
-            (MEDIA_DIR / filename).write_bytes(audio_bytes)
-            reply_audio_url = f"{request.base_url}media/{filename}"
+    voice_id = family.get("voice_id") or DEFAULT_VOICE_ID
+    audio_bytes = synthesize_speech(voice_id, reply_text)
+    if audio_bytes:
+        filename = f"{uuid.uuid4()}.mp3"
+        (MEDIA_DIR / filename).write_bytes(audio_bytes)
+        reply_audio_url = f"{request.base_url}media/{filename}"
 
     return InteractionReply(reply_text=reply_text, reply_audio_url=reply_audio_url, action=action)
 
@@ -196,10 +224,15 @@ def create_interaction(req: InteractionRequest, request: Request) -> Interaction
 @app.post("/v1/family-setup")
 def setup_family(req: FamilySetupRequest) -> dict:
     family = families.setdefault(req.family_id, {})
-    family["parent_name"] = req.parent_name
-    family["child_name"] = req.child_name
+    # Names are only overwritten when provided, so a partial update (e.g. the
+    # Devices tab saving just a phone number) can't blank out existing values.
+    if req.parent_name:
+        family["parent_name"] = req.parent_name
+    if req.child_name:
+        family["child_name"] = req.child_name
     family["language"] = req.language
     family["child_phone_number"] = req.child_phone_number
+    save_state()
     return {"status": "ok"}
 
 
@@ -212,6 +245,7 @@ def set_consent(req: ConsentRequest) -> dict:
         family["voice_consent_revoked_at"] = None
     else:
         family["voice_consent_revoked_at"] = now
+    save_state()
     return {
         "granted_at": family.get("voice_consent_granted_at"),
         "revoked_at": family.get("voice_consent_revoked_at"),
@@ -239,6 +273,7 @@ async def upload_voice_sample(family_id: str = Form(...), audio: UploadFile = Fi
 
     voice_id = response.json()["voice_id"]
     family["voice_id"] = voice_id
+    save_state()
     return {"voice_id": voice_id}
 
 

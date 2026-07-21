@@ -6,4 +6,6 @@ DerivedData/
 backend/.venv/
 backend/__pycache__/
 backend/media/
+backend/state.json
+backend/.pytest_cache/
 .env

@@ -4,6 +4,9 @@ struct OnboardingView: View {
     let onComplete: () -> Void
 
     @AppStorage("languageCode") private var storedLanguage = "en"
+    @AppStorage("parentName") private var storedParentName = ""
+    @AppStorage("childName") private var storedChildName = ""
+    @AppStorage("childPhoneNumber") private var storedChildPhoneNumber = ""
 
     @State private var step = 0
     @State private var parentName = ""
@@ -92,7 +95,10 @@ struct OnboardingView: View {
     private func finish() {
         let familyId = FamilyContext.shared.familyId
         storedLanguage = language
+        storedParentName = parentName
+        storedChildName = childName
         let trimmedPhoneNumber = childPhoneNumber.trimmingCharacters(in: .whitespaces)
+        storedChildPhoneNumber = trimmedPhoneNumber
         Task {
             try? await APIClient.shared.setupFamily(
                 familyId: familyId,
