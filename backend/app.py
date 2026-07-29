@@ -27,8 +27,10 @@ YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search"
 # after voice setup is complete.
 DEFAULT_VOICE_ID = os.environ.get("ELEVENLABS_DEFAULT_VOICE_ID", "21m00Tcm4TlvDq8ikWAM")
 
-MEDIA_DIR = Path(__file__).parent / "media"
-MEDIA_DIR.mkdir(exist_ok=True)
+DATA_DIR = Path(os.environ.get("AMMA_DATA_DIR", Path(__file__).parent))
+
+MEDIA_DIR = DATA_DIR / "media"
+MEDIA_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/media", StaticFiles(directory=MEDIA_DIR), name="media")
 
 # Serves cast_receiver.html — the custom Cast SDK receiver page the
@@ -46,7 +48,7 @@ app.mount("/cast", StaticFiles(directory=STATIC_DIR), name="cast")
 conversations: dict[str, list[dict]] = defaultdict(list)
 families: dict[str, dict] = {}
 
-STATE_FILE = Path(__file__).parent / "state.json"
+STATE_FILE = DATA_DIR / "state.json"
 
 
 def load_state() -> None:
