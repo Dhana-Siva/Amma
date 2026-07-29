@@ -1,0 +1,15 @@
+{
+  "originHash" : "300e6c85ec4fc774ac3f9525fa942dad932d839f3b168ec375a778cc2a715ea6",
+  "pins" : [
+    {
+      "identity" : "google-cast-sdk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SRGSSR/google-cast-sdk.git",
+      "state" : {
+        "revision" : "516f7111116bc412230309636842d3bbf77efdd8",
+        "version" : "4.8.4"
+      }
+    }
+  ],
+  "version" : 3
+}

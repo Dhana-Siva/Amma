@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Amma Cast Receiver</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+    #player { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+    #idle {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-family: sans-serif; font-size: 2vw; opacity: 0.6;
+    }
+    #debug {
+      position: absolute; bottom: 8px; left: 8px; right: 8px; z-index: 10;
+      color: rgba(255,255,255,0.75); font-family: monospace; font-size: 22px;
+      line-height: 1.4; white-space: pre-wrap; word-break: break-all;
+      pointer-events: none;
+      text-shadow: 0 0 4px #000, 0 0 4px #000;
+    }
+  </style>
+</head>
+<body>
+  <div id="idle">Amma</div>
+  <!-- Iframe is created fresh per video rather than reused, and driven by a
+       plain src URL (enablejsapi=1 + autoplay=1) instead of the YouTube JS
+       IFrame Player API — on real Chromecast hardware,
+       onYouTubeIframeAPIReady was confirmed (via on-screen logging) to never
+       fire at all, even though the identical code works fine in a desktop
+       browser. A bare iframe embed doesn't depend on that callback. -->
+  <div id="debug"></div>
+
+  <script src="https://www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"></script>
+  <script>
+    // Custom namespace Amma's iOS app sends "play this video" messages on.
+    // Kept app-specific (not a generic name) to avoid colliding with any
+    // other Cast sender that might reach this same namespace convention.
+    const NAMESPACE = 'urn:x-cast:com.dhana.amma.cast';
+
+    // Small on-screen scrolling log — there's no remote console access to
+    // this screen, so this is the only way to see what's actually happening
+    // when something doesn't play.
+    const debugLines = [];
+    function debugLog(message) {
+      debugLines.push(new Date().toLocaleTimeString() + ' ' + message);
+      while (debugLines.length > 8) debugLines.shift();
+      const el = document.getElementById('debug');
+      if (el) el.textContent = debugLines.join('\n');
+    }
+
+    window.onerror = (message, source, lineno) => {
+      debugLog('JS ERROR: ' + message + ' (line ' + lineno + ')');
+    };
+
+    debugLog('page loaded');
+
+    function playVideo(videoId) {
+      debugLog('playVideo ' + videoId);
+      document.getElementById('idle').style.display = 'none';
+
+      const old = document.getElementById('player');
+      if (old) old.remove();
+
+      const iframe = document.createElement('iframe');
+      iframe.id = 'player';
+      iframe.allow = 'autoplay';
+      iframe.src = 'https://www.youtube.com/embed/' + encodeURIComponent(videoId) +
+        '?autoplay=1&controls=0&rel=0&enablejsapi=1';
+      document.body.appendChild(iframe);
+    }
+
+    function stopVideo() {
+      debugLog('stopVideo');
+      const el = document.getElementById('player');
+      if (el) el.remove();
+      document.getElementById('idle').style.display = 'flex';
+    }
+
+    const context = cast.framework.CastReceiverContext.getInstance();
+
+    context.addCustomMessageListener(NAMESPACE, (event) => {
+      // event.data's exact shape (raw JSON string vs. already-parsed object)
+      // isn't documented, so handle both rather than assume one.
+      let data = event.data;
+      if (typeof data === 'string') {
+        try {
+          data = JSON.parse(data);
+        } catch (e) {
+          data = {};
+        }
+      }
+      data = data || {};
+
+      debugLog('received: ' + JSON.stringify(data));
+
+      if (data.action === 'stop') {
+        stopVideo();
+      } else if (data.videoId) {
+        playVideo(data.videoId);
+      }
+    });
+
+    context.start();
+  </script>
+</body>
+</html>

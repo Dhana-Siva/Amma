@@ -153,10 +153,12 @@ struct TalkView: View {
                 phase = .idle
             }
             if let audioURL = reply.replyAudioURL {
-                playback.play(url: audioURL)
+                await playback.play(url: audioURL)
             }
             if let action = reply.action {
-                await CommandExecutor.execute(action)
+                if let errorMessage = await CommandExecutor.execute(action) {
+                    await MainActor.run { statusMessage = errorMessage }
+                }
             }
         } catch {
             await MainActor.run {

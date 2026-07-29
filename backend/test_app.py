@@ -48,20 +48,31 @@ def mock_elevenlabs_tts(monkeypatch):
     return captured
 
 
+def mock_youtube_search(monkeypatch, items):
+    monkeypatch.setattr(app_module, "YOUTUBE_API_KEY", "test-youtube-key")
+    captured = {}
+
+    def fake_get(url, **kwargs):
+        captured["url"] = url
+        captured["params"] = kwargs.get("params")
+        return SimpleNamespace(status_code=200, json=lambda: {"items": items})
+
+    monkeypatch.setattr(app_module.requests, "get", fake_get)
+    return captured
+
+
 def test_health():
     response = client.get("/health")
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
 
 
-def test_build_tools_empty_without_phone_number():
-    assert app_module.build_tools({}) == []
-    assert app_module.build_tools({"child_phone_number": None}) == []
-
-
-def test_build_tools_present_with_phone_number():
-    tools = app_module.build_tools({"child_phone_number": "+15551234567"})
-    assert {tool["name"] for tool in tools} == {"place_call", "send_whatsapp_message"}
+def test_build_tools_always_available():
+    # Available even without a child_phone_number on file — a named contact
+    # is resolved on-device, so the backend doesn't need one to offer the tool.
+    expected = {"place_call", "send_whatsapp_message", "cast_media", "stop_cast"}
+    assert {tool["name"] for tool in app_module.build_tools({})} == expected
+    assert {tool["name"] for tool in app_module.build_tools({"child_phone_number": "+15551234567"})} == expected
 
 
 def test_interaction_speaks_with_default_voice_when_no_clone(monkeypatch, family_id):
@@ -97,14 +108,14 @@ def test_interaction_no_audio_when_elevenlabs_not_configured(monkeypatch, family
     assert response.json()["reply_audio_url"] is None
 
 
-def test_interaction_no_tools_offered_without_phone_number(monkeypatch, family_id):
+def test_interaction_offers_tools_even_without_phone_number(monkeypatch, family_id):
     create_mock = mock_claude_reply(monkeypatch, [text_block("Sure!")])
     mock_elevenlabs_tts(monkeypatch)
 
     client.post("/v1/interactions", json={"family_id": family_id, "transcript": "call my son"})
 
     _, kwargs = create_mock.call_args
-    assert "tools" not in kwargs
+    assert "tools" in kwargs
 
 
 def test_interaction_places_call(monkeypatch, family_id):
@@ -133,6 +144,79 @@ def test_interaction_sends_whatsapp_message(monkeypatch, family_id):
     assert action["params"]["phoneNumber"] == "+15551234567"
     # No text block in the reply, so it falls back to a generic in-progress line.
     assert data["reply_text"] == "Okay, doing that now."
+
+
+def test_interaction_places_call_to_named_contact(monkeypatch, family_id):
+    # No child_phone_number on file at all — only a named contact.
+    mock_claude_reply(monkeypatch, [tool_use_block("place_call", {"contact_name": "Priya"})])
+    mock_elevenlabs_tts(monkeypatch)
+
+    response = client.post("/v1/interactions", json={"family_id": family_id, "transcript": "call Priya"})
+
+    action = response.json()["action"]
+    assert action["intent"] == "placeCall"
+    assert action["params"] == {"contactName": "Priya"}
+
+
+def test_interaction_call_without_contact_or_saved_number_omits_null(monkeypatch, family_id):
+    # Neither a contact name nor a saved child_phone_number — params must
+    # stay empty rather than emit a null value the iOS side can't decode.
+    mock_claude_reply(monkeypatch, [tool_use_block("place_call", {})])
+    mock_elevenlabs_tts(monkeypatch)
+
+    response = client.post("/v1/interactions", json={"family_id": family_id, "transcript": "call him"})
+
+    assert response.json()["action"]["params"] == {}
+
+
+def test_interaction_casts_media(monkeypatch, family_id):
+    mock_claude_reply(monkeypatch, [tool_use_block("cast_media", {"query": "Rajinikanth songs"})])
+    mock_elevenlabs_tts(monkeypatch)
+    search = mock_youtube_search(monkeypatch, [
+        {"id": {"videoId": "abc123"}, "snippet": {"title": "Rajinikanth Hit Songs"}},
+    ])
+
+    response = client.post("/v1/interactions", json={"family_id": family_id, "transcript": "play rajini songs"})
+
+    action = response.json()["action"]
+    assert action["intent"] == "castMedia"
+    assert action["params"] == {"videoId": "abc123", "title": "Rajinikanth Hit Songs"}
+    assert search["params"]["q"] == "Rajinikanth songs"
+
+
+def test_interaction_cast_media_no_results(monkeypatch, family_id):
+    mock_claude_reply(monkeypatch, [tool_use_block("cast_media", {"query": "asdkjfhaskdjfh"})])
+    mock_elevenlabs_tts(monkeypatch)
+    mock_youtube_search(monkeypatch, [])
+
+    response = client.post("/v1/interactions", json={"family_id": family_id, "transcript": "play something obscure"})
+
+    data = response.json()
+    assert data["action"] is None
+    assert "couldn't find" in data["reply_text"].lower()
+
+
+def test_interaction_cast_media_without_youtube_api_key(monkeypatch, family_id):
+    # No YOUTUBE_API_KEY configured at all — should fail gracefully, not crash.
+    monkeypatch.setattr(app_module, "YOUTUBE_API_KEY", None)
+    mock_claude_reply(monkeypatch, [tool_use_block("cast_media", {"query": "a song"})])
+    mock_elevenlabs_tts(monkeypatch)
+
+    response = client.post("/v1/interactions", json={"family_id": family_id, "transcript": "play a song"})
+
+    assert response.status_code == 200
+    assert response.json()["action"] is None
+
+
+def test_interaction_stops_cast(monkeypatch, family_id):
+    mock_claude_reply(monkeypatch, [tool_use_block("stop_cast", {})])
+    mock_elevenlabs_tts(monkeypatch)
+
+    response = client.post("/v1/interactions", json={"family_id": family_id, "transcript": "stop the tv"})
+
+    action = response.json()["action"]
+    assert action["intent"] == "stopCast"
+    assert action["params"] == {}
 
 
 def test_family_setup_partial_update_preserves_existing_names(family_id):

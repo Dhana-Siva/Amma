@@ -5,20 +5,32 @@ options:
     iOS: "17.0"
   createIntermediateGroups: true
 
+packages:
+  GoogleCast:
+    url: https://github.com/SRGSSR/google-cast-sdk.git
+    from: 4.8.4
+
 targets:
   Amma:
     type: application
     platform: iOS
     sources:
       - path: Amma
+    dependencies:
+      - package: GoogleCast
     info:
       path: Amma/Info.plist
       properties:
+        CFBundleDisplayName: "Amma Appa Arugil - AAA"
         UILaunchScreen: {}
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
         NSMicrophoneUsageDescription: "Amma listens when you tap to talk, so it can send your message."
+        NSContactsUsageDescription: "Amma looks up phone numbers in your contacts when you ask it to call or message someone by name."
         NSLocalNetworkUsageDescription: "Amma looks for your TV and speakers on your home network so it can cast for you."
+        NSBonjourServices:
+          - _googlecast._tcp
+          - _592BF965._googlecast._tcp
         LSApplicationQueriesSchemes:
           - whatsapp
           - tel

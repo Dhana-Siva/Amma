@@ -19,6 +19,9 @@ MAX_HISTORY_TURNS = 10
 
 ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY")
 ELEVENLABS_BASE = "https://api.elevenlabs.io/v1"
+
+YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY")
+YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search"
 # Premade ElevenLabs voice ("Rachel") used until the family clones their own
 # via the Voice tab, so replies are spoken from first use instead of only
 # after voice setup is complete.
@@ -27,6 +30,14 @@ DEFAULT_VOICE_ID = os.environ.get("ELEVENLABS_DEFAULT_VOICE_ID", "21m00Tcm4TlvDq
 MEDIA_DIR = Path(__file__).parent / "media"
 MEDIA_DIR.mkdir(exist_ok=True)
 app.mount("/media", StaticFiles(directory=MEDIA_DIR), name="media")
+
+# Serves cast_receiver.html — the custom Cast SDK receiver page the
+# Chromecast loads and displays when Amma casts a video (see project plan:
+# the reverse-engineered YouTube Lounge/DIAL approach was tested against a
+# real Chromecast and confirmed broken, so casting goes through Google's
+# official Cast SDK to this page instead).
+STATIC_DIR = Path(__file__).parent / "static"
+app.mount("/cast", StaticFiles(directory=STATIC_DIR), name="cast")
 
 # Per-family state, kept in memory and mirrored to a JSON file on every write
 # so a backend restart doesn't lose voice clones, consent, or family setup.
@@ -85,8 +96,19 @@ class FamilySetupRequest(BaseModel):
 
 
 LANGUAGE_INSTRUCTIONS = {
-    "ta": "Reply only in warm, everyday spoken Tamil, written in Tamil script.",
-    "en": "Reply only in English.",
+    "ta": (
+        "Reply in casual, everyday spoken Tamil (Chennai-style), written in Tamil "
+        "script — not formal or literary Tamil (no எழுத்துத் தமிழ், no textbook "
+        "phrasing). Mix in common English words the way people actually text "
+        "(e.g. \"call\", \"message\", \"okay\"), use casual particles like pa/ma/da, "
+        "contractions, and the odd emoji, exactly like the sample chats you'd "
+        "text a parent, not like a translated document."
+    ),
+    "en": (
+        "Reply in casual, everyday English texting style — contractions, casual "
+        "filler words, the odd emoji, like a real text message, not a formal or "
+        "polished sentence."
+    ),
 }
 
 
@@ -96,37 +118,73 @@ def system_prompt(parent_name: str | None, child_name: str | None, language: str
     language_instruction = LANGUAGE_INSTRUCTIONS.get(language or "en", LANGUAGE_INSTRUCTIONS["en"])
     prompt = (
         f"You are standing in for {child}, texting {parent} the way {child} would: "
-        "warm, brief, a little informal, like a real check-in message rather than "
-        "an assistant response. Reply in 1-3 short sentences. Ask a small follow-up "
-        f"question when it feels natural. Never mention that you are an AI. {language_instruction}"
+        "warm, brief, casual and informal, like a real quick text between family "
+        "rather than an assistant response — never stiff, never formal. Reply in "
+        "1-3 short sentences. Ask a small follow-up question when it feels "
+        f"natural. Never mention that you are an AI. {language_instruction}"
     )
     if has_tools:
         prompt += (
-            f" If {parent} is clearly asking to call or message {child} directly "
-            "(not just chatting), use the matching tool. Still include a brief "
-            "in-character spoken line in the same reply, like you're letting them "
-            "know you're on it."
+            " Only use a tool when THIS message is itself a direct, "
+            "unambiguous request for that specific action — never because "
+            "an earlier message in the conversation asked for one. A "
+            "greeting, small talk, or a check-in like \"how are you\" or "
+            "\"did you eat\" should never trigger any tool, even if you "
+            "placed a call or cast something a moment ago. When in doubt, "
+            "don't call a tool — just reply warmly."
+            f" If {parent} is clearly asking to call or message someone directly "
+            "(not just chatting), use the matching tool. If they name a specific "
+            f"person other than {child} (a friend, relative, anyone else), pass "
+            "that person's name as contact_name so the app can look up their "
+            f"number in {parent}'s phone contacts. If they just mean {child} "
+            "without naming someone else, omit contact_name. Still include a "
+            "brief in-character spoken line in the same reply, like you're "
+            "letting them know you're on it — and since this hands off to "
+            "another app, weave in a warm, natural reminder in the same "
+            "breath to tap the small Amma link at the top of the screen "
+            "afterward to come back (phrased casually, like a loving nudge, "
+            "never like a technical instruction). If instead they clearly "
+            "want to watch or listen to something on the TV (a song, a "
+            "video, a show), use cast_media with a short search query "
+            "describing what they asked for. If something is already "
+            "playing on the TV and they ask to stop, pause, or turn it "
+            "off, use stop_cast."
         )
     return prompt
 
 
+CONTACT_NAME_PARAM = {
+    "type": "string",
+    "description": "Name of the specific person to reach, if the parent named someone. Omit to default to the child.",
+}
+
+
 def build_tools(family: dict) -> list[dict]:
-    if not family.get("child_phone_number"):
-        return []
     return [
         {
             "name": "place_call",
             "description": (
-                "Place a phone call to the child. Use when the parent clearly asks "
-                "to call, phone, or speak directly to their child."
+                "Place a voice call — including 'call/phone/ring on WhatsApp'. "
+                "Use this whenever the parent wants to actually talk to someone "
+                "by voice, even if they say the word WhatsApp; the app itself "
+                "decides whether that's a WhatsApp call or a regular call. Only "
+                "use send_whatsapp_message instead when they want a text sent, "
+                "not a call placed. Their child by default, or anyone they name."
             ),
-            "input_schema": {"type": "object", "properties": {}, "required": []},
+            "input_schema": {
+                "type": "object",
+                "properties": {"contact_name": CONTACT_NAME_PARAM},
+                "required": [],
+            },
         },
         {
             "name": "send_whatsapp_message",
             "description": (
-                "Send a WhatsApp message to the child on the parent's behalf. Use "
-                "when the parent asks to message, text, or WhatsApp their child."
+                "Send a WhatsApp text message on the parent's behalf. Use only "
+                "when they want to message, text, or write to someone — not "
+                "when they want to call/phone/ring/speak to them (use "
+                "place_call for that, even if they mention WhatsApp). Their "
+                "child by default, or anyone else they name."
             ),
             "input_schema": {
                 "type": "object",
@@ -134,12 +192,68 @@ def build_tools(family: dict) -> list[dict]:
                     "text": {
                         "type": "string",
                         "description": "A short message body to send, written as the parent would say it.",
-                    }
+                    },
+                    "contact_name": CONTACT_NAME_PARAM,
                 },
                 "required": ["text"],
             },
         },
+        {
+            "name": "cast_media",
+            "description": (
+                "Cast a video to the TV. Use when the parent asks to watch, "
+                "play, or listen to something on the TV — a song, a video, "
+                "a show, an artist. Not for calls or messages."
+            ),
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "A short search query describing what to play, phrased the way you'd search YouTube for it.",
+                    },
+                },
+                "required": ["query"],
+            },
+        },
+        {
+            "name": "stop_cast",
+            "description": (
+                "Stop whatever is currently playing on the TV. Use when the "
+                "parent asks to stop, pause, or turn off what's casting."
+            ),
+            "input_schema": {"type": "object", "properties": {}, "required": []},
+        },
     ]
+
+
+def resolve_youtube_video(query: str) -> dict | None:
+    if not YOUTUBE_API_KEY:
+        return None
+    try:
+        response = requests.get(
+            YOUTUBE_SEARCH_URL,
+            params={
+                "key": YOUTUBE_API_KEY,
+                "q": query,
+                "part": "snippet",
+                "type": "video",
+                "maxResults": 1,
+            },
+            timeout=10,
+        )
+        if response.status_code >= 400:
+            return None
+        items = response.json().get("items", [])
+        if not items:
+            return None
+        item = items[0]
+        return {
+            "videoId": item["id"]["videoId"],
+            "title": item["snippet"]["title"],
+        }
+    except (requests.RequestException, KeyError):
+        return None
 
 
 def synthesize_speech(voice_id: str, text: str) -> bytes | None:
@@ -193,19 +307,50 @@ def create_interaction(req: InteractionRequest, request: Request) -> Interaction
     action = None
     if tool_use is not None:
         reply_text = reply_text or "Okay, doing that now."
-        params = {"phoneNumber": family["child_phone_number"]}
-        if tool_use.name == "send_whatsapp_message":
-            intent = "sendMessage"
-            params["text"] = tool_use.input.get("text", "")
+        if tool_use.name == "cast_media":
+            video = resolve_youtube_video(tool_use.input.get("query", ""))
+            if video is None:
+                reply_text = "Hmm, couldn't find that one to play — try asking a bit differently?"
+            else:
+                action = {
+                    "id": str(uuid.uuid4()),
+                    "familyId": req.family_id,
+                    "intent": "castMedia",
+                    "params": video,
+                    "status": "pending",
+                }
+        elif tool_use.name == "stop_cast":
+            action = {
+                "id": str(uuid.uuid4()),
+                "familyId": req.family_id,
+                "intent": "stopCast",
+                "params": {},
+                "status": "pending",
+            }
         else:
-            intent = "placeCall"
-        action = {
-            "id": str(uuid.uuid4()),
-            "familyId": req.family_id,
-            "intent": intent,
-            "params": params,
-            "status": "pending",
-        }
+            contact_name = tool_use.input.get("contact_name") or None
+            # A named contact is resolved on-device (its number never reaches
+            # this server); otherwise fall back to the child's saved number.
+            # Never emit a null value — the iOS side decodes params as
+            # [String: String].
+            if contact_name:
+                params = {"contactName": contact_name}
+            elif family.get("child_phone_number"):
+                params = {"phoneNumber": family["child_phone_number"]}
+            else:
+                params = {}
+            if tool_use.name == "send_whatsapp_message":
+                intent = "sendMessage"
+                params["text"] = tool_use.input.get("text", "")
+            else:
+                intent = "placeCall"
+            action = {
+                "id": str(uuid.uuid4()),
+                "familyId": req.family_id,
+                "intent": intent,
+                "params": params,
+                "status": "pending",
+            }
 
     history.append({"role": "assistant", "content": reply_text})
     save_state()

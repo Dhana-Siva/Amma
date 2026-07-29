@@ -65,7 +65,7 @@ private struct FamilySetupRequestBody: Encodable {
 final class APIClient {
     static let shared = APIClient()
 
-    private let baseURL = URL(string: "http://192.168.86.38:8000")!
+    private let baseURL = URL(string: "http://192.168.86.48:8000")!
 
     private init() {}
 

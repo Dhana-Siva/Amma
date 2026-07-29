@@ -2,21 +2,71 @@ import UIKit
 
 @MainActor
 enum CommandExecutor {
-    static func execute(_ command: Command) {
+    /// Executes the command, returning a user-facing message on failure
+    /// (e.g. contact not found) or nil on success.
+    @discardableResult
+    static func execute(_ command: Command) async -> String? {
         switch command.intent {
         case .placeCall:
-            guard let phoneNumber = command.params["phoneNumber"], !phoneNumber.isEmpty else { return }
-            open(URL(string: "tel://\(sanitize(phoneNumber))"))
+            guard let phoneNumber = await resolvePhoneNumber(command) else {
+                return "Couldn't find that contact to call."
+            }
+            let sanitized = sanitize(phoneNumber)
+            // WhatsApp has no documented URL scheme for starting a call (only
+            // for opening a chat), so this undocumented one is best-effort —
+            // fall back to a regular call if it's not available.
+            if let whatsAppCallURL = URL(string: "whatsapp://calluser/?phone=\(sanitized)"),
+               UIApplication.shared.canOpenURL(whatsAppCallURL) {
+                open(whatsAppCallURL)
+            } else {
+                open(URL(string: "tel://\(sanitized)"))
+            }
+            return nil
 
         case .sendMessage:
-            guard let phoneNumber = command.params["phoneNumber"], !phoneNumber.isEmpty else { return }
+            guard let phoneNumber = await resolvePhoneNumber(command) else {
+                return "Couldn't find that contact to message."
+            }
             let text = command.params["text"] ?? ""
             let encodedText = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
             open(URL(string: "whatsapp://send?phone=\(sanitize(phoneNumber))&text=\(encodedText)"))
+            return nil
 
         case .castMedia:
-            break
+            CastService.logDiagnostic("[AmmaCast] CommandExecutor received castMedia, params=\(command.params)")
+            guard let videoId = command.params["videoId"], !videoId.isEmpty else {
+                return "Couldn't find that to play."
+            }
+            do {
+                try CastService.shared.play(videoId: videoId)
+                return nil
+            } catch CastServiceError.notConnected {
+                return "No TV linked yet — go to Devices to link one."
+            } catch {
+                return "Couldn't cast that to the TV right now."
+            }
+
+        case .stopCast:
+            CastService.logDiagnostic("[AmmaCast] CommandExecutor received stopCast")
+            do {
+                try CastService.shared.stop()
+                return nil
+            } catch CastServiceError.notConnected {
+                return "Nothing's linked to the TV right now."
+            } catch {
+                return "Couldn't stop the TV right now."
+            }
         }
+    }
+
+    /// A named contact (looked up on-device) takes priority; otherwise falls
+    /// back to the default phone number the backend sent (usually the child's).
+    private static func resolvePhoneNumber(_ command: Command) async -> String? {
+        if let contactName = command.params["contactName"], !contactName.isEmpty {
+            return await ContactsService.shared.phoneNumber(forName: contactName)
+        }
+        guard let phoneNumber = command.params["phoneNumber"], !phoneNumber.isEmpty else { return nil }
+        return phoneNumber
     }
 
     private static func sanitize(_ phoneNumber: String) -> String {

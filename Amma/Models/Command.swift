@@ -2,6 +2,7 @@ import Foundation
 
 enum CommandIntent: String, Codable {
     case castMedia
+    case stopCast
     case placeCall
     case sendMessage
 }

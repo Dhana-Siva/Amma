@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		00B4D05C5A717B8A3F010866 /* ContactsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B875499F781321E04458DB95 /* ContactsService.swift */; };
 		00D7476F32826A2808AA6197 /* CommandExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D92FB1AD40C1BC7EB87E1A3 /* CommandExecutor.swift */; };
 		066B0BFF9A8862B1A1886184 /* TalkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE3A7B5EE60E41865F35561 /* TalkView.swift */; };
 		06C0E4AEFD01E0FC4DFE5F7D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 236C6766CF36828490B7D3BC /* Assets.xcassets */; };
@@ -21,8 +22,12 @@
 		964401713C38A590B877B749 /* BehaviorProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560DA8E2D418C45DBD89C94D /* BehaviorProfile.swift */; };
 		A5D508C78FF4F90E1AB2008C /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3FF6775D877A307C7423243 /* Device.swift */; };
 		B828AAEAEF4A5CFCC29140A3 /* AmmaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B91A6BAB06578E8F7A15FF /* AmmaApp.swift */; };
+		BE22299E42B3A63B82A06659 /* GoogleCast in Frameworks */ = {isa = PBXBuildFile; productRef = 03BD25EEA4A7CD925B7D5F8F /* GoogleCast */; };
+		C1E846AF409D9150595FB595 /* TutorialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A64D9A98A8CA635E291B46D /* TutorialView.swift */; };
 		CE5FDA88FE033A5D274A0DF0 /* AudioRecorderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 947E6B852239AD840E1D23BD /* AudioRecorderService.swift */; };
+		EA0A81373E56ADF575D6D68C /* ContactsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6EC2BCB9F7FCA02444AF492 /* ContactsListView.swift */; };
 		F077B2D9E15D70F29ECC48D2 /* DevicesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE4E56D0841DBD32A118A6B /* DevicesView.swift */; };
+		F3257D0D479C4D9DDE5D28D7 /* CastService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A714A97324680E628A4C53DB /* CastService.swift */; };
 		FBDA5C345E3BB791FA94C348 /* Family.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C312C156A60CE751B810B8 /* Family.swift */; };
 /* End PBXBuildFile section */
 
@@ -36,9 +41,13 @@
 		8945E38F255ACC953E8F07FF /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		93FC45E7919E84E3329A402B /* VoiceSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceSetupView.swift; sourceTree = "<group>"; };
 		947E6B852239AD840E1D23BD /* AudioRecorderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderService.swift; sourceTree = "<group>"; };
+		9A64D9A98A8CA635E291B46D /* TutorialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialView.swift; sourceTree = "<group>"; };
 		9D92FB1AD40C1BC7EB87E1A3 /* CommandExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandExecutor.swift; sourceTree = "<group>"; };
 		A17ED20D5AE5462FE605A246 /* FamilyContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyContext.swift; sourceTree = "<group>"; };
+		A714A97324680E628A4C53DB /* CastService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CastService.swift; sourceTree = "<group>"; };
 		ABE4E56D0841DBD32A118A6B /* DevicesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicesView.swift; sourceTree = "<group>"; };
+		B6EC2BCB9F7FCA02444AF492 /* ContactsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsListView.swift; sourceTree = "<group>"; };
+		B875499F781321E04458DB95 /* ContactsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsService.swift; sourceTree = "<group>"; };
 		C98334855666D63E01D8F658 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		CFE3A7B5EE60E41865F35561 /* TalkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalkView.swift; sourceTree = "<group>"; };
 		D5B91A6BAB06578E8F7A15FF /* AmmaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmmaApp.swift; sourceTree = "<group>"; };
@@ -48,6 +57,17 @@
 		F79ECB0E6ED32866F8EAB12D /* Command.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Command.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFrameworksBuildPhase section */
+		3A71106168A277D143316E31 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BE22299E42B3A63B82A06659 /* GoogleCast in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
 /* Begin PBXGroup section */
 		16E6FFE534F69EBE22A4C914 /* Services */ = {
 			isa = PBXGroup;
@@ -55,7 +75,9 @@
 				C98334855666D63E01D8F658 /* APIClient.swift */,
 				53BD30F99FA1F7757DED3606 /* AudioPlaybackService.swift */,
 				947E6B852239AD840E1D23BD /* AudioRecorderService.swift */,
+				A714A97324680E628A4C53DB /* CastService.swift */,
 				9D92FB1AD40C1BC7EB87E1A3 /* CommandExecutor.swift */,
+				B875499F781321E04458DB95 /* ContactsService.swift */,
 				A17ED20D5AE5462FE605A246 /* FamilyContext.swift */,
 			);
 			path = Services;
@@ -81,6 +103,7 @@
 			isa = PBXGroup;
 			children = (
 				8945E38F255ACC953E8F07FF /* OnboardingView.swift */,
+				9A64D9A98A8CA635E291B46D /* TutorialView.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -125,6 +148,7 @@
 		AAD583335415DC0B91C280DE /* Devices */ = {
 			isa = PBXGroup;
 			children = (
+				B6EC2BCB9F7FCA02444AF492 /* ContactsListView.swift */,
 				ABE4E56D0841DBD32A118A6B /* DevicesView.swift */,
 			);
 			path = Devices;
@@ -171,6 +195,7 @@
 			buildPhases = (
 				590611EE9A5351214E1F5B1D /* Sources */,
 				7DFAE1754B63E0986BB15C2C /* Resources */,
+				3A71106168A277D143316E31 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -178,6 +203,7 @@
 			);
 			name = Amma;
 			packageProductDependencies = (
+				03BD25EEA4A7CD925B7D5F8F /* GoogleCast */,
 			);
 			productName = Amma;
 			productReference = F0F53ACDF9E19FB89007EED5 /* Amma.app */;
@@ -207,6 +233,9 @@
 			);
 			mainGroup = 9E0EA9B0E689ED179292DDEF;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				739AF5BDC016C2026DA6B9B0 /* XCRemoteSwiftPackageReference "google-cast-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5F4ACEAA6A50D88D3308ABCC /* Products */;
 			projectDirPath = "";
@@ -238,15 +267,19 @@
 				401A06AE5BAC9BA452C2B223 /* AudioPlaybackService.swift in Sources */,
 				CE5FDA88FE033A5D274A0DF0 /* AudioRecorderService.swift in Sources */,
 				964401713C38A590B877B749 /* BehaviorProfile.swift in Sources */,
+				F3257D0D479C4D9DDE5D28D7 /* CastService.swift in Sources */,
 				2CB11F454645B739D7BBFBF9 /* Command.swift in Sources */,
 				00D7476F32826A2808AA6197 /* CommandExecutor.swift in Sources */,
 				8E628BC16C109546F2E4C52E /* ConsentRecord.swift in Sources */,
+				EA0A81373E56ADF575D6D68C /* ContactsListView.swift in Sources */,
+				00B4D05C5A717B8A3F010866 /* ContactsService.swift in Sources */,
 				A5D508C78FF4F90E1AB2008C /* Device.swift in Sources */,
 				F077B2D9E15D70F29ECC48D2 /* DevicesView.swift in Sources */,
 				FBDA5C345E3BB791FA94C348 /* Family.swift in Sources */,
 				32820243DCF976F30A370D58 /* FamilyContext.swift in Sources */,
 				40E2A4C857F5096A0B452D5A /* OnboardingView.swift in Sources */,
 				066B0BFF9A8862B1A1886184 /* TalkView.swift in Sources */,
+				C1E846AF409D9150595FB595 /* TutorialView.swift in Sources */,
 				0A15C2004882E3CF70BC71D5 /* VoiceSample.swift in Sources */,
 				3A0811110F68ACB3B6F2547F /* VoiceSetupView.swift in Sources */,
 			);
@@ -440,6 +473,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		739AF5BDC016C2026DA6B9B0 /* XCRemoteSwiftPackageReference "google-cast-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SRGSSR/google-cast-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.8.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		03BD25EEA4A7CD925B7D5F8F /* GoogleCast */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 739AF5BDC016C2026DA6B9B0 /* XCRemoteSwiftPackageReference "google-cast-sdk" */;
+			productName = GoogleCast;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 476D5026FC2F0812AD83C4C2 /* Project object */;
 }
