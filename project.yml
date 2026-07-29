@@ -37,6 +37,10 @@ targets:
           - telprompt
         NSAppTransportSecurity:
           NSAllowsArbitraryLoads: true
+        CFBundleURLTypes:
+          - CFBundleURLName: com.dhana.amma
+            CFBundleURLSchemes:
+              - amma
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.dhana.amma
