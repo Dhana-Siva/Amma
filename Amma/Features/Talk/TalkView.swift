@@ -112,6 +112,7 @@ struct TalkView: View {
                 await MainActor.run { phase = .sending }
                 await send(transcript: transcript)
             } catch {
+                print("[AmmaDebug] transcribeAudio failed: \(error)")
                 await MainActor.run {
                     statusMessage = "Couldn't transcribe that — check your connection and try again."
                     phase = .idle

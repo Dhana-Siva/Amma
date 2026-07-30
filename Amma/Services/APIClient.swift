@@ -46,6 +46,13 @@ private struct TranscribeResponse: Decodable {
     var transcript: String
 }
 
+struct APIError: Error, CustomStringConvertible {
+    var statusCode: Int
+    var body: String
+
+    var description: String { "HTTP \(statusCode): \(body)" }
+}
+
 private struct FamilySetupRequestBody: Encodable {
     var familyId: String
     var parentName: String
@@ -139,7 +146,10 @@ final class APIClient {
 
         request.httpBody = body
 
-        let (data, _) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await URLSession.shared.data(for: request)
+        if let httpResponse = response as? HTTPURLResponse, !(200...299).contains(httpResponse.statusCode) {
+            throw APIError(statusCode: httpResponse.statusCode, body: String(data: data, encoding: .utf8) ?? "")
+        }
         return try JSONDecoder().decode(TranscribeResponse.self, from: data).transcript
     }
 
