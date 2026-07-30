@@ -363,7 +363,13 @@ def create_interaction(req: InteractionRequest, request: Request) -> Interaction
     if audio_bytes:
         filename = f"{uuid.uuid4()}.mp3"
         (MEDIA_DIR / filename).write_bytes(audio_bytes)
-        reply_audio_url = f"{request.base_url}media/{filename}"
+        # Railway (and most PaaS hosts) terminate TLS at the edge and proxy
+        # to the container over plain HTTP, so request.url.scheme reports
+        # "http" even though the public URL is https — trust the proxy's
+        # X-Forwarded-Proto instead, so the reply URL doesn't get blocked by
+        # iOS's ATS when it's actually https externally.
+        scheme = request.headers.get("x-forwarded-proto", request.url.scheme)
+        reply_audio_url = f"{scheme}://{request.url.netloc}/media/{filename}"
 
     return InteractionReply(reply_text=reply_text, reply_audio_url=reply_audio_url, action=action)
 
