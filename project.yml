@@ -35,8 +35,6 @@ targets:
           - whatsapp
           - tel
           - telprompt
-        NSAppTransportSecurity:
-          NSAllowsArbitraryLoads: true
         CFBundleURLTypes:
           - CFBundleURLName: com.dhana.amma
             CFBundleURLSchemes:
