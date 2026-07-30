@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Amma Appa Arugil - AAA</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_welcome_title">Welcome to Amma</string>
+    <string name="onboarding_welcome_body">A simple way to stay close, even from far away.</string>
+    <string name="onboarding_parent_name">Your name</string>
+    <string name="onboarding_child_name">Child\'s name</string>
+    <string name="onboarding_child_phone">Child\'s phone number (optional)</string>
+    <string name="onboarding_language">Language</string>
+    <string name="onboarding_consent_title">Before we start</string>
+    <string name="onboarding_consent_body">%1$s will be asked to separately consent to their voice being recorded and used to reply to you. That consent can be withdrawn at any time.</string>
+    <string name="onboarding_continue">Continue</string>
+    <string name="onboarding_get_started">Get started</string>
+
+    <!-- Tutorial -->
+    <string name="tutorial_page1_title">Tap to talk</string>
+    <string name="tutorial_page1_body_en">Tap the mic button and talk to Amma, just like talking to %1$s.</string>
+    <string name="tutorial_page1_body_ta">மைக் பட்டனை தட்டி பேசுங்கள், %1$s கூட பேசுவது போல.</string>
+    <string name="tutorial_page2_title">Hear their voice</string>
+    <string name="tutorial_page2_body_en">Amma replies in %1$s\'s own voice.</string>
+    <string name="tutorial_page2_body_ta">%1$s குரலிலேயே அம்மா பதில் சொல்லும்.</string>
+    <string name="tutorial_page3_title">Ask for anything</string>
+    <string name="tutorial_page3_body_en">Ask Amma to call, message, or play something on the TV — it\'ll take care of it.</string>
+    <string name="tutorial_page3_body_ta">அழைக்கவோ, மெசேஜ் அனுப்பவோ, டிவியில் ஏதாவது போடவோ அம்மாவிடம் கேளுங்கள்.</string>
+    <string name="tutorial_next">Next</string>
+    <string name="tutorial_got_it">Got it</string>
+
+    <!-- Talk -->
+    <string name="talk_empty_state">Tap the mic and say hello</string>
+    <string name="talk_error_transcribe">Couldn\'t hear that — check your connection and try again.</string>
+    <string name="talk_error_send">Couldn\'t reach Amma — check your connection.</string>
+
+    <!-- Tabs -->
+    <string name="tab_talk">Talk</string>
+    <string name="tab_voice">Voice</string>
+    <string name="tab_devices">Devices</string>
+    <string name="coming_soon">Coming soon</string>
+</resources>
