@@ -157,7 +157,13 @@ def system_prompt(parent_name: str | None, child_name: str | None, language: str
 
 CONTACT_NAME_PARAM = {
     "type": "string",
-    "description": "Name of the specific person to reach, if the parent named someone. Omit to default to the child.",
+    "description": (
+        "Name of the specific person to reach, if the parent named someone. "
+        "Omit to default to the child. Always give this in Latin/English "
+        "script and spelling (e.g. 'Geetha', not 'கீதா'), even if you're "
+        "replying in Tamil — phone contact lists are saved in Latin script, "
+        "and the app matches this name against them literally."
+    ),
 }
 
 
