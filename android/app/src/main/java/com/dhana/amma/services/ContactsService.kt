@@ -3,6 +3,7 @@ package com.dhana.amma.services
 import android.content.Context
 import android.content.pm.PackageManager
 import android.provider.ContactsContract
+import android.util.Log
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -18,12 +19,19 @@ data class ContactSummary(
 
 class ContactsService(private val context: Context) {
 
+    private companion object {
+        const val TAG = "AmmaContacts"
+    }
+
     private fun hasPermission(): Boolean =
         ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_CONTACTS) ==
             PackageManager.PERMISSION_GRANTED
 
     suspend fun allContacts(): List<ContactSummary> = withContext(Dispatchers.IO) {
-        if (!hasPermission()) return@withContext emptyList()
+        if (!hasPermission()) {
+            Log.d(TAG, "allContacts: READ_CONTACTS not granted, returning empty")
+            return@withContext emptyList()
+        }
 
         val byName = LinkedHashMap<String, MutableList<String>>()
         val cursor = context.contentResolver.query(
@@ -36,6 +44,7 @@ class ContactsService(private val context: Context) {
             null,
             "${ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME} ASC",
         )
+        Log.d(TAG, "allContacts: query returned cursor=${cursor != null}, count=${cursor?.count}")
         cursor?.use {
             val nameIdx = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
             val numberIdx = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
@@ -45,13 +54,16 @@ class ContactsService(private val context: Context) {
                 byName.getOrPut(name) { mutableListOf() }.add(number)
             }
         }
-        byName.entries
+        val result = byName.entries
             .sortedBy { it.key.lowercase() }
             .map { (name, numbers) -> ContactSummary(id = UUID.randomUUID(), name = name, phoneNumbers = numbers) }
+        Log.d(TAG, "allContacts: resolved ${result.size} distinct names: ${result.take(10).map { it.name }}")
+        result
     }
 
     suspend fun phoneNumber(name: String): String? = withContext(Dispatchers.IO) {
         val contacts = allContacts()
+        Log.d(TAG, "phoneNumber: looking up '$name' among ${contacts.size} contacts")
         if (contacts.isEmpty()) return@withContext null
 
         val target = name.trim().lowercase()
@@ -60,7 +72,10 @@ class ContactsService(private val context: Context) {
             val candidate = contact.name.trim().lowercase()
             candidate == target || candidate.contains(target) || target.contains(candidate)
         }
-        if (exact != null) return@withContext exact.phoneNumbers.firstOrNull()
+        if (exact != null) {
+            Log.d(TAG, "phoneNumber: exact match '${exact.name}'")
+            return@withContext exact.phoneNumbers.firstOrNull()
+        }
 
         val tolerance = max(1, target.length / 3)
         var best: ContactSummary? = null
@@ -72,6 +87,7 @@ class ContactsService(private val context: Context) {
                 best = contact
             }
         }
+        Log.d(TAG, "phoneNumber: best fuzzy match '${best?.name}' distance=$bestDistance tolerance=$tolerance")
         if (best != null && bestDistance <= tolerance) best.phoneNumbers.firstOrNull() else null
     }
 

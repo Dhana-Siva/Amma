@@ -1,8 +1,10 @@
 package com.dhana.amma.ui.talk
 
 import android.Manifest
+import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,10 +49,15 @@ fun TalkScreen() {
     val log by viewModel.log.collectAsState()
     val statusMessage by viewModel.statusMessage.collectAsState()
 
+    // Bundled into one prompt on first mic tap rather than asked separately
+    // per-feature — READ_CONTACTS/CALL_PHONE degrade gracefully if denied
+    // (contact-by-name lookup just fails gracefully; calls fall back to
+    // opening the dialer instead of auto-dialing), so only RECORD_AUDIO's
+    // result gates whether we actually proceed with recording.
     val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (granted) viewModel.onMicTap()
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { results ->
+        if (results[Manifest.permission.RECORD_AUDIO] == true) viewModel.onMicTap()
     }
 
     Scaffold { padding ->
@@ -96,13 +103,19 @@ fun TalkScreen() {
                     else -> {
                         Button(
                             onClick = {
-                                val hasPermission = androidx.core.content.ContextCompat.checkSelfPermission(
+                                val hasPermission = ContextCompat.checkSelfPermission(
                                     context, Manifest.permission.RECORD_AUDIO
-                                ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                                ) == PackageManager.PERMISSION_GRANTED
                                 if (hasPermission) {
                                     viewModel.onMicTap()
                                 } else {
-                                    permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                                    permissionLauncher.launch(
+                                        arrayOf(
+                                            Manifest.permission.RECORD_AUDIO,
+                                            Manifest.permission.READ_CONTACTS,
+                                            Manifest.permission.CALL_PHONE,
+                                        )
+                                    )
                                 }
                             },
                             shape = CircleShape,

@@ -1,11 +1,17 @@
 package com.dhana.amma.services
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.util.Log
+import androidx.core.content.ContextCompat
 import com.dhana.amma.models.Command
 import com.dhana.amma.models.CommandIntent
 import java.net.URLEncoder
+
+private const val TAG = "AmmaCommandExecutor"
 
 /**
  * Executes an action the backend returned from /v1/interactions. Returns
@@ -24,11 +30,16 @@ object CommandExecutor {
     }
 
     private suspend fun resolvePhoneNumber(command: Command, contactsService: ContactsService): String? {
+        Log.d(TAG, "resolvePhoneNumber: params=${command.params}")
         val contactName = command.params["contactName"]
         if (!contactName.isNullOrBlank()) {
-            return contactsService.phoneNumber(contactName)
+            val resolved = contactsService.phoneNumber(contactName)
+            Log.d(TAG, "resolvePhoneNumber: contactName='$contactName' -> $resolved")
+            return resolved
         }
-        return command.params["phoneNumber"]?.takeIf { it.isNotBlank() }
+        val fallback = command.params["phoneNumber"]?.takeIf { it.isNotBlank() }
+        Log.d(TAG, "resolvePhoneNumber: no contactName, fallback phoneNumber=$fallback")
+        return fallback
     }
 
     private fun sanitize(number: String): String =
@@ -38,14 +49,18 @@ object CommandExecutor {
         val number = resolvePhoneNumber(command, contactsService)
             ?: return "Couldn't find that contact to call."
         val sanitized = sanitize(number)
-        val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$sanitized")).apply {
+
+        val canAutoDial = ContextCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) ==
+            PackageManager.PERMISSION_GRANTED
+        val action = if (canAutoDial) Intent.ACTION_CALL else Intent.ACTION_DIAL
+        val intent = Intent(action, Uri.parse("tel:$sanitized")).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         return try {
             context.startActivity(intent)
             null
         } catch (e: Exception) {
-            "Couldn't open the dialer."
+            "Couldn't place the call."
         }
     }
 
