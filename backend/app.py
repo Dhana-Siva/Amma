@@ -182,12 +182,16 @@ def system_prompt(parent_name: str | None, child_name: str | None, language: str
             "describing what they asked for. If something is already "
             "playing on the TV and they ask to stop, pause, or turn it "
             "off, use stop_cast."
-            f" None of the above changes what language you reply in — your "
-            "spoken reply text must still follow the language instruction "
-            "given earlier in this prompt, even on a turn where you're also "
-            "using a tool. The only exception is the contact_name value "
-            "itself, which is always Latin/English script regardless of "
-            "reply language."
+            " IMPORTANT: your spoken reply text is a completely separate "
+            "piece of output from any tool call, and must always follow "
+            "the language instruction given earlier in this prompt, on "
+            "every turn without exception — including when you call "
+            "send_whatsapp_message (which has two fields to fill in) or "
+            "place_call. The ONLY thing ever in Latin/English script "
+            "regardless of reply language is the contact_name parameter "
+            "value itself. That rule applies to contact_name alone — it "
+            "does not carry over to your reply text, and does not carry "
+            "over to the text field of send_whatsapp_message either."
         )
     return prompt
 
