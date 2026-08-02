@@ -431,6 +431,25 @@ async def upload_voice_sample(family_id: str = Form(...), audio: UploadFile = Fi
         raise HTTPException(status_code=502, detail=f"ElevenLabs voice creation failed: {response.text}")
 
     voice_id = response.json()["voice_id"]
+
+    # Delete the family's previous cloned voice now that the new one exists
+    # — otherwise every re-recording eats into ElevenLabs' fixed 10-voice
+    # custom-voice quota permanently. Confirmed live: repeated test
+    # re-uploads across sessions silently piled up until the account hit
+    # the cap and every future upload failed with a 502. Best-effort: if
+    # this fails, the new voice still works, it just leaves the old one
+    # behind rather than blocking the request.
+    old_voice_id = family.get("voice_id")
+    if old_voice_id and old_voice_id != voice_id:
+        try:
+            requests.delete(
+                f"{ELEVENLABS_BASE}/voices/{old_voice_id}",
+                headers={"xi-api-key": ELEVENLABS_API_KEY},
+                timeout=30,
+            )
+        except requests.RequestException:
+            pass
+
     family["voice_id"] = voice_id
     save_state()
     return {"voice_id": voice_id}
