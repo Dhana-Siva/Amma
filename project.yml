@@ -10,6 +10,16 @@ packages:
     url: https://github.com/SRGSSR/google-cast-sdk.git
     from: 4.8.4
 
+schemes:
+  Amma:
+    build:
+      targets:
+        Amma: all
+    run:
+      config: Debug
+    archive:
+      config: Release
+
 targets:
   Amma:
     type: application
