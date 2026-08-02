@@ -170,6 +170,12 @@ def system_prompt(parent_name: str | None, child_name: str | None, language: str
             "describing what they asked for. If something is already "
             "playing on the TV and they ask to stop, pause, or turn it "
             "off, use stop_cast."
+            f" None of the above changes what language you reply in — your "
+            "spoken reply text must still follow the language instruction "
+            "given earlier in this prompt, even on a turn where you're also "
+            "using a tool. The only exception is the contact_name value "
+            "itself, which is always Latin/English script regardless of "
+            "reply language."
         )
     return prompt
 
