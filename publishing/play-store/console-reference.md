@@ -54,18 +54,18 @@ what the app actually does:
 
 ## Restricted permissions justification
 
-Play Console will ask you to justify these two — copy/adapt as needed:
+Play Console will ask you to justify this one — copy/adapt as needed:
 
 **READ_CONTACTS**: "The app lets a user ask a voice assistant to call or
 message a specific person by name (e.g. 'call my son'). The app looks up
-that person's phone number in the device's own Contacts to place the
-call/message — phone numbers are never transmitted off the device."
+that person's phone number in the device's own Contacts to open a
+WhatsApp chat/call with them — phone numbers are never transmitted off
+the device."
 
-**CALL_PHONE**: "When the user asks the voice assistant to call a
-specific contact, the app places the call directly rather than just
-opening the dialer, since the target users are elderly/low
-phone-literacy and an extra manual step to confirm the call is a real
-usability barrier for them."
+(`CALL_PHONE` was removed — calling now opens the contact's WhatsApp
+chat directly rather than dialing, since WhatsApp calls are free
+internationally and Android's WhatsApp has no call-initiation intent to
+trigger automatically.)
 
 ## Things only you can do
 

@@ -113,7 +113,6 @@ fun TalkScreen() {
                                         arrayOf(
                                             Manifest.permission.RECORD_AUDIO,
                                             Manifest.permission.READ_CONTACTS,
-                                            Manifest.permission.CALL_PHONE,
                                         )
                                     )
                                 }

@@ -1,12 +1,9 @@
 package com.dhana.amma.services
 
-import android.Manifest
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.util.Log
-import androidx.core.content.ContextCompat
 import com.dhana.amma.models.Command
 import com.dhana.amma.models.CommandIntent
 import java.net.URLEncoder
@@ -48,19 +45,23 @@ object CommandExecutor {
     private suspend fun placeCall(command: Command, context: Context, contactsService: ContactsService): String? {
         val number = resolvePhoneNumber(command, contactsService)
             ?: return "Couldn't find that contact to call."
-        val sanitized = sanitize(number)
+        val sanitized = sanitize(number).removePrefix("+")
 
-        val canAutoDial = ContextCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) ==
-            PackageManager.PERMISSION_GRANTED
-        val action = if (canAutoDial) Intent.ACTION_CALL else Intent.ACTION_DIAL
-        val intent = Intent(action, Uri.parse("tel:$sanitized")).apply {
+        // Opens the contact's WhatsApp chat rather than dialing directly —
+        // Android's WhatsApp exposes no call-initiation intent at all, so
+        // this is the closest to a WhatsApp call we can trigger: one tap
+        // on the call icon there starts a free WhatsApp voice call, which
+        // matters for international calling (e.g. calling family in India)
+        // where a regular carrier call would cost money. wa.me is the same
+        // mechanism sendMessage already uses, just without prefilled text.
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/$sanitized")).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         return try {
             context.startActivity(intent)
             null
         } catch (e: Exception) {
-            "Couldn't place the call."
+            "Couldn't open WhatsApp."
         }
     }
 
