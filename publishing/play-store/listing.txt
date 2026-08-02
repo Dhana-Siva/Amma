@@ -1,0 +1,34 @@
+SHORT DESCRIPTION (max 80 characters)
+--------------------------------------
+A warm way to stay close to family, in their own voice.
+
+(79 characters)
+
+
+FULL DESCRIPTION
+-----------------
+Amma is a simple way to stay close to family, built for parents and
+grandparents who'd rather talk than type.
+
+Just tap the mic and talk, like you're calling your child. Amma listens,
+and replies in a warm, natural voice — even in your child's own cloned
+voice, if they choose to set that up.
+
+FEATURES
+
+• Tap and talk — no typing, no complicated menus
+• Replies in a familiar voice, not a robotic assistant
+• Ask Amma to call or message someone by name, and it's handled
+• Cast videos or music to your TV just by asking
+• Works in Tamil and English
+
+Amma is designed to be simple enough for anyone, especially those who
+find typing or navigating apps difficult. One button. Just talk.
+
+PRIVACY
+
+Voice cloning is entirely optional and requires explicit consent, which
+can be withdrawn at any time. Phone numbers never leave your device —
+only the app's ability to look them up locally is used to place calls or
+send messages. See our privacy policy for full details:
+https://dhana-siva.github.io/amma-cast-receiver/privacy.html
