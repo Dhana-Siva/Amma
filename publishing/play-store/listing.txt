@@ -2,7 +2,7 @@ SHORT DESCRIPTION (max 80 characters)
 --------------------------------------
 A warm way to stay close to family, in their own voice.
 
-(79 characters)
+(55 characters)
 
 
 FULL DESCRIPTION
