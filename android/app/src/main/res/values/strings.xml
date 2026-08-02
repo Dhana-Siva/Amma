@@ -37,4 +37,9 @@
     <string name="tab_voice">Voice</string>
     <string name="tab_devices">Devices</string>
     <string name="coming_soon">Coming soon</string>
+
+    <!-- Devices -->
+    <string name="devices_connected">Connected to %1$s</string>
+    <string name="devices_not_connected">No TV linked yet — tap below to find one</string>
+    <string name="devices_disconnect">Disconnect</string>
 </resources>

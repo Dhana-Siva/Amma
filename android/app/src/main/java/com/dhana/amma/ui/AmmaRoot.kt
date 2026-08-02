@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.dhana.amma.AmmaApplication
 import com.dhana.amma.R
+import com.dhana.amma.ui.devices.DevicesScreen
 import com.dhana.amma.ui.onboarding.OnboardingScreen
 import com.dhana.amma.ui.onboarding.TutorialScreen
 import com.dhana.amma.ui.talk.TalkScreen
@@ -107,6 +108,7 @@ private fun MainTabs(application: AmmaApplication) {
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             when (selectedTab) {
                 0 -> TalkScreen()
+                2 -> DevicesScreen()
                 else -> ComingSoon()
             }
         }

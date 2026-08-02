@@ -73,6 +73,12 @@ dependencies {
     implementation("androidx.media3:media3-exoplayer:1.3.1")
     implementation("androidx.media3:media3-common:1.3.1")
 
+    implementation("com.google.android.gms:play-services-cast-framework:21.4.0")
+    // MediaRouteButton (used for Cast device selection) requires an
+    // AppCompat/MaterialComponents theme to compute its colors correctly —
+    // without this, it crashes with "background can not be translucent".
+    implementation("com.google.android.material:material:1.12.0")
+
     testImplementation("junit:junit:4.13.2")
     testImplementation("io.mockk:mockk:1.13.11")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
