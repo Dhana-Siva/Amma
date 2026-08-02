@@ -97,6 +97,25 @@ class FamilySetupRequest(BaseModel):
     child_phone_number: str | None = None
 
 
+class VoiceSelectRequest(BaseModel):
+    family_id: str
+    voice_id: str
+
+
+# A small curated set of ElevenLabs premade voices offered as a default,
+# no-cloning-needed alternative to recording/uploading the child's actual
+# voice — picking one just points the family at an existing public voice,
+# no consent or ElevenLabs voice-creation call needed.
+VOICE_PRESETS = [
+    {"voice_id": "CwhRBWXzGAHq8TQ4Fs17", "name": "Roger", "description": "Laid-back, casual"},
+    {"voice_id": "onwK4e9ZLuTAKqWW03F9", "name": "Daniel", "description": "Steady, broadcaster"},
+    {"voice_id": "JBFqnCBsd6RMkjVDRZzb", "name": "George", "description": "Warm storyteller"},
+    {"voice_id": "EXAVITQu4vr4xnSDxMaL", "name": "Sarah", "description": "Mature, reassuring"},
+    {"voice_id": "cgSgspJ2msm6clMCkdW9", "name": "Jessica", "description": "Playful, bright"},
+    {"voice_id": "Xb7hH8MSUJpSbSDYk0k2", "name": "Alice", "description": "Clear, engaging"},
+]
+
+
 LANGUAGE_INSTRUCTIONS = {
     "ta": (
         "Reply in casual, everyday spoken Tamil (Chennai-style), written in Tamil "
@@ -411,6 +430,37 @@ def set_consent(req: ConsentRequest) -> dict:
     }
 
 
+PRESET_VOICE_IDS = {preset["voice_id"] for preset in VOICE_PRESETS}
+
+
+@app.get("/v1/voice-presets")
+def voice_presets() -> dict:
+    return {"presets": VOICE_PRESETS}
+
+
+@app.post("/v1/voice-select")
+def select_voice(req: VoiceSelectRequest) -> dict:
+    family = families.setdefault(req.family_id, {})
+
+    # Free up the old cloned voice's quota slot if switching away from one
+    # (never try to delete a preset — it isn't ours to delete, and doesn't
+    # count against the family's custom-voice usage anyway).
+    old_voice_id = family.get("voice_id")
+    if old_voice_id and old_voice_id != req.voice_id and old_voice_id not in PRESET_VOICE_IDS and ELEVENLABS_API_KEY:
+        try:
+            requests.delete(
+                f"{ELEVENLABS_BASE}/voices/{old_voice_id}",
+                headers={"xi-api-key": ELEVENLABS_API_KEY},
+                timeout=30,
+            )
+        except requests.RequestException:
+            pass
+
+    family["voice_id"] = req.voice_id
+    save_state()
+    return {"status": "ok"}
+
+
 @app.post("/v1/voice-samples")
 async def upload_voice_sample(family_id: str = Form(...), audio: UploadFile = File(...)) -> dict:
     family = families.setdefault(family_id, {})
@@ -440,7 +490,7 @@ async def upload_voice_sample(family_id: str = Form(...), audio: UploadFile = Fi
     # this fails, the new voice still works, it just leaves the old one
     # behind rather than blocking the request.
     old_voice_id = family.get("voice_id")
-    if old_voice_id and old_voice_id != voice_id:
+    if old_voice_id and old_voice_id != voice_id and old_voice_id not in PRESET_VOICE_IDS:
         try:
             requests.delete(
                 f"{ELEVENLABS_BASE}/voices/{old_voice_id}",
