@@ -31,7 +31,7 @@ class AmmaPreferences(context: Context) {
 
     // One of CallingApp's values below — which app placeCall opens.
     // Messaging always goes through WhatsApp regardless of this setting,
-    // since Duo/Meet has no messaging and this keeps that behavior simple.
+    // since Viber/Skype-only calling keeps that behavior simple.
     var callingApp: String
         get() = prefs.getString(KEY_CALLING_APP, CallingApp.WHATSAPP) ?: CallingApp.WHATSAPP
         set(value) = prefs.edit().putString(KEY_CALLING_APP, value).apply()
@@ -50,5 +50,5 @@ class AmmaPreferences(context: Context) {
 object CallingApp {
     const val WHATSAPP = "whatsapp"
     const val VIBER = "viber"
-    const val DUO = "duo"
+    const val SKYPE = "skype"
 }

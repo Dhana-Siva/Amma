@@ -129,9 +129,9 @@ private fun DevicesMainScreen(onViewContacts: () -> Unit) {
             callingApp = CallingApp.VIBER
             application.preferences.callingApp = CallingApp.VIBER
         }
-        LanguageOption("Google Meet", selected = callingApp == CallingApp.DUO) {
-            callingApp = CallingApp.DUO
-            application.preferences.callingApp = CallingApp.DUO
+        LanguageOption("Skype", selected = callingApp == CallingApp.SKYPE) {
+            callingApp = CallingApp.SKYPE
+            application.preferences.callingApp = CallingApp.SKYPE
         }
 
         Spacer(Modifier.height(24.dp))
