@@ -41,3 +41,21 @@ data class VoiceSampleResponse(
 data class TranscribeResponse(
     val transcript: String,
 )
+
+@Serializable
+data class VoicePreset(
+    @SerialName("voice_id") val voiceId: String,
+    val name: String,
+    val description: String,
+)
+
+@Serializable
+data class VoicePresetsResponse(
+    val presets: List<VoicePreset>,
+)
+
+@Serializable
+data class VoiceSelectRequestBody(
+    @SerialName("family_id") val familyId: String,
+    @SerialName("voice_id") val voiceId: String,
+)

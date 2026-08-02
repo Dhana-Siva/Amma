@@ -5,7 +5,10 @@ import com.dhana.amma.models.FamilySetupRequestBody
 import com.dhana.amma.models.InteractionReply
 import com.dhana.amma.models.InteractionRequestBody
 import com.dhana.amma.models.TranscribeResponse
+import com.dhana.amma.models.VoicePreset
+import com.dhana.amma.models.VoicePresetsResponse
 import com.dhana.amma.models.VoiceSampleResponse
+import com.dhana.amma.models.VoiceSelectRequestBody
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -15,6 +18,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
@@ -44,6 +48,12 @@ private interface AmmaApiService {
     @Multipart
     @POST("v1/transcribe")
     suspend fun transcribeAudio(@Part audio: MultipartBody.Part): Response<TranscribeResponse>
+
+    @GET("v1/voice-presets")
+    suspend fun voicePresets(): Response<VoicePresetsResponse>
+
+    @POST("v1/voice-select")
+    suspend fun selectVoice(@Body body: VoiceSelectRequestBody): Response<ResponseBody>
 }
 
 class AmmaApiClient(baseUrl: String = "https://amma-production.up.railway.app/") {
@@ -94,15 +104,32 @@ class AmmaApiClient(baseUrl: String = "https://amma-production.up.railway.app/")
         response.throwIfNotSuccessful()
     }
 
-    suspend fun uploadVoiceSample(familyId: UUID, audioFile: File): String {
+    suspend fun uploadVoiceSample(
+        familyId: UUID,
+        audioFile: File,
+        filename: String = "sample.m4a",
+        contentType: String = "audio/m4a",
+    ): String {
         val familyIdPart = MultipartBody.Part.createFormData("family_id", familyId.toString())
         val audioPart = MultipartBody.Part.createFormData(
             "audio",
-            "sample.m4a",
-            audioFile.asRequestBody("audio/m4a".toMediaType()),
+            filename,
+            audioFile.asRequestBody(contentType.toMediaType()),
         )
         val response = service.uploadVoiceSample(familyIdPart, audioPart)
         return response.bodyOrThrow().voiceId
+    }
+
+    suspend fun voicePresets(): List<VoicePreset> {
+        val response = service.voicePresets()
+        return response.bodyOrThrow().presets
+    }
+
+    suspend fun selectVoice(familyId: UUID, voiceId: String) {
+        val response = service.selectVoice(
+            VoiceSelectRequestBody(familyId = familyId.toString(), voiceId = voiceId)
+        )
+        response.throwIfNotSuccessful()
     }
 
     suspend fun transcribeAudio(audioFile: File): String {
