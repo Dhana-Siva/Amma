@@ -1,0 +1,82 @@
+APP NAME
+--------
+Amma Appa Arugil - AAA
+(already set as the app's display name; this is what shows on the App Store)
+
+
+SUBTITLE (max 30 characters)
+------------------------------
+Stay close, in their voice
+
+(26 characters)
+
+
+PROMOTIONAL TEXT (max 170 characters, editable anytime without a new review)
+-------------------------------------------------------------------------------
+Talk to Amma like you're calling your child — it replies in their own
+voice, and can call, message, or cast to your TV for you.
+
+(127 characters)
+
+
+DESCRIPTION (max 4000 characters)
+------------------------------------
+Amma is a simple way to stay close to family, built for parents and
+grandparents who'd rather talk than type.
+
+Just tap the mic and talk, like you're calling your child. Amma listens,
+and replies in a warm, natural voice — even in your child's own cloned
+voice, if they choose to set that up.
+
+FEATURES
+
+• Tap and talk — no typing, no complicated menus
+• Replies in a familiar voice, not a robotic assistant
+• Ask Amma to call or message someone by name, and it's handled
+• Cast videos or music to your TV just by asking
+• Works in Tamil and English
+
+Amma is designed to be simple enough for anyone, especially those who
+find typing or navigating apps difficult. One button. Just talk.
+
+PRIVACY
+
+Voice cloning is entirely optional and requires explicit consent, which
+can be withdrawn at any time. Phone numbers never leave your device —
+only the app's ability to look them up locally is used to place calls or
+send messages. See our privacy policy for full details.
+
+
+KEYWORDS (max 100 characters, comma-separated, no spaces after commas)
+---------------------------------------------------------------------------
+family,voice,elderly,parent,call,assistant,accessibility,senior,tamil,talk
+
+
+SUPPORT URL
+-----------
+https://dhana-siva.github.io/amma-cast-receiver/privacy.html
+(doubles as the support contact since it lists the email — a dedicated
+support page isn't set up; if App Review pushes back on this, a second
+simple page can be added quickly)
+
+
+MARKETING URL (optional)
+-------------------------
+(leave blank — not required)
+
+
+PRIVACY POLICY URL
+-------------------
+https://dhana-siva.github.io/amma-cast-receiver/privacy.html
+
+
+CATEGORY
+--------
+Primary: Lifestyle
+Secondary: Social Networking (optional)
+
+
+AGE RATING
+----------
+4+ — no objectionable content; answer "No" to all content questionnaire
+items (violence, mature themes, gambling, etc.)
