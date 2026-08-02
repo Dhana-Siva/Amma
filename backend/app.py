@@ -132,6 +132,18 @@ LANGUAGE_INSTRUCTIONS = {
     ),
 }
 
+# Fallback reply text used when the model's tool-use turn didn't include its
+# own spoken line, or when a cast_media search comes up empty — these are
+# hardcoded (not model output) so they need their own per-language variants.
+DOING_THAT_NOW_TEXT = {
+    "ta": "சரி பா, செய்றேன்! 😊",
+    "en": "Okay, doing that now.",
+}
+CAST_NOT_FOUND_TEXT = {
+    "ta": "அது கிடைக்கல பா — வேற மாதிரி சொல்லு? 🤔",
+    "en": "Hmm, couldn't find that one to play — try asking a bit differently?",
+}
+
 
 def system_prompt(parent_name: str | None, child_name: str | None, language: str | None, has_tools: bool) -> str:
     parent = parent_name or "your parent"
@@ -337,13 +349,14 @@ def create_interaction(req: InteractionRequest, request: Request) -> Interaction
         (block for block in response.content if block.type == "tool_use"), None
     )
 
+    lang = family.get("language") or "en"
     action = None
     if tool_use is not None:
-        reply_text = reply_text or "Okay, doing that now."
+        reply_text = reply_text or DOING_THAT_NOW_TEXT.get(lang, DOING_THAT_NOW_TEXT["en"])
         if tool_use.name == "cast_media":
             video = resolve_youtube_video(tool_use.input.get("query", ""))
             if video is None:
-                reply_text = "Hmm, couldn't find that one to play — try asking a bit differently?"
+                reply_text = CAST_NOT_FOUND_TEXT.get(lang, CAST_NOT_FOUND_TEXT["en"])
             else:
                 action = {
                     "id": str(uuid.uuid4()),
