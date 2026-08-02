@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.dhana.amma.AmmaApplication
 import com.dhana.amma.R
+import com.dhana.amma.services.CallingApp
 import kotlinx.coroutines.launch
 
 @Composable
@@ -41,6 +42,7 @@ fun OnboardingScreen(onComplete: () -> Unit) {
     var childName by remember { mutableStateOf("") }
     var childPhoneNumber by remember { mutableStateOf("") }
     var languageCode by remember { mutableStateOf("en") }
+    var callingApp by remember { mutableStateOf(CallingApp.WHATSAPP) }
 
     Column(
         modifier = Modifier
@@ -83,6 +85,15 @@ fun OnboardingScreen(onComplete: () -> Unit) {
                 }
             }
             2 -> {
+                Text(stringResource(R.string.onboarding_calling_app_title), style = MaterialTheme.typography.headlineMedium)
+                Spacer(Modifier.height(8.dp))
+                Text(stringResource(R.string.onboarding_calling_app_body), style = MaterialTheme.typography.bodyMedium)
+                Spacer(Modifier.height(16.dp))
+                CallingAppOption("WhatsApp", selected = callingApp == CallingApp.WHATSAPP) { callingApp = CallingApp.WHATSAPP }
+                CallingAppOption("Viber", selected = callingApp == CallingApp.VIBER) { callingApp = CallingApp.VIBER }
+                CallingAppOption("Google Meet", selected = callingApp == CallingApp.DUO) { callingApp = CallingApp.DUO }
+            }
+            3 -> {
                 val name = childName.ifBlank { "your child" }
                 Text(stringResource(R.string.onboarding_consent_title), style = MaterialTheme.typography.headlineMedium)
                 Spacer(Modifier.height(12.dp))
@@ -98,7 +109,7 @@ fun OnboardingScreen(onComplete: () -> Unit) {
         val canContinue = step != 1 || (parentName.isNotBlank() && childName.isNotBlank())
         Button(
             onClick = {
-                if (step < 2) {
+                if (step < 3) {
                     step += 1
                 } else {
                     application.preferences.apply {
@@ -106,6 +117,7 @@ fun OnboardingScreen(onComplete: () -> Unit) {
                         this.parentName = parentName
                         this.childName = childName
                         this.childPhoneNumber = childPhoneNumber.trim()
+                        this.callingApp = callingApp
                         this.onboardingComplete = true
                     }
                     scope.launch {
@@ -125,7 +137,7 @@ fun OnboardingScreen(onComplete: () -> Unit) {
             enabled = canContinue,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text(if (step < 2) stringResource(R.string.onboarding_continue) else stringResource(R.string.onboarding_get_started))
+            Text(if (step < 3) stringResource(R.string.onboarding_continue) else stringResource(R.string.onboarding_get_started))
         }
     }
 }
@@ -134,6 +146,19 @@ fun OnboardingScreen(onComplete: () -> Unit) {
 private fun LanguageOption(label: String, selected: Boolean, onSelect: () -> Unit) {
     Row(
         modifier = Modifier.selectable(selected = selected, onClick = onSelect),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        RadioButton(selected = selected, onClick = onSelect)
+        Text(label)
+    }
+}
+
+@Composable
+private fun CallingAppOption(label: String, selected: Boolean, onSelect: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .selectable(selected = selected, onClick = onSelect),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         RadioButton(selected = selected, onClick = onSelect)

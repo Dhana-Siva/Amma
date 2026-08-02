@@ -9,6 +9,8 @@
     <string name="onboarding_child_name">Child\'s name</string>
     <string name="onboarding_child_phone">Child\'s phone number (optional)</string>
     <string name="onboarding_language">Language</string>
+    <string name="onboarding_calling_app_title">How should Amma call people?</string>
+    <string name="onboarding_calling_app_body">Amma opens this app to place calls — pick whichever your family already uses. You can change this later in Devices.</string>
     <string name="onboarding_consent_title">Before we start</string>
     <string name="onboarding_consent_body">%1$s will be asked to separately consent to their voice being recorded and used to reply to you. That consent can be withdrawn at any time.</string>
     <string name="onboarding_continue">Continue</string>

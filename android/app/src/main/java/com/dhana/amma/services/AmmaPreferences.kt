@@ -29,6 +29,13 @@ class AmmaPreferences(context: Context) {
         get() = prefs.getString(KEY_CHILD_PHONE_NUMBER, "") ?: ""
         set(value) = prefs.edit().putString(KEY_CHILD_PHONE_NUMBER, value).apply()
 
+    // One of CallingApp's values below — which app placeCall opens.
+    // Messaging always goes through WhatsApp regardless of this setting,
+    // since Duo/Meet has no messaging and this keeps that behavior simple.
+    var callingApp: String
+        get() = prefs.getString(KEY_CALLING_APP, CallingApp.WHATSAPP) ?: CallingApp.WHATSAPP
+        set(value) = prefs.edit().putString(KEY_CALLING_APP, value).apply()
+
     private companion object {
         const val KEY_ONBOARDING_COMPLETE = "onboarding_complete"
         const val KEY_HAS_SEEN_TUTORIAL = "has_seen_tutorial"
@@ -36,5 +43,12 @@ class AmmaPreferences(context: Context) {
         const val KEY_PARENT_NAME = "parent_name"
         const val KEY_CHILD_NAME = "child_name"
         const val KEY_CHILD_PHONE_NUMBER = "child_phone_number"
+        const val KEY_CALLING_APP = "calling_app"
     }
+}
+
+object CallingApp {
+    const val WHATSAPP = "whatsapp"
+    const val VIBER = "viber"
+    const val DUO = "duo"
 }

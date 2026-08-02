@@ -42,6 +42,7 @@ import androidx.core.content.ContextCompat
 import androidx.mediarouter.app.MediaRouteButton
 import com.dhana.amma.AmmaApplication
 import com.dhana.amma.R
+import com.dhana.amma.services.CallingApp
 import com.google.android.gms.cast.framework.CastButtonFactory
 import kotlinx.coroutines.launch
 
@@ -67,6 +68,7 @@ private fun DevicesMainScreen(onViewContacts: () -> Unit) {
     val connectedDeviceName by castService.connectedDeviceName.collectAsState()
 
     var languageCode by remember { mutableStateOf(application.preferences.languageCode) }
+    var callingApp by remember { mutableStateOf(application.preferences.callingApp) }
 
     fun onLanguageSelected(code: String) {
         languageCode = code
@@ -111,6 +113,25 @@ private fun DevicesMainScreen(onViewContacts: () -> Unit) {
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             LanguageOption("தமிழ்", selected = languageCode == "ta") { onLanguageSelected("ta") }
             LanguageOption("English", selected = languageCode == "en") { onLanguageSelected("en") }
+        }
+
+        Spacer(Modifier.height(24.dp))
+        HorizontalDivider()
+        Spacer(Modifier.height(24.dp))
+
+        Text("Calling app", style = MaterialTheme.typography.labelLarge, modifier = Modifier.fillMaxWidth())
+        Spacer(Modifier.height(8.dp))
+        LanguageOption("WhatsApp", selected = callingApp == CallingApp.WHATSAPP) {
+            callingApp = CallingApp.WHATSAPP
+            application.preferences.callingApp = CallingApp.WHATSAPP
+        }
+        LanguageOption("Viber", selected = callingApp == CallingApp.VIBER) {
+            callingApp = CallingApp.VIBER
+            application.preferences.callingApp = CallingApp.VIBER
+        }
+        LanguageOption("Google Meet", selected = callingApp == CallingApp.DUO) {
+            callingApp = CallingApp.DUO
+            application.preferences.callingApp = CallingApp.DUO
         }
 
         Spacer(Modifier.height(24.dp))

@@ -17,9 +17,15 @@ private const val TAG = "AmmaCommandExecutor"
  */
 object CommandExecutor {
 
-    suspend fun execute(command: Command, context: Context, contactsService: ContactsService, castService: CastService): String? {
+    suspend fun execute(
+        command: Command,
+        context: Context,
+        contactsService: ContactsService,
+        castService: CastService,
+        preferences: AmmaPreferences,
+    ): String? {
         return when (command.intent) {
-            CommandIntent.PlaceCall -> placeCall(command, context, contactsService)
+            CommandIntent.PlaceCall -> placeCall(command, context, contactsService, preferences.callingApp)
             CommandIntent.SendMessage -> sendMessage(command, context, contactsService)
             CommandIntent.CastMedia -> castMedia(command, castService)
             CommandIntent.StopCast -> stopCast(castService)
@@ -42,26 +48,34 @@ object CommandExecutor {
     private fun sanitize(number: String): String =
         number.filterIndexed { index, c -> c.isDigit() || (c == '+' && index == 0) }
 
-    private suspend fun placeCall(command: Command, context: Context, contactsService: ContactsService): String? {
+    private suspend fun placeCall(
+        command: Command,
+        context: Context,
+        contactsService: ContactsService,
+        callingApp: String,
+    ): String? {
         val number = resolvePhoneNumber(command, contactsService)
             ?: return "Couldn't find that contact to call."
         val sanitized = sanitize(number).removePrefix("+")
 
-        // Opens the contact's WhatsApp chat rather than dialing directly —
-        // Android's WhatsApp exposes no call-initiation intent at all, so
-        // this is the closest to a WhatsApp call we can trigger: one tap
-        // on the call icon there starts a free WhatsApp voice call, which
-        // matters for international calling (e.g. calling family in India)
-        // where a regular carrier call would cost money. wa.me is the same
-        // mechanism sendMessage already uses, just without prefilled text.
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/$sanitized")).apply {
+        // None of these apps expose a call-initiation intent to third-party
+        // apps on Android — each opens the contact's chat/contact page in
+        // that app, one tap away from starting a free call, which matters
+        // for international calling (e.g. calling family in India) where a
+        // regular carrier call would cost money.
+        val (uri, appLabel) = when (callingApp) {
+            CallingApp.VIBER -> Uri.parse("viber://chat?number=%2B$sanitized") to "Viber"
+            CallingApp.DUO -> Uri.parse("https://duo.app.goo.gl/call?phone=%2B$sanitized") to "Google Meet"
+            else -> Uri.parse("https://wa.me/$sanitized") to "WhatsApp"
+        }
+        val intent = Intent(Intent.ACTION_VIEW, uri).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         return try {
             context.startActivity(intent)
             null
         } catch (e: Exception) {
-            "Couldn't open WhatsApp."
+            "Couldn't open $appLabel."
         }
     }
 

@@ -8,6 +8,7 @@ import com.dhana.amma.AmmaApplication
 import com.dhana.amma.models.InteractionChannel
 import com.dhana.amma.models.InteractionLog
 import com.dhana.amma.services.AmmaApiClient
+import com.dhana.amma.services.AmmaPreferences
 import com.dhana.amma.services.AudioPlaybackService
 import com.dhana.amma.services.AudioRecorderService
 import com.dhana.amma.services.CastService
@@ -28,6 +29,7 @@ class TalkViewModel(
     private val apiClient: AmmaApiClient,
     private val contactsService: ContactsService,
     private val castService: CastService,
+    private val preferences: AmmaPreferences,
     val recorder: AudioRecorderService,
     private val playback: AudioPlaybackService,
 ) : ViewModel() {
@@ -96,7 +98,7 @@ class TalkViewModel(
                 playback.play(audioUrl)
             }
             reply.action?.let { action ->
-                val error = CommandExecutor.execute(action, appContext, contactsService, castService)
+                val error = CommandExecutor.execute(action, appContext, contactsService, castService, preferences)
                 if (error != null) {
                     _statusMessage.value = error
                 }
@@ -116,6 +118,7 @@ class TalkViewModel(
                 apiClient = application.apiClient,
                 contactsService = application.contactsService,
                 castService = application.castService,
+                preferences = application.preferences,
                 recorder = AudioRecorderService(application.applicationContext),
                 playback = AudioPlaybackService(application.applicationContext),
             ) as T
