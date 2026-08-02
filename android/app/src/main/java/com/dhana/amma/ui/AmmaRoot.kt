@@ -32,6 +32,7 @@ import com.dhana.amma.ui.devices.DevicesScreen
 import com.dhana.amma.ui.onboarding.OnboardingScreen
 import com.dhana.amma.ui.onboarding.TutorialScreen
 import com.dhana.amma.ui.talk.TalkScreen
+import com.dhana.amma.ui.voice.VoiceSetupScreen
 
 private enum class MainTab { Talk, Voice, Devices }
 
@@ -108,6 +109,7 @@ private fun MainTabs(application: AmmaApplication) {
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             when (selectedTab) {
                 0 -> TalkScreen()
+                1 -> VoiceSetupScreen()
                 2 -> DevicesScreen()
                 else -> ComingSoon()
             }

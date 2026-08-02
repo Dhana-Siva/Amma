@@ -8,19 +8,30 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -32,15 +43,46 @@ import androidx.mediarouter.app.MediaRouteButton
 import com.dhana.amma.AmmaApplication
 import com.dhana.amma.R
 import com.google.android.gms.cast.framework.CastButtonFactory
+import kotlinx.coroutines.launch
 
 @Composable
 fun DevicesScreen() {
+    var showContacts by remember { mutableStateOf(false) }
+
+    if (showContacts) {
+        ContactsListScreen(onBack = { showContacts = false })
+    } else {
+        DevicesMainScreen(onViewContacts = { showContacts = true })
+    }
+}
+
+@Composable
+private fun DevicesMainScreen(onViewContacts: () -> Unit) {
     val context = LocalContext.current
     val application = context.applicationContext as AmmaApplication
     val castService = application.castService
+    val scope = rememberCoroutineScope()
 
     val isConnected by castService.isConnected.collectAsState()
     val connectedDeviceName by castService.connectedDeviceName.collectAsState()
+
+    var languageCode by remember { mutableStateOf(application.preferences.languageCode) }
+
+    fun onLanguageSelected(code: String) {
+        languageCode = code
+        application.preferences.languageCode = code
+        scope.launch {
+            runCatching {
+                application.apiClient.setupFamily(
+                    familyId = application.familyContext.familyId,
+                    parentName = application.preferences.parentName,
+                    childName = application.preferences.childName,
+                    language = code,
+                    childPhoneNumber = application.preferences.childPhoneNumber,
+                )
+            }
+        }
+    }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -60,10 +102,21 @@ fun DevicesScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        Text("Language", style = MaterialTheme.typography.labelLarge, modifier = Modifier.fillMaxWidth())
+        Spacer(Modifier.height(8.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            LanguageOption("தமிழ்", selected = languageCode == "ta") { onLanguageSelected("ta") }
+            LanguageOption("English", selected = languageCode == "en") { onLanguageSelected("en") }
+        }
+
+        Spacer(Modifier.height(24.dp))
+        HorizontalDivider()
+        Spacer(Modifier.height(24.dp))
+
         Text(
             text = if (isConnected) {
                 stringResource(R.string.devices_connected, connectedDeviceName ?: "TV")
@@ -96,5 +149,24 @@ fun DevicesScreen() {
                 Text(stringResource(R.string.devices_disconnect))
             }
         }
+
+        Spacer(Modifier.height(24.dp))
+        HorizontalDivider()
+        Spacer(Modifier.height(24.dp))
+
+        OutlinedButton(onClick = onViewContacts, modifier = Modifier.fillMaxWidth()) {
+            Text("View phone contacts")
+        }
+    }
+}
+
+@Composable
+private fun LanguageOption(label: String, selected: Boolean, onSelect: () -> Unit) {
+    Row(
+        modifier = Modifier.selectable(selected = selected, onClick = onSelect),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        RadioButton(selected = selected, onClick = onSelect)
+        Text(label)
     }
 }
