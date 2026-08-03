@@ -50,5 +50,5 @@ class AmmaPreferences(context: Context) {
 object CallingApp {
     const val WHATSAPP = "whatsapp"
     const val VIBER = "viber"
-    const val SKYPE = "skype"
+    const val TELEGRAM = "telegram"
 }

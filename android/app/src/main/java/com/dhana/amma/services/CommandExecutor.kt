@@ -56,19 +56,19 @@ object CommandExecutor {
     ): String? {
         val number = resolvePhoneNumber(command, contactsService)
             ?: return "Couldn't find that contact to call."
-        val sanitized = sanitize(number)
-        val withoutPlus = sanitized.removePrefix("+")
+        val withoutPlus = sanitize(number).removePrefix("+")
 
-        // WhatsApp/Viber expose no call-initiation intent to third-party
-        // apps on Android — both just open the contact's chat page, one
-        // tap away from starting a free call, which matters for
+        // None of these apps expose a call-initiation intent to third-party
+        // apps on Android — each opens the contact's chat/profile page,
+        // one tap away from starting a free call, which matters for
         // international calling (e.g. calling family in India) where a
-        // regular carrier call would cost money. Skype's URI scheme is the
-        // exception — skype:<number>?call actually starts the call
-        // directly, no extra tap needed.
+        // regular carrier call would cost money. Telegram's phone-number
+        // lookup only resolves if the contact has Telegram installed with
+        // that exact number and allows being found by phone number in
+        // their privacy settings.
         val (uri, appLabel) = when (callingApp) {
             CallingApp.VIBER -> Uri.parse("viber://chat?number=%2B$withoutPlus") to "Viber"
-            CallingApp.SKYPE -> Uri.parse("skype:$sanitized?call") to "Skype"
+            CallingApp.TELEGRAM -> Uri.parse("https://t.me/+$withoutPlus") to "Telegram"
             else -> Uri.parse("https://wa.me/$withoutPlus") to "WhatsApp"
         }
         val intent = Intent(Intent.ACTION_VIEW, uri).apply {

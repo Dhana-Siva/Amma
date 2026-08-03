@@ -91,7 +91,7 @@ fun OnboardingScreen(onComplete: () -> Unit) {
                 Spacer(Modifier.height(16.dp))
                 CallingAppOption("WhatsApp", selected = callingApp == CallingApp.WHATSAPP) { callingApp = CallingApp.WHATSAPP }
                 CallingAppOption("Viber", selected = callingApp == CallingApp.VIBER) { callingApp = CallingApp.VIBER }
-                CallingAppOption("Skype", selected = callingApp == CallingApp.SKYPE) { callingApp = CallingApp.SKYPE }
+                CallingAppOption("Telegram", selected = callingApp == CallingApp.TELEGRAM) { callingApp = CallingApp.TELEGRAM }
             }
             3 -> {
                 val name = childName.ifBlank { "your child" }
