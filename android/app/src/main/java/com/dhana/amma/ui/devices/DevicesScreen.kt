@@ -133,6 +133,10 @@ private fun DevicesMainScreen(onViewContacts: () -> Unit) {
             callingApp = CallingApp.TELEGRAM
             application.preferences.callingApp = CallingApp.TELEGRAM
         }
+        LanguageOption("Teams (experimental)", selected = callingApp == CallingApp.TEAMS) {
+            callingApp = CallingApp.TEAMS
+            application.preferences.callingApp = CallingApp.TEAMS
+        }
 
         Spacer(Modifier.height(24.dp))
         HorizontalDivider()

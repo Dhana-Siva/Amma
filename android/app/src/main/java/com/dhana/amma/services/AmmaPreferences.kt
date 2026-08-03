@@ -51,4 +51,10 @@ object CallingApp {
     const val WHATSAPP = "whatsapp"
     const val VIBER = "viber"
     const val TELEGRAM = "telegram"
+
+    // Experimental — added at the user's request to test whether Teams'
+    // documented l/call deep link (normally used with work emails in
+    // enterprise contexts) also works for a bare phone number on a
+    // personal Teams account. Not confirmed working; drop if it isn't.
+    const val TEAMS = "teams"
 }

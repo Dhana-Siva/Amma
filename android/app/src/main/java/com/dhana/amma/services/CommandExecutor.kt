@@ -69,6 +69,7 @@ object CommandExecutor {
         val (uri, appLabel) = when (callingApp) {
             CallingApp.VIBER -> Uri.parse("viber://chat?number=%2B$withoutPlus") to "Viber"
             CallingApp.TELEGRAM -> Uri.parse("https://t.me/+$withoutPlus") to "Telegram"
+            CallingApp.TEAMS -> Uri.parse("https://teams.microsoft.com/l/call/0/0?users=%2B$withoutPlus") to "Teams"
             else -> Uri.parse("https://wa.me/$withoutPlus") to "WhatsApp"
         }
         val intent = Intent(Intent.ACTION_VIEW, uri).apply {
