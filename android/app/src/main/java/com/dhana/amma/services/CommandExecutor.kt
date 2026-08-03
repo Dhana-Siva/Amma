@@ -77,6 +77,7 @@ object CommandExecutor {
         }
         return try {
             context.startActivity(intent)
+            NotificationHelper.showReturnToAmma(context, appLabel)
             null
         } catch (e: Exception) {
             "Couldn't open $appLabel."
@@ -95,6 +96,7 @@ object CommandExecutor {
         }
         return try {
             context.startActivity(intent)
+            NotificationHelper.showReturnToAmma(context, "WhatsApp")
             null
         } catch (e: Exception) {
             "Couldn't open WhatsApp."

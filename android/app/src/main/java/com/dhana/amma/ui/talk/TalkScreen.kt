@@ -2,6 +2,7 @@ package com.dhana.amma.ui.talk
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -109,12 +110,14 @@ fun TalkScreen() {
                                 if (hasPermission) {
                                     viewModel.onMicTap()
                                 } else {
-                                    permissionLauncher.launch(
-                                        arrayOf(
-                                            Manifest.permission.RECORD_AUDIO,
-                                            Manifest.permission.READ_CONTACTS,
-                                        )
+                                    val permissions = mutableListOf(
+                                        Manifest.permission.RECORD_AUDIO,
+                                        Manifest.permission.READ_CONTACTS,
                                     )
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                        permissions.add(Manifest.permission.POST_NOTIFICATIONS)
+                                    }
+                                    permissionLauncher.launch(permissions.toTypedArray())
                                 }
                             },
                             shape = CircleShape,

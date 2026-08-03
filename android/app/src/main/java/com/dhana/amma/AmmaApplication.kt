@@ -6,6 +6,7 @@ import com.dhana.amma.services.AmmaPreferences
 import com.dhana.amma.services.CastService
 import com.dhana.amma.services.ContactsService
 import com.dhana.amma.services.FamilyContext
+import com.dhana.amma.services.NotificationHelper
 
 class AmmaApplication : Application() {
     lateinit var familyContext: FamilyContext
@@ -27,5 +28,6 @@ class AmmaApplication : Application() {
         contactsService = ContactsService(this)
         castService = CastService()
         castService.configure(this)
+        NotificationHelper.createChannel(this)
     }
 }
