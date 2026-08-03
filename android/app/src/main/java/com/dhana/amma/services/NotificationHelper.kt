@@ -68,11 +68,22 @@ object NotificationHelper {
             .setContentTitle("Done in $appLabel?")
             .setContentText("Tap to come back to Amma")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setAutoCancel(true)
+            // Ongoing (not auto-dismissed, can't be swiped away) so it
+            // stays as a small icon in the status bar the whole time the
+            // parent is away in WhatsApp/Viber/Telegram, not just for the
+            // few seconds a normal heads-up banner shows before dropping
+            // into the shade. Cleared explicitly (see clearReturnToAmma)
+            // once they actually come back to Amma, not by autoCancel.
+            .setOngoing(true)
             .setContentIntent(pendingIntent)
             .build()
 
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
         manager?.notify(NOTIFICATION_ID, notification)
+    }
+
+    fun clearReturnToAmma(context: Context) {
+        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+        manager?.cancel(NOTIFICATION_ID)
     }
 }
