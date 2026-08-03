@@ -64,7 +64,7 @@ object NotificationHelper {
         )
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("Done in $appLabel?")
             .setContentText("Tap to come back to Amma")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
