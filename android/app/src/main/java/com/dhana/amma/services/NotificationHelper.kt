@@ -22,15 +22,24 @@ import com.dhana.amma.R
  * this notification is what makes that reminder literally true on Android.
  */
 object NotificationHelper {
-    private const val CHANNEL_ID = "return_to_amma"
+    // "_v2" because a channel's importance is locked at creation and can't
+    // be raised retroactively for anyone who already has the old channel
+    // from an earlier build — a new channel id is the only way to actually
+    // change it, the original DEFAULT-importance channel just becomes
+    // orphaned/unused, which is harmless.
+    private const val CHANNEL_ID = "return_to_amma_v2"
     private const val NOTIFICATION_ID = 1001
 
     fun createChannel(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+        // HIGH importance so this actually pops up as a heads-up banner —
+        // DEFAULT only lands quietly in the shade, easy to miss entirely
+        // for a parent who's actively over in WhatsApp/Viber/Telegram and
+        // has no reason to think to pull down their notification shade.
         val channel = NotificationChannel(
             CHANNEL_ID,
             "Return to Amma",
-            NotificationManager.IMPORTANCE_DEFAULT,
+            NotificationManager.IMPORTANCE_HIGH,
         )
         val manager = context.getSystemService(NotificationManager::class.java)
         manager?.createNotificationChannel(channel)
@@ -58,7 +67,7 @@ object NotificationHelper {
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle("Done in $appLabel?")
             .setContentText("Tap to come back to Amma")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
             .build()
