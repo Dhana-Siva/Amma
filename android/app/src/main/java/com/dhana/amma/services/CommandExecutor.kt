@@ -77,7 +77,7 @@ object CommandExecutor {
         }
         return try {
             context.startActivity(intent)
-            NotificationHelper.showReturnToAmma(context, appLabel)
+            OverlayHelper.showReturnToAmma(context, appLabel)
             null
         } catch (e: Exception) {
             "Couldn't open $appLabel."

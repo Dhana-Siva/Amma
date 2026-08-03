@@ -25,6 +25,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,14 +36,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.mediarouter.app.MediaRouteButton
 import com.dhana.amma.AmmaApplication
 import com.dhana.amma.R
 import com.dhana.amma.services.CallingApp
+import com.dhana.amma.services.OverlayHelper
 import com.google.android.gms.cast.framework.CastButtonFactory
 import kotlinx.coroutines.launch
 
@@ -69,6 +74,21 @@ private fun DevicesMainScreen(onViewContacts: () -> Unit) {
 
     var languageCode by remember { mutableStateOf(application.preferences.languageCode) }
     var callingApp by remember { mutableStateOf(application.preferences.callingApp) }
+    var hasOverlayPermission by remember { mutableStateOf(OverlayHelper.canDrawOverlays(context)) }
+
+    // Granting "display over other apps" happens in system settings, not
+    // an in-app dialog — re-check when the user comes back to this screen
+    // (e.g. returning from that settings page) rather than only once.
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                hasOverlayPermission = OverlayHelper.canDrawOverlays(context)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
 
     fun onLanguageSelected(code: String) {
         languageCode = code
@@ -136,6 +156,30 @@ private fun DevicesMainScreen(onViewContacts: () -> Unit) {
         LanguageOption("Teams (experimental)", selected = callingApp == CallingApp.TEAMS) {
             callingApp = CallingApp.TEAMS
             application.preferences.callingApp = CallingApp.TEAMS
+        }
+
+        Spacer(Modifier.height(24.dp))
+        HorizontalDivider()
+        Spacer(Modifier.height(24.dp))
+
+        Text("Return-to-Amma button", style = MaterialTheme.typography.labelLarge, modifier = Modifier.fillMaxWidth())
+        Spacer(Modifier.height(8.dp))
+        Text(
+            if (hasOverlayPermission) {
+                "On — a floating button appears to bring you back to Amma after a call or message."
+            } else {
+                "Off — you'll get a notification instead, which needs an extra swipe-and-tap gesture."
+            },
+            style = MaterialTheme.typography.bodyMedium,
+        )
+        if (!hasOverlayPermission) {
+            Spacer(Modifier.height(8.dp))
+            OutlinedButton(
+                onClick = { OverlayHelper.requestPermission(context) },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("Turn on floating button")
+            }
         }
 
         Spacer(Modifier.height(24.dp))
