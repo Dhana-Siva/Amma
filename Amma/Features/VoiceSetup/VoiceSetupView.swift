@@ -1,7 +1,10 @@
 import SwiftUI
 
 struct VoiceSetupView: View {
-    @State private var consentGiven = false
+    // Previously plain @State — reset to false on every relaunch even if
+    // the family had genuinely granted consent on the backend already.
+    // @AppStorage persists it, matching the same fix made on Android.
+    @AppStorage("voiceConsentGranted") private var consentGiven = false
     @State private var status = "Not started"
     @State private var isUploading = false
     @StateObject private var recorder = AudioRecorderService()

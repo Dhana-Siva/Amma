@@ -8,17 +8,21 @@ struct DevicesView: View {
     @AppStorage("childName") private var storedChildName = ""
     @AppStorage("childPhoneNumber") private var storedChildPhoneNumber = ""
 
-    @State private var phoneInput = ""
-    @State private var isSaving = false
-    @State private var status: String?
     @State private var languageStatus: String?
-    @FocusState private var isPhoneFieldFocused: Bool
 
     private var isConnected: Bool { !storedChildPhoneNumber.isEmpty }
 
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    NavigationLink {
+                        ProfileView()
+                    } label: {
+                        Label("Edit profile", systemImage: "person.crop.circle")
+                    }
+                }
+
                 Section("Language") {
                     Picker("Language", selection: $storedLanguage) {
                         Text("தமிழ்").tag("ta")
@@ -92,70 +96,16 @@ struct DevicesView: View {
                             .foregroundStyle(.secondary)
                     }
 
-                    TextField("Child's phone number", text: $phoneInput)
-                        .keyboardType(.phonePad)
-                        .textContentType(.telephoneNumber)
-                        .focused($isPhoneFieldFocused)
-                        .submitLabel(.done)
-                        .onSubmit { isPhoneFieldFocused = false }
-
-                    Button(isSaving ? "Saving..." : "Save number") {
-                        save()
-                    }
-                    .disabled(isSaving || phoneInput.trimmingCharacters(in: .whitespaces).isEmpty)
-
-                    if let status {
-                        Text(status)
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                    }
-
                     NavigationLink("View phone contacts") {
                         ContactsListView()
                     }
                 }
             }
             .navigationTitle("Devices")
-            .scrollDismissesKeyboard(.interactively)
-            .toolbar {
-                ToolbarItemGroup(placement: .keyboard) {
-                    Spacer()
-                    Button("Done") { isPhoneFieldFocused = false }
-                }
-            }
             .onAppear {
-                phoneInput = storedChildPhoneNumber
                 if !castService.isConnected { castService.startDiscovery() }
             }
             .onDisappear { castService.stopDiscovery() }
-        }
-    }
-
-    private func save() {
-        let trimmed = phoneInput.trimmingCharacters(in: .whitespaces)
-        guard !trimmed.isEmpty else { return }
-        isSaving = true
-        status = nil
-        Task {
-            do {
-                try await APIClient.shared.setupFamily(
-                    familyId: FamilyContext.shared.familyId,
-                    parentName: storedParentName,
-                    childName: storedChildName,
-                    language: storedLanguage,
-                    childPhoneNumber: trimmed
-                )
-                await MainActor.run {
-                    storedChildPhoneNumber = trimmed
-                    status = "Saved. Amma can now call or WhatsApp on your behalf."
-                    isSaving = false
-                }
-            } catch {
-                await MainActor.run {
-                    status = "Couldn't save — check your connection and try again."
-                    isSaving = false
-                }
-            }
         }
     }
 }

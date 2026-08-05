@@ -37,6 +37,7 @@ targets:
           UIApplicationSupportsMultipleScenes: false
         NSMicrophoneUsageDescription: "Amma listens when you tap to talk, so it can send your message."
         NSContactsUsageDescription: "Amma looks up phone numbers in your contacts when you ask it to call or message someone by name."
+        NSCameraUsageDescription: "Amma can take a photo of your child to show on their profile."
         NSLocalNetworkUsageDescription: "Amma looks for your TV and speakers on your home network so it can cast for you."
         NSBonjourServices:
           - _googlecast._tcp

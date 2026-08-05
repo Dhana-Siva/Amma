@@ -42,6 +42,8 @@
 		<string>_googlecast._tcp</string>
 		<string>_592BF965._googlecast._tcp</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Amma can take a photo of your child to show on their profile.</string>
 	<key>NSContactsUsageDescription</key>
 	<string>Amma looks up phone numbers in your contacts when you ask it to call or message someone by name.</string>
 	<key>NSLocalNetworkUsageDescription</key>

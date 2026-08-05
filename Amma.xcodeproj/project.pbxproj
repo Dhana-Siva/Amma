@@ -25,6 +25,7 @@
 		BE22299E42B3A63B82A06659 /* GoogleCast in Frameworks */ = {isa = PBXBuildFile; productRef = 03BD25EEA4A7CD925B7D5F8F /* GoogleCast */; };
 		C1E846AF409D9150595FB595 /* TutorialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A64D9A98A8CA635E291B46D /* TutorialView.swift */; };
 		CE5FDA88FE033A5D274A0DF0 /* AudioRecorderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 947E6B852239AD840E1D23BD /* AudioRecorderService.swift */; };
+		D2CADE9C18B2D778E5D4FE9E /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0996CEB183A0C006B535DBF /* ProfileView.swift */; };
 		EA0A81373E56ADF575D6D68C /* ContactsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6EC2BCB9F7FCA02444AF492 /* ContactsListView.swift */; };
 		F077B2D9E15D70F29ECC48D2 /* DevicesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE4E56D0841DBD32A118A6B /* DevicesView.swift */; };
 		F3257D0D479C4D9DDE5D28D7 /* CastService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A714A97324680E628A4C53DB /* CastService.swift */; };
@@ -43,6 +44,7 @@
 		947E6B852239AD840E1D23BD /* AudioRecorderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderService.swift; sourceTree = "<group>"; };
 		9A64D9A98A8CA635E291B46D /* TutorialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialView.swift; sourceTree = "<group>"; };
 		9D92FB1AD40C1BC7EB87E1A3 /* CommandExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandExecutor.swift; sourceTree = "<group>"; };
+		A0996CEB183A0C006B535DBF /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		A17ED20D5AE5462FE605A246 /* FamilyContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyContext.swift; sourceTree = "<group>"; };
 		A714A97324680E628A4C53DB /* CastService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CastService.swift; sourceTree = "<group>"; };
 		ABE4E56D0841DBD32A118A6B /* DevicesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicesView.swift; sourceTree = "<group>"; };
@@ -150,6 +152,7 @@
 			children = (
 				B6EC2BCB9F7FCA02444AF492 /* ContactsListView.swift */,
 				ABE4E56D0841DBD32A118A6B /* DevicesView.swift */,
+				A0996CEB183A0C006B535DBF /* ProfileView.swift */,
 			);
 			path = Devices;
 			sourceTree = "<group>";
@@ -278,6 +281,7 @@
 				FBDA5C345E3BB791FA94C348 /* Family.swift in Sources */,
 				32820243DCF976F30A370D58 /* FamilyContext.swift in Sources */,
 				40E2A4C857F5096A0B452D5A /* OnboardingView.swift in Sources */,
+				D2CADE9C18B2D778E5D4FE9E /* ProfileView.swift in Sources */,
 				066B0BFF9A8862B1A1886184 /* TalkView.swift in Sources */,
 				C1E846AF409D9150595FB595 /* TutorialView.swift in Sources */,
 				0A15C2004882E3CF70BC71D5 /* VoiceSample.swift in Sources */,

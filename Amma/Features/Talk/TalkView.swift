@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 private enum TalkPhase {
     case idle
@@ -8,6 +9,8 @@ private enum TalkPhase {
 }
 
 struct TalkView: View {
+    @AppStorage("childName") private var childName = ""
+    @AppStorage("childPhotoPath") private var childPhotoPath = ""
     @State private var log: [InteractionLog] = []
     @State private var phase: TalkPhase = .idle
     @State private var statusMessage: String?
@@ -65,7 +68,21 @@ struct TalkView: View {
                 talkButton
                     .padding(.bottom, 24)
             }
-            .navigationTitle("Amma")
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    HStack(spacing: 8) {
+                        if !childPhotoPath.isEmpty, let image = UIImage(contentsOfFile: childPhotoPath) {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 32, height: 32)
+                                .clipShape(Circle())
+                        }
+                        Text(childName.isEmpty ? "Amma" : childName)
+                            .font(.headline)
+                    }
+                }
+            }
         }
     }
 
