@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.dhana.amma.AmmaApplication
 import com.dhana.amma.models.VoicePreset
 import com.dhana.amma.services.AmmaApiClient
+import com.dhana.amma.services.AmmaPreferences
 import com.dhana.amma.services.AudioRecorderService
 import com.dhana.amma.services.FamilyContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,10 +20,11 @@ private data class PickedSample(val file: File, val filename: String, val conten
 class VoiceSetupViewModel(
     private val familyContext: FamilyContext,
     private val apiClient: AmmaApiClient,
+    private val preferences: AmmaPreferences,
     val recorder: AudioRecorderService,
 ) : ViewModel() {
 
-    private val _consentGiven = MutableStateFlow(false)
+    private val _consentGiven = MutableStateFlow(preferences.voiceConsentGranted)
     val consentGiven: StateFlow<Boolean> = _consentGiven.asStateFlow()
 
     private val _status = MutableStateFlow("Not started")
@@ -53,6 +55,7 @@ class VoiceSetupViewModel(
 
     fun onConsentChanged(granted: Boolean) {
         _consentGiven.value = granted
+        preferences.voiceConsentGranted = granted
         viewModelScope.launch {
             runCatching { apiClient.setVoiceConsent(familyContext.familyId, granted) }
         }
@@ -119,6 +122,7 @@ class VoiceSetupViewModel(
             return VoiceSetupViewModel(
                 familyContext = application.familyContext,
                 apiClient = application.apiClient,
+                preferences = application.preferences,
                 recorder = AudioRecorderService(application.applicationContext),
             ) as T
         }

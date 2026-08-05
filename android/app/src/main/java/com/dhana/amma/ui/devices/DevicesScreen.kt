@@ -51,19 +51,24 @@ import com.dhana.amma.services.OverlayHelper
 import com.google.android.gms.cast.framework.CastButtonFactory
 import kotlinx.coroutines.launch
 
+private enum class DevicesSubscreen { Main, Contacts, Profile }
+
 @Composable
 fun DevicesScreen() {
-    var showContacts by remember { mutableStateOf(false) }
+    var subscreen by remember { mutableStateOf(DevicesSubscreen.Main) }
 
-    if (showContacts) {
-        ContactsListScreen(onBack = { showContacts = false })
-    } else {
-        DevicesMainScreen(onViewContacts = { showContacts = true })
+    when (subscreen) {
+        DevicesSubscreen.Contacts -> ContactsListScreen(onBack = { subscreen = DevicesSubscreen.Main })
+        DevicesSubscreen.Profile -> ProfileScreen(onBack = { subscreen = DevicesSubscreen.Main })
+        DevicesSubscreen.Main -> DevicesMainScreen(
+            onViewContacts = { subscreen = DevicesSubscreen.Contacts },
+            onEditProfile = { subscreen = DevicesSubscreen.Profile },
+        )
     }
 }
 
 @Composable
-private fun DevicesMainScreen(onViewContacts: () -> Unit) {
+private fun DevicesMainScreen(onViewContacts: () -> Unit, onEditProfile: () -> Unit) {
     val context = LocalContext.current
     val application = context.applicationContext as AmmaApplication
     val castService = application.castService
@@ -128,6 +133,14 @@ private fun DevicesMainScreen(onViewContacts: () -> Unit) {
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        OutlinedButton(onClick = onEditProfile, modifier = Modifier.fillMaxWidth()) {
+            Text("Edit profile")
+        }
+
+        Spacer(Modifier.height(24.dp))
+        HorizontalDivider()
+        Spacer(Modifier.height(24.dp))
+
         Text("Language", style = MaterialTheme.typography.labelLarge, modifier = Modifier.fillMaxWidth())
         Spacer(Modifier.height(8.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
