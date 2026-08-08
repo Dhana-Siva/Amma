@@ -17,12 +17,14 @@ private struct InteractionRequestBody: Encodable {
     var transcript: String
     var channel: String
     var heartRate: Int?
+    var castLinked: Bool
 
     enum CodingKeys: String, CodingKey {
         case familyId = "family_id"
         case transcript
         case channel
         case heartRate = "heart_rate"
+        case castLinked = "cast_linked"
     }
 }
 
@@ -106,13 +108,13 @@ final class APIClient {
 
     private init() {}
 
-    func sendInteraction(familyId: UUID, transcript: String, channel: InteractionChannel, heartRate: Int? = nil) async throws -> InteractionReply {
+    func sendInteraction(familyId: UUID, transcript: String, channel: InteractionChannel, heartRate: Int? = nil, castLinked: Bool = false) async throws -> InteractionReply {
         let url = baseURL.appendingPathComponent("v1/interactions")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try JSONEncoder().encode(
-            InteractionRequestBody(familyId: familyId.uuidString, transcript: transcript, channel: channel.rawValue, heartRate: heartRate)
+            InteractionRequestBody(familyId: familyId.uuidString, transcript: transcript, channel: channel.rawValue, heartRate: heartRate, castLinked: castLinked)
         )
 
         let (data, _) = try await URLSession.shared.data(for: request)

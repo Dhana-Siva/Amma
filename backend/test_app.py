@@ -131,6 +131,33 @@ def test_interaction_omits_heart_rate_context_when_absent(monkeypatch, family_id
     assert "bpm" not in kwargs["system"]
 
 
+def test_interaction_instructs_against_casting_when_tv_not_linked(monkeypatch, family_id):
+    create_mock = mock_claude_reply(monkeypatch, [text_block("Hi!")])
+    mock_elevenlabs_tts(monkeypatch)
+
+    client.post(
+        "/v1/interactions",
+        json={"family_id": family_id, "transcript": "play a song", "cast_linked": False},
+    )
+
+    _, kwargs = create_mock.call_args
+    assert "isn't linked" in kwargs["system"]
+    assert "do NOT use cast_media" in kwargs["system"]
+
+
+def test_interaction_omits_cast_link_instruction_when_linked(monkeypatch, family_id):
+    create_mock = mock_claude_reply(monkeypatch, [text_block("Hi!")])
+    mock_elevenlabs_tts(monkeypatch)
+
+    client.post(
+        "/v1/interactions",
+        json={"family_id": family_id, "transcript": "play a song", "cast_linked": True},
+    )
+
+    _, kwargs = create_mock.call_args
+    assert "isn't linked" not in kwargs["system"]
+
+
 def test_interaction_offers_tools_even_without_phone_number(monkeypatch, family_id):
     create_mock = mock_claude_reply(monkeypatch, [text_block("Sure!")])
     mock_elevenlabs_tts(monkeypatch)

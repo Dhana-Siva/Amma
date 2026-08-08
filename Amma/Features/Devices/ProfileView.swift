@@ -24,8 +24,10 @@ struct ProfileView: View {
                 HStack {
                     Spacer()
                     PhotoPickerField(title: "You", placeholderIcon: "person.fill", photoPath: $parentPhotoPath)
+                        .id("photo-field-parent")
                     Spacer()
                     PhotoPickerField(title: "Child", placeholderIcon: "face.smiling", photoPath: $childPhotoPath)
+                        .id("photo-field-child")
                     Spacer()
                 }
                 .padding(.vertical, 8)
@@ -41,6 +43,7 @@ struct ProfileView: View {
 
             Section {
                 HomeScreenPictureField()
+                    .id("home-screen-picture-field")
             } header: {
                 Text("Home screen")
             } footer: {
@@ -136,6 +139,13 @@ private struct PhotoPickerField: View {
             .font(.caption)
         }
         .onChange(of: photosPickerItem) { _, newItem in
+            // Defensively force the camera sheet closed whenever the
+            // library picker produces a selection — seen on a real iOS
+            // 17.5 device (not reproducible on the Simulator, which has
+            // no camera at all) where choosing a library photo on one of
+            // several sibling photo-picker fields in this same Form could
+            // still leave — or flip — showCamera true elsewhere.
+            showCamera = false
             Task {
                 if let data = try? await newItem?.loadTransferable(type: Data.self),
                    let image = UIImage(data: data) {
@@ -237,6 +247,9 @@ private struct HomeScreenPictureField: View {
         }
         .frame(maxWidth: .infinity)
         .onChange(of: photosPickerItem) { _, newItem in
+            // See matching comment on PhotoPickerField's onChange above —
+            // same defensive reset, same real-device-only symptom.
+            showCamera = false
             Task {
                 if let data = try? await newItem?.loadTransferable(type: Data.self),
                    let image = UIImage(data: data) {

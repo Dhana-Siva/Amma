@@ -80,6 +80,13 @@ class InteractionRequest(BaseModel):
     # via HealthKit on-device — optional, and absent entirely for anyone
     # without a watch or who hasn't granted the permission.
     heart_rate: int | None = None
+    # Whether a Chromecast is currently linked, read from CastService on
+    # the iOS side. Lets the model explain — warmly, in character, in
+    # whatever language the reply is already in — that the TV needs to be
+    # linked first, instead of silently trying (and failing) to cast, or
+    # the app falling back to a hardcoded English message that breaks the
+    # illusion for a Tamil-speaking parent.
+    cast_linked: bool = False
 
 
 class InteractionReply(BaseModel):
@@ -155,6 +162,7 @@ def system_prompt(
     language: str | None,
     has_tools: bool,
     heart_rate: int | None = None,
+    cast_linked: bool = False,
 ) -> str:
     parent = parent_name or "your parent"
     child = child_name or "their child"
@@ -206,7 +214,21 @@ def system_prompt(
             "describing what they asked for. If something is already "
             "playing on the TV and they ask to stop, pause, or turn it "
             "off, use stop_cast."
-            " IMPORTANT: your spoken reply text is a completely separate "
+            + (
+                ""
+                if cast_linked
+                else (
+                    f" The TV isn't linked right now, so if {parent} asks to "
+                    "watch, play, or listen to something, do NOT use "
+                    "cast_media or stop_cast — instead reply warmly and "
+                    "in-character (in the same language as everything else "
+                    "in this reply) letting them know the TV needs to be "
+                    "linked first, with a casual nudge to check Setup, the "
+                    "same way you'd nudge them to tap the Amma link after "
+                    "a call or message."
+                )
+            )
+            + " IMPORTANT: your spoken reply text is a completely separate "
             "piece of output from any tool call, and must always follow "
             "the language instruction given earlier in this prompt, on "
             "every turn without exception — including when you call "
@@ -363,7 +385,7 @@ def create_interaction(req: InteractionRequest, request: Request) -> Interaction
     create_kwargs = dict(
         model=MODEL,
         max_tokens=300,
-        system=system_prompt(parent_name, child_name, family.get("language"), bool(tools), req.heart_rate),
+        system=system_prompt(parent_name, child_name, family.get("language"), bool(tools), req.heart_rate, req.cast_linked),
         messages=history[-MAX_HISTORY_TURNS:],
     )
     if tools:

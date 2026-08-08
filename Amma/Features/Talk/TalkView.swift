@@ -18,6 +18,7 @@ struct TalkView: View {
     @StateObject private var recorder = AudioRecorderService()
     @StateObject private var playback = AudioPlaybackService()
     @ObservedObject private var health = HealthService.shared
+    @ObservedObject private var castService = CastService.shared
     #if targetEnvironment(simulator)
     @State private var debugTranscript = ""
     #endif
@@ -43,18 +44,23 @@ struct TalkView: View {
                     .padding(.horizontal, 32)
                     Spacer()
                 } else {
-                    List(log) { entry in
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(entry.transcript)
-                                .font(.subheadline)
-                            if let reply = entry.responseText {
-                                Text(reply)
-                                    .font(.subheadline.bold())
-                                    .foregroundStyle(.blue)
+                    VStack(spacing: 8) {
+                        HomeScreenPictureView(size: 64)
+                            .padding(.top, 12)
+
+                        List(log) { entry in
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(entry.transcript)
+                                    .font(.subheadline)
+                                if let reply = entry.responseText {
+                                    Text(reply)
+                                        .font(.subheadline.bold())
+                                        .foregroundStyle(.blue)
+                                }
                             }
                         }
+                        .listStyle(.plain)
                     }
-                    .listStyle(.plain)
                 }
 
                 if let statusMessage {
@@ -190,7 +196,8 @@ struct TalkView: View {
                 familyId: familyId,
                 transcript: transcript,
                 channel: .voice,
-                heartRate: health.latestBPM
+                heartRate: health.latestBPM,
+                castLinked: castService.isConnected
             )
             await MainActor.run {
                 log.append(InteractionLog(

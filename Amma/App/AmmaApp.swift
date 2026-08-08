@@ -36,13 +36,13 @@ struct RootTabView: View {
     var body: some View {
         TabView {
             TalkView()
-                .tabItem { Label("Talk", systemImage: "waveform") }
+                .tabItem { Label("Talk 💬", systemImage: "waveform") }
 
             VoiceSetupView()
-                .tabItem { Label("Voice", systemImage: "waveform.badge.mic") }
+                .tabItem { Label("Voice 🎤", systemImage: "waveform.badge.mic") }
 
             DevicesView()
-                .tabItem { Label("Setup", systemImage: "tv") }
+                .tabItem { Label("Setup ⚙️", systemImage: "tv") }
         }
         // Voice conversations naturally have gaps where nothing is touching
         // the screen (listening to a reply, thinking of what to say next).

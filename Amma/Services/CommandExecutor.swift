@@ -41,7 +41,7 @@ enum CommandExecutor {
                 try CastService.shared.play(videoId: videoId)
                 return nil
             } catch CastServiceError.notConnected {
-                return "No TV linked yet — go to Devices to link one."
+                return "No TV linked yet — go to Setup to link one."
             } catch {
                 return "Couldn't cast that to the TV right now."
             }
