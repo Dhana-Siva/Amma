@@ -33,7 +33,6 @@ targets:
       path: Amma/Amma.entitlements
       properties:
         com.apple.developer.healthkit: true
-        com.apple.developer.healthkit.access: []
     info:
       path: Amma/Info.plist
       properties:
