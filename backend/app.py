@@ -76,6 +76,10 @@ class InteractionRequest(BaseModel):
     channel: str = "tap"
     parent_name: str | None = None
     child_name: str | None = None
+    # Latest heart rate reading from the parent's paired Apple Watch, read
+    # via HealthKit on-device — optional, and absent entirely for anyone
+    # without a watch or who hasn't granted the permission.
+    heart_rate: int | None = None
 
 
 class InteractionReply(BaseModel):
@@ -145,7 +149,13 @@ CAST_NOT_FOUND_TEXT = {
 }
 
 
-def system_prompt(parent_name: str | None, child_name: str | None, language: str | None, has_tools: bool) -> str:
+def system_prompt(
+    parent_name: str | None,
+    child_name: str | None,
+    language: str | None,
+    has_tools: bool,
+    heart_rate: int | None = None,
+) -> str:
     parent = parent_name or "your parent"
     child = child_name or "their child"
     language_instruction = LANGUAGE_INSTRUCTIONS.get(language or "en", LANGUAGE_INSTRUCTIONS["en"])
@@ -156,6 +166,16 @@ def system_prompt(parent_name: str | None, child_name: str | None, language: str
         "1-3 short sentences. Ask a small follow-up question when it feels "
         f"natural. Never mention that you are an AI. {language_instruction}"
     )
+    if heart_rate:
+        prompt += (
+            f" Background context, not something to always bring up: {parent}'s "
+            f"smartwatch currently reads a heart rate of {heart_rate} bpm. Only "
+            "weave that in if it's clearly elevated (roughly over 100) or "
+            "unusually low (roughly under 50) and it fits naturally as a brief, "
+            "caring, non-alarmist line — never medical advice, never every "
+            "single message. Otherwise say nothing about it and just reply "
+            "normally."
+        )
     if has_tools:
         prompt += (
             " Only use a tool when THIS message is itself a direct, "
@@ -343,7 +363,7 @@ def create_interaction(req: InteractionRequest, request: Request) -> Interaction
     create_kwargs = dict(
         model=MODEL,
         max_tokens=300,
-        system=system_prompt(parent_name, child_name, family.get("language"), bool(tools)),
+        system=system_prompt(parent_name, child_name, family.get("language"), bool(tools), req.heart_rate),
         messages=history[-MAX_HISTORY_TURNS:],
     )
     if tools:

@@ -42,7 +42,7 @@ struct RootTabView: View {
                 .tabItem { Label("Voice", systemImage: "waveform.badge.mic") }
 
             DevicesView()
-                .tabItem { Label("Devices", systemImage: "tv") }
+                .tabItem { Label("Setup", systemImage: "tv") }
         }
         // Voice conversations naturally have gaps where nothing is touching
         // the screen (listening to a reply, thinking of what to say next).

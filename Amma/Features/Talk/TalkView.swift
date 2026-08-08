@@ -9,6 +9,7 @@ private enum TalkPhase {
 }
 
 struct TalkView: View {
+    @AppStorage("parentName") private var parentName = ""
     @AppStorage("childName") private var childName = ""
     @AppStorage("childPhotoPath") private var childPhotoPath = ""
     @State private var log: [InteractionLog] = []
@@ -16,6 +17,7 @@ struct TalkView: View {
     @State private var statusMessage: String?
     @StateObject private var recorder = AudioRecorderService()
     @StateObject private var playback = AudioPlaybackService()
+    @ObservedObject private var health = HealthService.shared
     #if targetEnvironment(simulator)
     @State private var debugTranscript = ""
     #endif
@@ -27,9 +29,28 @@ struct TalkView: View {
             VStack {
                 if log.isEmpty {
                     Spacer()
-                    Text("Tap the button and say something.\nAmma will reply.")
-                        .multilineTextAlignment(.center)
-                        .foregroundStyle(.secondary)
+                    VStack(spacing: 16) {
+                        if !childPhotoPath.isEmpty, let image = UIImage(contentsOfFile: childPhotoPath) {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 132, height: 132)
+                                .clipShape(Circle())
+                        } else {
+                            Image(systemName: "face.smiling")
+                                .font(.system(size: 88))
+                                .foregroundStyle(.secondary.opacity(0.5))
+                        }
+
+                        Text(greeting)
+                            .font(.title3.bold())
+                            .multilineTextAlignment(.center)
+
+                        Text("Tap the button and say something.\nAmma will reply.")
+                            .multilineTextAlignment(.center)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.horizontal, 32)
                     Spacer()
                 } else {
                     List(log) { entry in
@@ -83,7 +104,31 @@ struct TalkView: View {
                     }
                 }
             }
+            .task {
+                // Best-effort — only refreshes if the parent already granted
+                // Health access from the Setup tab; never prompts from here.
+                if health.isAuthorized { await health.refresh() }
+            }
         }
+    }
+
+    // A time-of-day greeting with the parent's name and a matching emoji —
+    // shown on the empty Talk screen, i.e. exactly the moment the app
+    // opens (or a fresh tab, after backgrounding). Purely a warm first
+    // impression; carries no data, so no localization plumbing needed
+    // beyond the two greeting words themselves reading naturally in
+    // either language selected on the Setup tab.
+    private var greeting: String {
+        let hour = Calendar.current.component(.hour, from: Date())
+        let (text, emoji): (String, String)
+        switch hour {
+        case 5..<12: (text, emoji) = ("Good morning", "☀️")
+        case 12..<17: (text, emoji) = ("Good afternoon", "🌤️")
+        case 17..<21: (text, emoji) = ("Good evening", "🌆")
+        default: (text, emoji) = ("Hello", "🌙")
+        }
+        let name = parentName.trimmingCharacters(in: .whitespaces)
+        return name.isEmpty ? "\(text)! \(emoji)" : "\(text), \(name)! \(emoji)"
     }
 
     private var talkButton: some View {
@@ -154,7 +199,8 @@ struct TalkView: View {
             let reply = try await APIClient.shared.sendInteraction(
                 familyId: familyId,
                 transcript: transcript,
-                channel: .voice
+                channel: .voice,
+                heartRate: health.latestBPM
             )
             await MainActor.run {
                 log.append(InteractionLog(

@@ -46,6 +46,8 @@
 	<string>Amma can take a photo of your child to show on their profile.</string>
 	<key>NSContactsUsageDescription</key>
 	<string>Amma looks up phone numbers in your contacts when you ask it to call or message someone by name.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Amma can read your heart rate from your paired Apple Watch so it can gently check in when it seems elevated.</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Amma looks for your TV and speakers on your home network so it can cast for you.</string>
 	<key>NSMicrophoneUsageDescription</key>

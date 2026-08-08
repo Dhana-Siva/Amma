@@ -7,13 +7,12 @@ struct ProfileView: View {
     @AppStorage("parentName") private var parentName = ""
     @AppStorage("childName") private var childName = ""
     @AppStorage("childPhoneNumber") private var childPhoneNumber = ""
+    @AppStorage("parentPhotoPath") private var parentPhotoPath = ""
     @AppStorage("childPhotoPath") private var childPhotoPath = ""
     // Same persisted key VoiceSetupView reads/writes, so both screens
     // share one source of truth instead of drifting out of sync.
     @AppStorage("voiceConsentGranted") private var consentGiven = false
 
-    @State private var photosPickerItem: PhotosPickerItem?
-    @State private var showCamera = false
     @State private var isSaving = false
     @State private var status: String?
 
@@ -24,19 +23,9 @@ struct ProfileView: View {
             Section {
                 HStack {
                     Spacer()
-                    VStack(spacing: 12) {
-                        photoView
-                            .frame(width: 120, height: 120)
-                            .clipShape(Circle())
-
-                        HStack(spacing: 16) {
-                            PhotosPicker(selection: $photosPickerItem, matching: .images) {
-                                Text("Choose photo")
-                            }
-                            Button("Take photo") { showCamera = true }
-                        }
-                        .font(.subheadline)
-                    }
+                    PhotoPickerField(title: "You", placeholderIcon: "person.fill", photoPath: $parentPhotoPath)
+                    Spacer()
+                    PhotoPickerField(title: "Child", placeholderIcon: "face.smiling", photoPath: $childPhotoPath)
                     Spacer()
                 }
                 .padding(.vertical, 8)
@@ -71,54 +60,6 @@ struct ProfileView: View {
             }
         }
         .navigationTitle("Profile")
-        .onChange(of: photosPickerItem) { _, newItem in
-            Task {
-                if let data = try? await newItem?.loadTransferable(type: Data.self),
-                   let image = UIImage(data: data) {
-                    savePhoto(image)
-                }
-            }
-        }
-        .fullScreenCover(isPresented: $showCamera) {
-            CameraCapture { image in
-                showCamera = false
-                if let image { savePhoto(image) }
-            }
-            .ignoresSafeArea()
-        }
-    }
-
-    @ViewBuilder
-    private var photoView: some View {
-        if !childPhotoPath.isEmpty, let image = UIImage(contentsOfFile: childPhotoPath) {
-            Image(uiImage: image)
-                .resizable()
-                .scaledToFill()
-        } else {
-            ZStack {
-                Circle().fill(Color(.systemGray5))
-                Image(systemName: "person.fill")
-                    .font(.system(size: 48))
-                    .foregroundStyle(.secondary)
-            }
-        }
-    }
-
-    private func savePhoto(_ image: UIImage) {
-        guard let data = image.jpegData(compressionQuality: 0.9) else { return }
-        let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        // Clean up the previous photo file, if any, now that it's replaced.
-        if !childPhotoPath.isEmpty {
-            try? FileManager.default.removeItem(atPath: childPhotoPath)
-        }
-        let fileURL = documents.appendingPathComponent("child_photo_\(UUID().uuidString).jpg")
-        do {
-            try data.write(to: fileURL)
-            childPhotoPath = fileURL.path
-        } catch {
-            // Not critical enough to surface an error for — the photo
-            // just won't update, existing profile fields are unaffected.
-        }
     }
 
     private func save() {
@@ -143,6 +84,96 @@ struct ProfileView: View {
                     isSaving = false
                 }
             }
+        }
+    }
+}
+
+/// One photo slot (avatar + "Choose photo"/"Take photo" + persistence to
+/// Documents). Used twice in ProfileView — once for the parent's own
+/// picture, once for the child's — each bound to its own @AppStorage path
+/// so the two never clobber each other.
+private struct PhotoPickerField: View {
+    let title: String
+    let placeholderIcon: String
+    @Binding var photoPath: String
+
+    @State private var photosPickerItem: PhotosPickerItem?
+    @State private var showCamera = false
+
+    var body: some View {
+        VStack(spacing: 8) {
+            photoView
+                .frame(width: 96, height: 96)
+                .clipShape(Circle())
+
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            VStack(spacing: 4) {
+                PhotosPicker(selection: $photosPickerItem, matching: .images) {
+                    Text("Choose photo")
+                }
+                // No camera on the Simulator, and some devices/
+                // configurations (camera restricted by MDM or Screen
+                // Time, iPads without one) don't have it either —
+                // UIImagePickerController crashes with an uncaught
+                // NSInvalidArgumentException if you set .camera as the
+                // source type when it isn't available, so hide the
+                // button instead.
+                if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                    Button("Take photo") { showCamera = true }
+                }
+            }
+            .font(.caption)
+        }
+        .onChange(of: photosPickerItem) { _, newItem in
+            Task {
+                if let data = try? await newItem?.loadTransferable(type: Data.self),
+                   let image = UIImage(data: data) {
+                    savePhoto(image)
+                }
+            }
+        }
+        .fullScreenCover(isPresented: $showCamera) {
+            CameraCapture { image in
+                showCamera = false
+                if let image { savePhoto(image) }
+            }
+            .ignoresSafeArea()
+        }
+    }
+
+    @ViewBuilder
+    private var photoView: some View {
+        if !photoPath.isEmpty, let image = UIImage(contentsOfFile: photoPath) {
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFill()
+        } else {
+            ZStack {
+                Circle().fill(Color(.systemGray5))
+                Image(systemName: placeholderIcon)
+                    .font(.system(size: 36))
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private func savePhoto(_ image: UIImage) {
+        guard let data = image.jpegData(compressionQuality: 0.9) else { return }
+        let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        // Clean up the previous photo file, if any, now that it's replaced.
+        if !photoPath.isEmpty {
+            try? FileManager.default.removeItem(atPath: photoPath)
+        }
+        let fileURL = documents.appendingPathComponent("photo_\(UUID().uuidString).jpg")
+        do {
+            try data.write(to: fileURL)
+            photoPath = fileURL.path
+        } catch {
+            // Not critical enough to surface an error for — the photo
+            // just won't update, existing profile fields are unaffected.
         }
     }
 }

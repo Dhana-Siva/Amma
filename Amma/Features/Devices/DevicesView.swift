@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DevicesView: View {
     @ObservedObject private var castService = CastService.shared
+    @ObservedObject private var healthService = HealthService.shared
 
     @AppStorage("languageCode") private var storedLanguage = "en"
     @AppStorage("parentName") private var storedParentName = ""
@@ -82,6 +83,37 @@ struct DevicesView: View {
                     }
                 }
 
+                Section("Vitals") {
+                    if !healthService.isAvailable {
+                        Text("Not available on this device.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    } else if !healthService.isAuthorized {
+                        Button("Connect Apple Watch") {
+                            Task { await healthService.requestAuthorization() }
+                        }
+                        Text("Lets Amma see your heart rate from a paired Apple Watch, so it can gently check in when it seems elevated.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    } else {
+                        HStack {
+                            Label("Heart rate", systemImage: "heart.fill")
+                                .foregroundStyle(.red)
+                            Spacer()
+                            if let bpm = healthService.latestBPM {
+                                Text("\(bpm) bpm")
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                Text("No reading yet")
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        Button("Refresh") {
+                            Task { await healthService.refresh() }
+                        }
+                    }
+                }
+
                 Section("Calling") {
                     HStack {
                         Label("WhatsApp", systemImage: "message.fill")
@@ -101,7 +133,7 @@ struct DevicesView: View {
                     }
                 }
             }
-            .navigationTitle("Devices")
+            .navigationTitle("Setup")
             .onAppear {
                 if !castService.isConnected { castService.startDiscovery() }
             }

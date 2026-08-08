@@ -16,11 +16,13 @@ private struct InteractionRequestBody: Encodable {
     var familyId: String
     var transcript: String
     var channel: String
+    var heartRate: Int?
 
     enum CodingKeys: String, CodingKey {
         case familyId = "family_id"
         case transcript
         case channel
+        case heartRate = "heart_rate"
     }
 }
 
@@ -44,6 +46,34 @@ private struct VoiceSampleResponse: Decodable {
 
 private struct TranscribeResponse: Decodable {
     var transcript: String
+}
+
+struct VoicePreset: Decodable, Identifiable, Equatable {
+    var voiceId: String
+    var name: String
+    var description: String
+
+    var id: String { voiceId }
+
+    enum CodingKeys: String, CodingKey {
+        case voiceId = "voice_id"
+        case name
+        case description
+    }
+}
+
+private struct VoicePresetsResponse: Decodable {
+    var presets: [VoicePreset]
+}
+
+private struct VoiceSelectRequestBody: Encodable {
+    var familyId: String
+    var voiceId: String
+
+    enum CodingKeys: String, CodingKey {
+        case familyId = "family_id"
+        case voiceId = "voice_id"
+    }
 }
 
 struct APIError: Error, CustomStringConvertible {
@@ -76,13 +106,13 @@ final class APIClient {
 
     private init() {}
 
-    func sendInteraction(familyId: UUID, transcript: String, channel: InteractionChannel) async throws -> InteractionReply {
+    func sendInteraction(familyId: UUID, transcript: String, channel: InteractionChannel, heartRate: Int? = nil) async throws -> InteractionReply {
         let url = baseURL.appendingPathComponent("v1/interactions")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try JSONEncoder().encode(
-            InteractionRequestBody(familyId: familyId.uuidString, transcript: transcript, channel: channel.rawValue)
+            InteractionRequestBody(familyId: familyId.uuidString, transcript: transcript, channel: channel.rawValue, heartRate: heartRate)
         )
 
         let (data, _) = try await URLSession.shared.data(for: request)
@@ -151,6 +181,23 @@ final class APIClient {
             throw APIError(statusCode: httpResponse.statusCode, body: String(data: data, encoding: .utf8) ?? "")
         }
         return try JSONDecoder().decode(TranscribeResponse.self, from: data).transcript
+    }
+
+    func fetchVoicePresets() async throws -> [VoicePreset] {
+        let url = baseURL.appendingPathComponent("v1/voice-presets")
+        let (data, _) = try await URLSession.shared.data(from: url)
+        return try JSONDecoder().decode(VoicePresetsResponse.self, from: data).presets
+    }
+
+    func selectVoice(familyId: UUID, voiceId: String) async throws {
+        let url = baseURL.appendingPathComponent("v1/voice-select")
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(
+            VoiceSelectRequestBody(familyId: familyId.uuidString, voiceId: voiceId)
+        )
+        _ = try await URLSession.shared.data(for: request)
     }
 
     func setupFamily(familyId: UUID, parentName: String, childName: String, language: String, childPhoneNumber: String? = nil) async throws {
