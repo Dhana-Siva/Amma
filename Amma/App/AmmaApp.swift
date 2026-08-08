@@ -27,60 +27,22 @@ struct AmmaApp: App {
     }
 }
 
-/// Which tab opens by default when the app launches, chosen from Setup >
-/// Home page. Distinct from "last tab used" — switching tabs during a
-/// session doesn't change this, only the picker in Setup does.
-enum HomeTab: String, CaseIterable, Identifiable {
-    case talk, voice, setup
-
-    var id: String { rawValue }
-
-    var title: String {
-        switch self {
-        case .talk: "Talk"
-        case .voice: "Voice"
-        case .setup: "Setup"
-        }
-    }
-
-    var systemImage: String {
-        switch self {
-        case .talk: "waveform"
-        case .voice: "waveform.badge.mic"
-        case .setup: "tv"
-        }
-    }
-}
-
 struct RootTabView: View {
     @AppStorage("languageCode") private var storedLanguage = "en"
     @AppStorage("parentName") private var storedParentName = ""
     @AppStorage("childName") private var storedChildName = ""
     @AppStorage("childPhoneNumber") private var storedChildPhoneNumber = ""
 
-    // Only seeded from the Setup > Home page preference at launch — after
-    // that it's a normal tab selection, so tapping around the app doesn't
-    // silently change what "home" means.
-    @State private var selectedTab: HomeTab
-
-    init() {
-        let stored = UserDefaults.standard.string(forKey: "homeTab").flatMap(HomeTab.init) ?? .talk
-        _selectedTab = State(initialValue: stored)
-    }
-
     var body: some View {
-        TabView(selection: $selectedTab) {
+        TabView {
             TalkView()
-                .tabItem { Label(HomeTab.talk.title, systemImage: HomeTab.talk.systemImage) }
-                .tag(HomeTab.talk)
+                .tabItem { Label("Talk", systemImage: "waveform") }
 
             VoiceSetupView()
-                .tabItem { Label(HomeTab.voice.title, systemImage: HomeTab.voice.systemImage) }
-                .tag(HomeTab.voice)
+                .tabItem { Label("Voice", systemImage: "waveform.badge.mic") }
 
             DevicesView()
-                .tabItem { Label(HomeTab.setup.title, systemImage: HomeTab.setup.systemImage) }
-                .tag(HomeTab.setup)
+                .tabItem { Label("Setup", systemImage: "tv") }
         }
         // Voice conversations naturally have gaps where nothing is touching
         // the screen (listening to a reply, thinking of what to say next).

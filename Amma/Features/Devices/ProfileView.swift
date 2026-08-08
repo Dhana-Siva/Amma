@@ -40,6 +40,14 @@ struct ProfileView: View {
             }
 
             Section {
+                HomeScreenPictureField()
+            } header: {
+                Text("Home screen")
+            } footer: {
+                Text("Shown on the Talk screen when you open the app — pick one of the defaults or use your own photo.")
+            }
+
+            Section {
                 Toggle("I consent to my voice being used", isOn: $consentGiven)
                     .onChange(of: consentGiven) { _, newValue in
                         Task { try? await APIClient.shared.setVoiceConsent(familyId: familyId, granted: newValue) }
@@ -173,6 +181,99 @@ private struct PhotoPickerField: View {
             photoPath = fileURL.path
         } catch {
             // Not critical enough to surface an error for — the photo
+            // just won't update, existing profile fields are unaffected.
+        }
+    }
+}
+
+/// Editor for the Talk screen's welcome picture: a row of curated preset
+/// icons plus the same "Choose photo"/"Take photo" pattern as the You/
+/// Child fields above, except a custom photo and a preset are mutually
+/// exclusive here — picking one clears the other. HomeScreenPictureView
+/// (shared with TalkView) renders whichever is currently set.
+private struct HomeScreenPictureField: View {
+    @AppStorage("homeScreenPhotoPath") private var photoPath = ""
+    @AppStorage("homeScreenPreset") private var presetRaw = ""
+
+    @State private var photosPickerItem: PhotosPickerItem?
+    @State private var showCamera = false
+
+    var body: some View {
+        VStack(spacing: 16) {
+            HomeScreenPictureView(size: 100)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(HomeScreenPreset.allCases) { preset in
+                        Button {
+                            selectPreset(preset)
+                        } label: {
+                            ZStack {
+                                Circle().fill(preset.tint.opacity(0.15))
+                                Image(systemName: preset.systemImage)
+                                    .foregroundStyle(preset.tint)
+                            }
+                            .frame(width: 44, height: 44)
+                            .overlay(
+                                Circle().stroke(preset.tint, lineWidth: presetRaw == preset.rawValue ? 2.5 : 0)
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, 2)
+                .padding(.vertical, 2)
+            }
+
+            HStack(spacing: 16) {
+                PhotosPicker(selection: $photosPickerItem, matching: .images) {
+                    Text("Choose photo")
+                }
+                if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                    Button("Take photo") { showCamera = true }
+                }
+            }
+            .font(.subheadline)
+        }
+        .frame(maxWidth: .infinity)
+        .onChange(of: photosPickerItem) { _, newItem in
+            Task {
+                if let data = try? await newItem?.loadTransferable(type: Data.self),
+                   let image = UIImage(data: data) {
+                    saveCustomPhoto(image)
+                }
+            }
+        }
+        .fullScreenCover(isPresented: $showCamera) {
+            CameraCapture { image in
+                showCamera = false
+                if let image { saveCustomPhoto(image) }
+            }
+            .ignoresSafeArea()
+        }
+    }
+
+    private func selectPreset(_ preset: HomeScreenPreset) {
+        if !photoPath.isEmpty {
+            try? FileManager.default.removeItem(atPath: photoPath)
+            photoPath = ""
+        }
+        presetRaw = preset.rawValue
+    }
+
+    private func saveCustomPhoto(_ image: UIImage) {
+        guard let data = image.jpegData(compressionQuality: 0.9) else { return }
+        let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        if !photoPath.isEmpty {
+            try? FileManager.default.removeItem(atPath: photoPath)
+        }
+        let fileURL = documents.appendingPathComponent("home_screen_\(UUID().uuidString).jpg")
+        do {
+            try data.write(to: fileURL)
+            photoPath = fileURL.path
+            presetRaw = ""
+        } catch {
+            // Not critical enough to surface an error for — the picture
             // just won't update, existing profile fields are unaffected.
         }
     }

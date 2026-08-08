@@ -30,17 +30,7 @@ struct TalkView: View {
                 if log.isEmpty {
                     Spacer()
                     VStack(spacing: 16) {
-                        if !childPhotoPath.isEmpty, let image = UIImage(contentsOfFile: childPhotoPath) {
-                            Image(uiImage: image)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 132, height: 132)
-                                .clipShape(Circle())
-                        } else {
-                            Image(systemName: "face.smiling")
-                                .font(.system(size: 88))
-                                .foregroundStyle(.secondary.opacity(0.5))
-                        }
+                        HomeScreenPictureView(size: 132)
 
                         Text(greeting)
                             .font(.title3.bold())
