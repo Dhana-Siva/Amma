@@ -59,7 +59,7 @@
 		CFE3A7B5EE60E41865F35561 /* TalkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalkView.swift; sourceTree = "<group>"; };
 		D5B91A6BAB06578E8F7A15FF /* AmmaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmmaApp.swift; sourceTree = "<group>"; };
 		E62B058BA0F5CDACAF5FDD79 /* ConsentRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsentRecord.swift; sourceTree = "<group>"; };
-		F0F53ACDF9E19FB89007EED5 /* Amma.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Amma.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F0F53ACDF9E19FB89007EED5 /* Amma.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Amma.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F3FF6775D877A307C7423243 /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
 		F79ECB0E6ED32866F8EAB12D /* Command.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Command.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -239,7 +239,6 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					50B135409FE91CFBB4BE9C85 = {
-						DevelopmentTeam = H72SV43N57;
 						ProvisioningStyle = Automatic;
 					};
 				};

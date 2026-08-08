@@ -57,7 +57,6 @@ struct RootTabView: View {
     @AppStorage("parentName") private var storedParentName = ""
     @AppStorage("childName") private var storedChildName = ""
     @AppStorage("childPhoneNumber") private var storedChildPhoneNumber = ""
-    @AppStorage("homeTab") private var homeTabRaw = HomeTab.talk.rawValue
 
     // Only seeded from the Setup > Home page preference at launch — after
     // that it's a normal tab selection, so tapping around the app doesn't

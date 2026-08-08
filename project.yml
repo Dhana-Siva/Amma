@@ -33,6 +33,16 @@ targets:
       path: Amma/Amma.entitlements
       properties:
         com.apple.developer.healthkit: true
+        # Not something the app actually uses (it's for correcting workout/
+        # estimate algorithms) — picked up by accident via Xcode's
+        # "+ Capability" search when adding plain HealthKit. Harmless, but
+        # worth removing via Xcode's Signing & Capabilities UI (not by
+        # editing this file / regenerating) before App Store submission,
+        # since that's the only path that keeps the provisioning profile's
+        # capability registration in sync. Recorded here so a future
+        # `xcodegen generate` doesn't silently drop it and break the
+        # profile that's currently working on-device.
+        com.apple.developer.healthkit.recalibrate-estimates: true
     info:
       path: Amma/Info.plist
       properties:

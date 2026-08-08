@@ -5,7 +5,7 @@ struct DevicesView: View {
     @ObservedObject private var healthService = HealthService.shared
 
     @AppStorage("languageCode") private var storedLanguage = "en"
-    @AppStorage("homeTab") private var homeTabRaw = HomeTab.talk.rawValue
+    @AppStorage("homeTab") private var homeTab = HomeTab.talk
     @AppStorage("parentName") private var storedParentName = ""
     @AppStorage("childName") private var storedChildName = ""
     @AppStorage("childPhoneNumber") private var storedChildPhoneNumber = ""
@@ -26,10 +26,7 @@ struct DevicesView: View {
                 }
 
                 Section("Home page") {
-                    Picker("Home page", selection: Binding(
-                        get: { HomeTab(rawValue: homeTabRaw) ?? .talk },
-                        set: { homeTabRaw = $0.rawValue }
-                    )) {
+                    Picker("Home page", selection: $homeTab) {
                         ForEach(HomeTab.allCases) { tab in
                             Label(tab.title, systemImage: tab.systemImage).tag(tab)
                         }
