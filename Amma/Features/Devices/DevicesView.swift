@@ -5,6 +5,7 @@ struct DevicesView: View {
     @ObservedObject private var healthService = HealthService.shared
 
     @AppStorage("languageCode") private var storedLanguage = "en"
+    @AppStorage("homeTab") private var homeTabRaw = HomeTab.talk.rawValue
     @AppStorage("parentName") private var storedParentName = ""
     @AppStorage("childName") private var storedChildName = ""
     @AppStorage("childPhoneNumber") private var storedChildPhoneNumber = ""
@@ -22,6 +23,22 @@ struct DevicesView: View {
                     } label: {
                         Label("Edit profile", systemImage: "person.crop.circle")
                     }
+                }
+
+                Section("Home page") {
+                    Picker("Home page", selection: Binding(
+                        get: { HomeTab(rawValue: homeTabRaw) ?? .talk },
+                        set: { homeTabRaw = $0.rawValue }
+                    )) {
+                        ForEach(HomeTab.allCases) { tab in
+                            Label(tab.title, systemImage: tab.systemImage).tag(tab)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+
+                    Text("Which tab Amma opens to when you launch the app.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                 }
 
                 Section("Language") {
@@ -88,7 +105,7 @@ struct DevicesView: View {
                         Text("Not available on this device.")
                             .font(.footnote)
                             .foregroundStyle(.secondary)
-                    } else if !healthService.isAuthorized {
+                    } else if !healthService.hasRequestedAccess {
                         Button("Connect Apple Watch") {
                             Task { await healthService.requestAuthorization() }
                         }
@@ -138,6 +155,9 @@ struct DevicesView: View {
                 if !castService.isConnected { castService.startDiscovery() }
             }
             .onDisappear { castService.stopDiscovery() }
+            .task {
+                if healthService.hasRequestedAccess { await healthService.refresh() }
+            }
         }
     }
 }

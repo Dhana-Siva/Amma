@@ -107,7 +107,7 @@ struct TalkView: View {
             .task {
                 // Best-effort — only refreshes if the parent already granted
                 // Health access from the Setup tab; never prompts from here.
-                if health.isAuthorized { await health.refresh() }
+                if health.hasRequestedAccess { await health.refresh() }
             }
         }
     }

@@ -12,28 +12,37 @@ final class HealthService: ObservableObject {
 
     @Published private(set) var latestBPM: Int?
     @Published private(set) var lastUpdated: Date?
-    @Published private(set) var isAuthorized = false
+    // HealthKit deliberately never reports back whether *read* access was
+    // granted or denied — Apple's privacy design has
+    // `authorizationStatus(for:)` always read .notDetermined for read-only
+    // types even after the prompt, specifically so apps can't detect a
+    // "denied" read and pester the user about it. So this tracks only
+    // whether we've ever asked, not what the answer was; if it was denied,
+    // refresh() just silently keeps finding no samples, which reads fine
+    // as "no reading yet" rather than a broken permission state, and we
+    // don't re-show the "Connect Apple Watch" prompt every single launch.
+    @Published private(set) var hasRequestedAccess: Bool {
+        didSet { UserDefaults.standard.set(hasRequestedAccess, forKey: "healthAccessRequested") }
+    }
 
     private let store = HKHealthStore()
     private let heartRateType = HKQuantityType(.heartRate)
 
-    private init() {}
+    private init() {
+        hasRequestedAccess = UserDefaults.standard.bool(forKey: "healthAccessRequested")
+    }
 
     var isAvailable: Bool { HKHealthStore.isHealthDataAvailable() }
 
     func requestAuthorization() async {
         guard isAvailable else { return }
-        do {
-            try await store.requestAuthorization(toShare: [], read: [heartRateType])
-            isAuthorized = true
-            await refresh()
-        } catch {
-            isAuthorized = false
-        }
+        hasRequestedAccess = true
+        try? await store.requestAuthorization(toShare: [], read: [heartRateType])
+        await refresh()
     }
 
     func refresh() async {
-        guard isAvailable else { return }
+        guard isAvailable, hasRequestedAccess else { return }
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
         let sample = await withCheckedContinuation { (continuation: CheckedContinuation<HKQuantitySample?, Never>) in
             let query = HKSampleQuery(
