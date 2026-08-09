@@ -55,6 +55,9 @@ targets:
         NSCameraUsageDescription: "Amma can take a photo of your child to show on their profile."
         NSLocalNetworkUsageDescription: "Amma looks for your TV and speakers on your home network so it can cast for you."
         NSHealthShareUsageDescription: "Amma can read your heart rate from your paired Apple Watch so it can gently check in when it seems elevated."
+        # Amma never writes to Health — this is only required by Apple's
+        # validator because the HealthKit capability is enabled at all.
+        NSHealthUpdateUsageDescription: "Amma does not write anything to Health. This permission is requested only because HealthKit is enabled for reading your heart rate."
         NSBonjourServices:
           - _googlecast._tcp
           - _592BF965._googlecast._tcp
