@@ -22,6 +22,7 @@ struct TalkView: View {
     #if targetEnvironment(simulator)
     @State private var debugTranscript = ""
     #endif
+    @State private var welcomeAppeared = false
 
     private let familyId = FamilyContext.shared.familyId
 
@@ -30,16 +31,27 @@ struct TalkView: View {
             VStack {
                 if log.isEmpty {
                     Spacer()
-                    VStack(spacing: 16) {
-                        HomeScreenPictureView(size: 132)
+                    VStack(spacing: 20) {
+                        HomeScreenPictureView(size: 140)
+                            .overlay(Circle().stroke(Color(.systemBackground), lineWidth: 5))
+                            .shadow(color: .black.opacity(0.16), radius: 16, y: 8)
+                            .scaleEffect(welcomeAppeared ? 1 : 0.7)
+                            .opacity(welcomeAppeared ? 1 : 0)
 
                         Text(greeting)
-                            .font(.title3.bold())
+                            .font(.title2.bold())
                             .multilineTextAlignment(.center)
+                            .opacity(welcomeAppeared ? 1 : 0)
+                            .offset(y: welcomeAppeared ? 0 : 8)
 
                         Text("Tap the button and say something.\nAmma will reply.")
+                            .font(.subheadline)
                             .multilineTextAlignment(.center)
                             .foregroundStyle(.secondary)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 12)
+                            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+                            .opacity(welcomeAppeared ? 1 : 0)
                     }
                     .padding(.horizontal, 32)
                     Spacer()
@@ -85,6 +97,22 @@ struct TalkView: View {
                 talkButton
                     .padding(.bottom, 24)
             }
+            .background {
+                if log.isEmpty {
+                    LinearGradient(
+                        colors: [greetingAccentColor.opacity(0.22), Color(.systemBackground)],
+                        startPoint: .top,
+                        endPoint: .center
+                    )
+                    .ignoresSafeArea()
+                }
+            }
+            .onAppear {
+                guard log.isEmpty, !welcomeAppeared else { return }
+                withAnimation(.spring(response: 0.55, dampingFraction: 0.75).delay(0.05)) {
+                    welcomeAppeared = true
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     HStack(spacing: 8) {
@@ -125,6 +153,20 @@ struct TalkView: View {
         }
         let name = parentName.trimmingCharacters(in: .whitespaces)
         return name.isEmpty ? "\(text)! \(emoji)" : "\(text), \(name)! \(emoji)"
+    }
+
+    // A soft accent tint for the welcome screen's background gradient and
+    // picture shadow, shifting with the same time-of-day boundaries as the
+    // greeting so the whole screen reads as one cohesive moment rather
+    // than a plain white page with text on it.
+    private var greetingAccentColor: Color {
+        let hour = Calendar.current.component(.hour, from: Date())
+        switch hour {
+        case 5..<12: return .orange
+        case 12..<17: return .blue
+        case 17..<21: return .pink
+        default: return .indigo
+        }
     }
 
     private var talkButton: some View {
