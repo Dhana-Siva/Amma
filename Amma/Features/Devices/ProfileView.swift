@@ -2,6 +2,21 @@ import SwiftUI
 import PhotosUI
 import UIKit
 
+/// Which picture slot a photo-library or camera pick currently in
+/// progress is destined for. Centralizing this at ProfileView — rather
+/// than each field owning its own PhotosPicker/camera state — means only
+/// one picker of each kind ever exists in the view tree at a time.
+/// Reported live on a real iOS 17.5 device (not reproducible on the
+/// Simulator): with three separate PhotosPicker instances mounted
+/// simultaneously (You/Child/Home screen), picking a photo in any one of
+/// them re-presented the picker sheet again immediately — three times in
+/// a row, matching the instance count exactly. Per-instance `.id()`s
+/// weren't enough to stop it; the fix is not having three live at once.
+private enum PhotoTarget: Identifiable {
+    case parent, child, homeScreen
+    var id: Self { self }
+}
+
 struct ProfileView: View {
     @AppStorage("languageCode") private var storedLanguage = "en"
     @AppStorage("parentName") private var parentName = ""
@@ -9,12 +24,27 @@ struct ProfileView: View {
     @AppStorage("childPhoneNumber") private var childPhoneNumber = ""
     @AppStorage("parentPhotoPath") private var parentPhotoPath = ""
     @AppStorage("childPhotoPath") private var childPhotoPath = ""
+    @AppStorage("homeScreenPhotoPath") private var homeScreenPhotoPath = ""
+    @AppStorage("homeScreenPreset") private var homeScreenPreset = ""
     // Same persisted key VoiceSetupView reads/writes, so both screens
     // share one source of truth instead of drifting out of sync.
     @AppStorage("voiceConsentGranted") private var consentGiven = false
 
     @State private var isSaving = false
     @State private var status: String?
+
+    // The one shared photo-picking state for the whole screen — see
+    // PhotoTarget's doc comment for why this isn't per-field.
+    // isPhotosPickerPresented is a real stored Bool, not a computed
+    // Binding over photosPickerTarget — an inline Binding(get:set:) here
+    // is recreated every body evaluation, which broke the picker's
+    // internal auto-dismiss-on-select behavior (selecting a photo left
+    // the sheet open with just a checkmark, no way to confirm) even
+    // though presentation itself worked fine.
+    @State private var photosPickerTarget: PhotoTarget?
+    @State private var isPhotosPickerPresented = false
+    @State private var photosPickerItem: PhotosPickerItem?
+    @State private var cameraTarget: PhotoTarget?
 
     private let familyId = FamilyContext.shared.familyId
 
@@ -23,11 +53,21 @@ struct ProfileView: View {
             Section {
                 HStack {
                     Spacer()
-                    PhotoPickerField(title: "You", placeholderIcon: "person.fill", photoPath: $parentPhotoPath)
-                        .id("photo-field-parent")
+                    PhotoPickerField(
+                        title: "You",
+                        placeholderIcon: "person.fill",
+                        photoPath: parentPhotoPath,
+                        onChoosePhoto: { beginPhotoPicker(for: .parent) },
+                        onTakePhoto: { cameraTarget = .parent }
+                    )
                     Spacer()
-                    PhotoPickerField(title: "Child", placeholderIcon: "face.smiling", photoPath: $childPhotoPath)
-                        .id("photo-field-child")
+                    PhotoPickerField(
+                        title: "Child",
+                        placeholderIcon: "face.smiling",
+                        photoPath: childPhotoPath,
+                        onChoosePhoto: { beginPhotoPicker(for: .child) },
+                        onTakePhoto: { cameraTarget = .child }
+                    )
                     Spacer()
                 }
                 .padding(.vertical, 8)
@@ -43,7 +83,6 @@ struct ProfileView: View {
 
             Section {
                 AvatarPickerField()
-                    .id("avatar-picker-field")
             } header: {
                 Text("Avatar")
             } footer: {
@@ -51,8 +90,10 @@ struct ProfileView: View {
             }
 
             Section {
-                HomeScreenPictureField()
-                    .id("home-screen-picture-field")
+                HomeScreenPictureField(
+                    onChoosePhoto: { beginPhotoPicker(for: .homeScreen) },
+                    onTakePhoto: { cameraTarget = .homeScreen }
+                )
             } header: {
                 Text("Home screen")
             } footer: {
@@ -80,6 +121,69 @@ struct ProfileView: View {
             }
         }
         .navigationTitle("Profile")
+        .photosPicker(
+            isPresented: $isPhotosPickerPresented,
+            selection: $photosPickerItem,
+            matching: .images
+        )
+        .onChange(of: photosPickerItem) { _, newItem in
+            guard let target = photosPickerTarget else { return }
+            Task {
+                if let data = try? await newItem?.loadTransferable(type: Data.self),
+                   let image = UIImage(data: data) {
+                    await MainActor.run { applyPhoto(image, to: target) }
+                }
+                await MainActor.run {
+                    photosPickerItem = nil
+                    photosPickerTarget = nil
+                }
+            }
+        }
+        .fullScreenCover(item: $cameraTarget) { target in
+            CameraCapture { image in
+                if let image { applyPhoto(image, to: target) }
+                cameraTarget = nil
+            }
+            .ignoresSafeArea()
+        }
+    }
+
+    private func beginPhotoPicker(for target: PhotoTarget) {
+        photosPickerTarget = target
+        isPhotosPickerPresented = true
+    }
+
+    private func applyPhoto(_ image: UIImage, to target: PhotoTarget) {
+        guard let data = image.jpegData(compressionQuality: 0.9) else { return }
+        let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+
+        func write(replacing existingPath: String, prefix: String) -> String? {
+            if !existingPath.isEmpty {
+                try? FileManager.default.removeItem(atPath: existingPath)
+            }
+            let fileURL = documents.appendingPathComponent("\(prefix)_\(UUID().uuidString).jpg")
+            do {
+                try data.write(to: fileURL)
+                return fileURL.path
+            } catch {
+                // Not critical enough to surface an error for — the
+                // picture just won't update, existing fields are
+                // unaffected.
+                return nil
+            }
+        }
+
+        switch target {
+        case .parent:
+            if let path = write(replacing: parentPhotoPath, prefix: "photo") { parentPhotoPath = path }
+        case .child:
+            if let path = write(replacing: childPhotoPath, prefix: "photo") { childPhotoPath = path }
+        case .homeScreen:
+            if let path = write(replacing: homeScreenPhotoPath, prefix: "home_screen") {
+                homeScreenPhotoPath = path
+                homeScreenPreset = ""
+            }
+        }
     }
 
     private func save() {
@@ -108,17 +212,30 @@ struct ProfileView: View {
     }
 }
 
-/// One photo slot (avatar + "Choose photo"/"Take photo" + persistence to
-/// Documents). Used twice in ProfileView — once for the parent's own
-/// picture, once for the child's — each bound to its own @AppStorage path
-/// so the two never clobber each other.
+/// One photo slot's display + trigger buttons (avatar preview, "Choose
+/// photo"/"Take photo"). Purely presentational — actual picking is owned
+/// by ProfileView (a single shared PhotosPicker/camera for the whole
+/// screen; see PhotoTarget's doc comment for why).
 private struct PhotoPickerField: View {
     let title: String
     let placeholderIcon: String
-    @Binding var photoPath: String
+    let photoPath: String
+    let onChoosePhoto: () -> Void
+    let onTakePhoto: (() -> Void)?
 
-    @State private var photosPickerItem: PhotosPickerItem?
-    @State private var showCamera = false
+    init(title: String, placeholderIcon: String, photoPath: String, onChoosePhoto: @escaping () -> Void, onTakePhoto: @escaping () -> Void) {
+        self.title = title
+        self.placeholderIcon = placeholderIcon
+        self.photoPath = photoPath
+        self.onChoosePhoto = onChoosePhoto
+        // No camera on the Simulator, and some devices/configurations
+        // (camera restricted by MDM or Screen Time, iPads without one)
+        // don't have it either — UIImagePickerController crashes with an
+        // uncaught NSInvalidArgumentException if you set .camera as the
+        // source type when it isn't available, so hide the button
+        // instead.
+        self.onTakePhoto = UIImagePickerController.isSourceTypeAvailable(.camera) ? onTakePhoto : nil
+    }
 
     var body: some View {
         VStack(spacing: 8) {
@@ -130,44 +247,24 @@ private struct PhotoPickerField: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
-            VStack(spacing: 4) {
-                PhotosPicker(selection: $photosPickerItem, matching: .images) {
-                    Text("Choose photo")
+            VStack(spacing: 10) {
+                Button(action: onChoosePhoto) {
+                    Label("Choose photo", systemImage: "photo.on.rectangle")
                 }
-                // No camera on the Simulator, and some devices/
-                // configurations (camera restricted by MDM or Screen
-                // Time, iPads without one) don't have it either —
-                // UIImagePickerController crashes with an uncaught
-                // NSInvalidArgumentException if you set .camera as the
-                // source type when it isn't available, so hide the
-                // button instead.
-                if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                    Button("Take photo") { showCamera = true }
+                .buttonStyle(.bordered)
+                .tint(.blue)
+                .controlSize(.small)
+
+                if let onTakePhoto {
+                    Button(action: onTakePhoto) {
+                        Label("Take photo", systemImage: "camera")
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.secondary)
+                    .controlSize(.small)
                 }
             }
             .font(.caption)
-        }
-        .onChange(of: photosPickerItem) { _, newItem in
-            // Defensively force the camera sheet closed whenever the
-            // library picker produces a selection — seen on a real iOS
-            // 17.5 device (not reproducible on the Simulator, which has
-            // no camera at all) where choosing a library photo on one of
-            // several sibling photo-picker fields in this same Form could
-            // still leave — or flip — showCamera true elsewhere.
-            showCamera = false
-            Task {
-                if let data = try? await newItem?.loadTransferable(type: Data.self),
-                   let image = UIImage(data: data) {
-                    savePhoto(image)
-                }
-            }
-        }
-        .fullScreenCover(isPresented: $showCamera) {
-            CameraCapture { image in
-                showCamera = false
-                if let image { savePhoto(image) }
-            }
-            .ignoresSafeArea()
         }
     }
 
@@ -186,23 +283,6 @@ private struct PhotoPickerField: View {
             }
         }
     }
-
-    private func savePhoto(_ image: UIImage) {
-        guard let data = image.jpegData(compressionQuality: 0.9) else { return }
-        let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        // Clean up the previous photo file, if any, now that it's replaced.
-        if !photoPath.isEmpty {
-            try? FileManager.default.removeItem(atPath: photoPath)
-        }
-        let fileURL = documents.appendingPathComponent("photo_\(UUID().uuidString).jpg")
-        do {
-            try data.write(to: fileURL)
-            photoPath = fileURL.path
-        } catch {
-            // Not critical enough to surface an error for — the photo
-            // just won't update, existing profile fields are unaffected.
-        }
-    }
 }
 
 /// Editor for the small avatar shown next to the child's name at the top
@@ -210,7 +290,8 @@ private struct PhotoPickerField: View {
 /// plus a row of friendly character presets as an alternative — for a
 /// parent who hasn't uploaded (or doesn't want to show) a real photo
 /// there. Exactly one is active; AvatarView (shared with TalkView)
-/// renders whichever it is.
+/// renders whichever it is. No photo picking of its own, so unaffected
+/// by the shared-picker refactor above.
 private struct AvatarPickerField: View {
     @AppStorage("childName") private var childName = ""
     @AppStorage("childPhotoPath") private var childPhotoPath = ""
@@ -288,16 +369,24 @@ private struct AvatarPickerField: View {
 }
 
 /// Editor for the Talk screen's welcome picture: a row of curated preset
-/// icons plus the same "Choose photo"/"Take photo" pattern as the You/
-/// Child fields above, except a custom photo and a preset are mutually
-/// exclusive here — picking one clears the other. HomeScreenPictureView
-/// (shared with TalkView) renders whichever is currently set.
+/// icons plus the same "Choose photo"/"Take photo" trigger buttons as
+/// the You/Child fields — picking a preset here clears any custom photo
+/// (applyPhoto in ProfileView does the reverse when a new photo is
+/// picked). HomeScreenPictureView (shared with TalkView) renders
+/// whichever is currently set. No photo picking of its own — see
+/// PhotoTarget's doc comment on ProfileView.
 private struct HomeScreenPictureField: View {
     @AppStorage("homeScreenPhotoPath") private var photoPath = ""
     @AppStorage("homeScreenPreset") private var presetRaw = ""
 
-    @State private var photosPickerItem: PhotosPickerItem?
-    @State private var showCamera = false
+    let onChoosePhoto: () -> Void
+    let onTakePhoto: (() -> Void)?
+
+    init(onChoosePhoto: @escaping () -> Void, onTakePhoto: @escaping () -> Void) {
+        self.onChoosePhoto = onChoosePhoto
+        // See matching comment on PhotoPickerField's init.
+        self.onTakePhoto = UIImagePickerController.isSourceTypeAvailable(.camera) ? onTakePhoto : nil
+    }
 
     var body: some View {
         VStack(spacing: 16) {
@@ -326,35 +415,26 @@ private struct HomeScreenPictureField: View {
                 .padding(.vertical, 2)
             }
 
-            HStack(spacing: 16) {
-                PhotosPicker(selection: $photosPickerItem, matching: .images) {
-                    Text("Choose photo")
+            HStack(spacing: 24) {
+                Button(action: onChoosePhoto) {
+                    Label("Choose photo", systemImage: "photo.on.rectangle")
                 }
-                if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                    Button("Take photo") { showCamera = true }
+                .buttonStyle(.bordered)
+                .tint(.blue)
+                .controlSize(.small)
+
+                if let onTakePhoto {
+                    Button(action: onTakePhoto) {
+                        Label("Take photo", systemImage: "camera")
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.secondary)
+                    .controlSize(.small)
                 }
             }
             .font(.subheadline)
         }
         .frame(maxWidth: .infinity)
-        .onChange(of: photosPickerItem) { _, newItem in
-            // See matching comment on PhotoPickerField's onChange above —
-            // same defensive reset, same real-device-only symptom.
-            showCamera = false
-            Task {
-                if let data = try? await newItem?.loadTransferable(type: Data.self),
-                   let image = UIImage(data: data) {
-                    saveCustomPhoto(image)
-                }
-            }
-        }
-        .fullScreenCover(isPresented: $showCamera) {
-            CameraCapture { image in
-                showCamera = false
-                if let image { saveCustomPhoto(image) }
-            }
-            .ignoresSafeArea()
-        }
     }
 
     private func selectPreset(_ preset: HomeScreenPreset) {
@@ -363,23 +443,6 @@ private struct HomeScreenPictureField: View {
             photoPath = ""
         }
         presetRaw = preset.rawValue
-    }
-
-    private func saveCustomPhoto(_ image: UIImage) {
-        guard let data = image.jpegData(compressionQuality: 0.9) else { return }
-        let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        if !photoPath.isEmpty {
-            try? FileManager.default.removeItem(atPath: photoPath)
-        }
-        let fileURL = documents.appendingPathComponent("home_screen_\(UUID().uuidString).jpg")
-        do {
-            try data.write(to: fileURL)
-            photoPath = fileURL.path
-            presetRaw = ""
-        } catch {
-            // Not critical enough to surface an error for — the picture
-            // just won't update, existing profile fields are unaffected.
-        }
     }
 }
 
