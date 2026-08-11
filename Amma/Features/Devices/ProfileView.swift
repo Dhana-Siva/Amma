@@ -42,6 +42,15 @@ struct ProfileView: View {
             }
 
             Section {
+                AvatarPickerField()
+                    .id("avatar-picker-field")
+            } header: {
+                Text("Avatar")
+            } footer: {
+                Text("Shown next to the name at the top of Talk — pick the real photo or a friendly default.")
+            }
+
+            Section {
                 HomeScreenPictureField()
                     .id("home-screen-picture-field")
             } header: {
@@ -192,6 +201,88 @@ private struct PhotoPickerField: View {
         } catch {
             // Not critical enough to surface an error for — the photo
             // just won't update, existing profile fields are unaffected.
+        }
+    }
+}
+
+/// Editor for the small avatar shown next to the child's name at the top
+/// of Talk: a "Son"/"Child" tile using the real photo already set above,
+/// plus a row of friendly character presets as an alternative — for a
+/// parent who hasn't uploaded (or doesn't want to show) a real photo
+/// there. Exactly one is active; AvatarView (shared with TalkView)
+/// renders whichever it is.
+private struct AvatarPickerField: View {
+    @AppStorage("childName") private var childName = ""
+    @AppStorage("childPhotoPath") private var childPhotoPath = ""
+    @AppStorage("avatarUsesChildPhoto") private var usesChildPhoto = true
+    @AppStorage("avatarPreset") private var presetRaw = ""
+
+    var body: some View {
+        VStack(spacing: 16) {
+            AvatarView(size: 90)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    Button {
+                        usesChildPhoto = true
+                    } label: {
+                        VStack(spacing: 4) {
+                            childPhotoThumbnail
+                                .frame(width: 48, height: 48)
+                                .clipShape(Circle())
+                                .overlay(
+                                    Circle().stroke(.blue, lineWidth: usesChildPhoto ? 2.5 : 0)
+                                )
+                            Text(childName.isEmpty ? "Child" : childName)
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                        }
+                    }
+                    .buttonStyle(.plain)
+
+                    ForEach(AvatarPreset.allCases) { preset in
+                        Button {
+                            usesChildPhoto = false
+                            presetRaw = preset.rawValue
+                        } label: {
+                            VStack(spacing: 4) {
+                                ZStack {
+                                    Circle().fill(preset.tint.opacity(0.18))
+                                    Image(systemName: preset.systemImage)
+                                        .foregroundStyle(preset.tint)
+                                }
+                                .frame(width: 48, height: 48)
+                                .overlay(
+                                    Circle().stroke(preset.tint, lineWidth: (!usesChildPhoto && presetRaw == preset.rawValue) ? 2.5 : 0)
+                                )
+                                Text(preset.title)
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, 2)
+                .padding(.vertical, 2)
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    @ViewBuilder
+    private var childPhotoThumbnail: some View {
+        if !childPhotoPath.isEmpty, let image = UIImage(contentsOfFile: childPhotoPath) {
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFill()
+        } else {
+            ZStack {
+                Circle().fill(Color(.systemGray5))
+                Image(systemName: "person.fill")
+                    .foregroundStyle(.secondary)
+            }
         }
     }
 }

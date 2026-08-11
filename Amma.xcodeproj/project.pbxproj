@@ -24,6 +24,7 @@
 		AFB7D4409BD4C29CC09FB65D /* HealthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C9C6227861D401A221BF0D8 /* HealthService.swift */; };
 		B828AAEAEF4A5CFCC29140A3 /* AmmaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B91A6BAB06578E8F7A15FF /* AmmaApp.swift */; };
 		BBE34C286A62102C7030F244 /* HomeScreenPicture.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71D4439BDED1A3F2078E80F /* HomeScreenPicture.swift */; };
+		BBF016DA8517C8C95529E954 /* AvatarPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F42F3B4A92527CC3EA71019 /* AvatarPreset.swift */; };
 		BE22299E42B3A63B82A06659 /* GoogleCast in Frameworks */ = {isa = PBXBuildFile; productRef = 03BD25EEA4A7CD925B7D5F8F /* GoogleCast */; };
 		C1E846AF409D9150595FB595 /* TutorialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A64D9A98A8CA635E291B46D /* TutorialView.swift */; };
 		CE5FDA88FE033A5D274A0DF0 /* AudioRecorderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 947E6B852239AD840E1D23BD /* AudioRecorderService.swift */; };
@@ -39,6 +40,7 @@
 		12C312C156A60CE751B810B8 /* Family.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Family.swift; sourceTree = "<group>"; };
 		236C6766CF36828490B7D3BC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2C9C6227861D401A221BF0D8 /* HealthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthService.swift; sourceTree = "<group>"; };
+		2F42F3B4A92527CC3EA71019 /* AvatarPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarPreset.swift; sourceTree = "<group>"; };
 		3DF4C5F416AD2578368DF24E /* VoiceSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceSample.swift; sourceTree = "<group>"; };
 		44916104B6F7D978106C8446 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		53BD30F99FA1F7757DED3606 /* AudioPlaybackService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlaybackService.swift; sourceTree = "<group>"; };
@@ -179,6 +181,7 @@
 		C66FE9DEFEC2F072408901D1 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				2F42F3B4A92527CC3EA71019 /* AvatarPreset.swift */,
 				560DA8E2D418C45DBD89C94D /* BehaviorProfile.swift */,
 				F79ECB0E6ED32866F8EAB12D /* Command.swift */,
 				E62B058BA0F5CDACAF5FDD79 /* ConsentRecord.swift */,
@@ -289,6 +292,7 @@
 				B828AAEAEF4A5CFCC29140A3 /* AmmaApp.swift in Sources */,
 				401A06AE5BAC9BA452C2B223 /* AudioPlaybackService.swift in Sources */,
 				CE5FDA88FE033A5D274A0DF0 /* AudioRecorderService.swift in Sources */,
+				BBF016DA8517C8C95529E954 /* AvatarPreset.swift in Sources */,
 				964401713C38A590B877B749 /* BehaviorProfile.swift in Sources */,
 				F3257D0D479C4D9DDE5D28D7 /* CastService.swift in Sources */,
 				2CB11F454645B739D7BBFBF9 /* Command.swift in Sources */,
