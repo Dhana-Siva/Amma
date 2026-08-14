@@ -58,18 +58,24 @@ struct TalkView: View {
                         HomeScreenPictureView(size: 64)
                             .padding(.top, 12)
 
-                        List(log) { entry in
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(entry.transcript)
-                                    .font(.subheadline)
-                                if let reply = entry.responseText {
-                                    Text(reply)
-                                        .font(.subheadline.bold())
-                                        .foregroundStyle(.blue)
+                        ScrollViewReader { scrollProxy in
+                            ScrollView {
+                                LazyVStack(spacing: 16) {
+                                    ForEach(log) { entry in
+                                        conversationBubbles(for: entry)
+                                            .id(entry.id)
+                                    }
+                                }
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 12)
+                            }
+                            .onChange(of: log.count) { _, _ in
+                                guard let lastID = log.last?.id else { return }
+                                withAnimation(.easeOut(duration: 0.3)) {
+                                    scrollProxy.scrollTo(lastID, anchor: .bottom)
                                 }
                             }
                         }
-                        .listStyle(.plain)
                     }
                 }
 
@@ -158,6 +164,45 @@ struct TalkView: View {
         case 12..<17: return .blue
         case 17..<21: return .pink
         default: return .indigo
+        }
+    }
+
+    // One exchange as chat bubbles: the parent's message right-aligned in
+    // a filled accent bubble (like an outgoing text), Amma's reply
+    // left-aligned with a small avatar, a tinted border, and a soft
+    // shadow so the panel reads as an active conversation rather than a
+    // flat list of plain text rows.
+    @ViewBuilder
+    private func conversationBubbles(for entry: InteractionLog) -> some View {
+        VStack(alignment: .trailing, spacing: 8) {
+            HStack {
+                Spacer(minLength: 48)
+                Text(entry.transcript)
+                    .font(.subheadline)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(Color.pink, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    .shadow(color: .pink.opacity(0.25), radius: 6, y: 3)
+            }
+
+            if let reply = entry.responseText {
+                HStack(alignment: .bottom, spacing: 8) {
+                    AvatarView(size: 26)
+                    Text(reply)
+                        .font(.subheadline)
+                        .foregroundStyle(.primary)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
+                        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                .stroke(greetingAccentColor.opacity(0.4), lineWidth: 1.5)
+                        )
+                        .shadow(color: .black.opacity(0.08), radius: 6, y: 3)
+                    Spacer(minLength: 48)
+                }
+            }
         }
     }
 
