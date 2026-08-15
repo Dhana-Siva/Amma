@@ -75,11 +75,20 @@ struct ProfileView: View {
             }
 
             Section {
-                TextField("Your name", text: $parentName)
-                TextField("Child's name", text: $childName)
-                TextField("Child's phone number", text: $childPhoneNumber)
-                    .keyboardType(.phonePad)
-                    .textContentType(.telephoneNumber)
+                LabeledContent("Parent name") {
+                    TextField("Required", text: $parentName)
+                        .multilineTextAlignment(.trailing)
+                }
+                LabeledContent("Child name") {
+                    TextField("Required", text: $childName)
+                        .multilineTextAlignment(.trailing)
+                }
+                LabeledContent("Child number") {
+                    TextField("Optional", text: $childPhoneNumber)
+                        .multilineTextAlignment(.trailing)
+                        .keyboardType(.phonePad)
+                        .textContentType(.telephoneNumber)
+                }
             } footer: {
                 Text("Nothing here appears in the Talk greeting — that uses how your child addresses you, set below.")
             }
