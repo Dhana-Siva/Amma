@@ -8,6 +8,8 @@ struct DevicesView: View {
     @AppStorage("parentName") private var storedParentName = ""
     @AppStorage("childName") private var storedChildName = ""
     @AppStorage("childPhoneNumber") private var storedChildPhoneNumber = ""
+    @AppStorage("workspaceBorderEnabled") private var workspaceBorderEnabled = false
+    @AppStorage("workspaceBorderColorHex") private var workspaceBorderColorHex = "FF2D78"
 
     @State private var languageStatus: String?
 
@@ -112,6 +114,22 @@ struct DevicesView: View {
                             Task { await healthService.refresh() }
                         }
                     }
+                }
+
+                Section {
+                    Toggle("Show border", isOn: $workspaceBorderEnabled)
+                    ColorPicker(
+                        "Border color",
+                        selection: Binding(
+                            get: { Color(hex: workspaceBorderColorHex) ?? .pink },
+                            set: { workspaceBorderColorHex = $0.hexString ?? workspaceBorderColorHex }
+                        )
+                    )
+                    .disabled(!workspaceBorderEnabled)
+                } header: {
+                    Text("Talk border")
+                } footer: {
+                    Text("Adds a colored frame around the Talk screen.")
                 }
 
                 Section("Calling") {

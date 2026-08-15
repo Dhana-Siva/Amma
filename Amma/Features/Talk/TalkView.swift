@@ -10,6 +10,8 @@ private enum TalkPhase {
 struct TalkView: View {
     @AppStorage("parentName") private var parentName = ""
     @AppStorage("parentRelation") private var parentRelation = ""
+    @AppStorage("workspaceBorderEnabled") private var workspaceBorderEnabled = false
+    @AppStorage("workspaceBorderColorHex") private var workspaceBorderColorHex = "FF2D78"
     @State private var log: [InteractionLog] = []
     @State private var phase: TalkPhase = .idle
     @State private var statusMessage: String?
@@ -21,6 +23,10 @@ struct TalkView: View {
     @State private var debugTranscript = ""
     #endif
     @State private var welcomeAppeared = false
+    // A brief emoji "reaction" pops onto the newest reply bubble when it
+    // arrives, then fades — see conversationBubbles and send() below.
+    @State private var reactionEmoji = "✨"
+    @State private var showReaction = false
 
     private let familyId = FamilyContext.shared.familyId
 
@@ -109,6 +115,13 @@ struct TalkView: View {
                         endPoint: .center
                     )
                     .ignoresSafeArea()
+                }
+            }
+            .overlay {
+                if workspaceBorderEnabled, let borderColor = Color(hex: workspaceBorderColorHex) {
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
+                        .stroke(borderColor, lineWidth: 3)
+                        .padding(6)
                 }
             }
             .onAppear {
@@ -202,6 +215,14 @@ struct TalkView: View {
                                 .stroke(greetingAccentColor.opacity(0.4), lineWidth: 1.5)
                         )
                         .shadow(color: .black.opacity(0.08), radius: 6, y: 3)
+                        .overlay(alignment: .topTrailing) {
+                            if entry.id == log.last?.id && showReaction {
+                                Text(reactionEmoji)
+                                    .font(.system(size: 26))
+                                    .offset(x: 12, y: -14)
+                                    .transition(.scale(scale: 0.3).combined(with: .opacity))
+                            }
+                        }
                     Spacer(minLength: 48)
                 }
             }
@@ -271,6 +292,24 @@ struct TalkView: View {
     }
     #endif
 
+    // Pops a random cheerful emoji onto the newest reply bubble and fades
+    // it out shortly after — purely decorative, makes a fresh reply feel
+    // a little more alive than just text appearing.
+    private func triggerReaction() {
+        reactionEmoji = ["✨", "💖", "😊", "🎉", "👋", "🌟"].randomElement() ?? "✨"
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
+            showReaction = true
+        }
+        Task {
+            try? await Task.sleep(nanoseconds: 1_400_000_000)
+            await MainActor.run {
+                withAnimation(.easeOut(duration: 0.3)) {
+                    showReaction = false
+                }
+            }
+        }
+    }
+
     private func send(transcript: String) async {
         do {
             let reply = try await APIClient.shared.sendInteraction(
@@ -293,6 +332,7 @@ struct TalkView: View {
                 ))
                 statusMessage = nil
                 phase = .idle
+                triggerReaction()
             }
             if let audioURL = reply.replyAudioURL {
                 await playback.play(url: audioURL)
