@@ -9,7 +9,7 @@ private enum TalkPhase {
 
 struct TalkView: View {
     @AppStorage("parentName") private var parentName = ""
-    @AppStorage("childName") private var childName = ""
+    @AppStorage("parentRelation") private var parentRelation = ""
     @State private var log: [InteractionLog] = []
     @State private var phase: TalkPhase = .idle
     @State private var statusMessage: String?
@@ -119,11 +119,7 @@ struct TalkView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    HStack(spacing: 8) {
-                        AvatarView(size: 32)
-                        Text(childName.isEmpty ? "Amma" : childName)
-                            .font(.headline)
-                    }
+                    AvatarView(size: 36)
                 }
             }
             .task {
@@ -149,8 +145,14 @@ struct TalkView: View {
         case 17..<21: (text, emoji) = ("Good evening", "🌆")
         default: (text, emoji) = ("Hello", "🌙")
         }
+        // Prefer how the child actually addresses the parent (Amma, Mom,
+        // Appa, ...) set in Edit Profile — reads far more like the child
+        // themselves greeting them than a first name would. Falls back to
+        // the parent's name, then to nothing, if relation isn't set.
+        let relation = parentRelation.trimmingCharacters(in: .whitespaces)
         let name = parentName.trimmingCharacters(in: .whitespaces)
-        return name.isEmpty ? "\(text)! \(emoji)" : "\(text), \(name)! \(emoji)"
+        let addressee = relation.isEmpty ? name : relation
+        return addressee.isEmpty ? "\(text)! \(emoji)" : "\(text), \(addressee)! \(emoji)"
     }
 
     // A soft accent tint for the welcome screen's background gradient and

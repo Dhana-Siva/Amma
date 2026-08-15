@@ -20,6 +20,7 @@ private enum PhotoTarget: Identifiable {
 struct ProfileView: View {
     @AppStorage("languageCode") private var storedLanguage = "en"
     @AppStorage("parentName") private var parentName = ""
+    @AppStorage("parentRelation") private var parentRelation = ""
     @AppStorage("childName") private var childName = ""
     @AppStorage("childPhoneNumber") private var childPhoneNumber = ""
     @AppStorage("parentPhotoPath") private var parentPhotoPath = ""
@@ -79,6 +80,16 @@ struct ProfileView: View {
                 TextField("Child's phone number", text: $childPhoneNumber)
                     .keyboardType(.phonePad)
                     .textContentType(.telephoneNumber)
+            } footer: {
+                Text("Nothing here appears in the Talk greeting — that uses how your child addresses you, set below.")
+            }
+
+            Section {
+                TextField("How your child addresses you (e.g. Amma, Mom)", text: $parentRelation)
+            } header: {
+                Text("Relation")
+            } footer: {
+                Text("Used for the greeting on Talk — \"Good morning, \(parentRelation.trimmingCharacters(in: .whitespaces).isEmpty ? "Amma" : parentRelation)!\" instead of your name.")
             }
 
             Section {
