@@ -16,7 +16,10 @@ enum ReturnReminderService {
     static func requestAuthorizationIfNeeded() {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             guard settings.authorizationStatus == .notDetermined else { return }
-            UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
+            // .timeSensitive must be explicitly requested here, or content
+            // marked .timeSensitive below won't actually be treated as
+            // such — it'd just fall back to the default interruption level.
+            UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .timeSensitive]) { _, _ in }
         }
     }
 
@@ -28,6 +31,13 @@ enum ReturnReminderService {
         let content = UNMutableNotificationContent()
         content.title = "👋 Amma"
         content.body = "Tap to come back to Amma when you're done."
+        content.sound = .default
+        // Without this, iOS can silently hold or suppress the banner under
+        // a Focus mode (Sleep, Do Not Disturb, Personal, ...) even with
+        // notification permission granted — .timeSensitive is the level
+        // that's allowed to break through those by default. No extra
+        // entitlement needed (unlike .critical).
+        content.interruptionLevel = .timeSensitive
 
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 2, repeats: false)
         let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
