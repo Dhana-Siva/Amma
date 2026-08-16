@@ -12,13 +12,19 @@ enum CommandExecutor {
                 return "Couldn't find that contact to call."
             }
             let sanitized = sanitize(phoneNumber)
-            // WhatsApp has no documented URL scheme for starting a call (only
-            // for opening a chat), so this undocumented one is best-effort —
-            // fall back to a regular call if it's not available.
-            if let whatsAppCallURL = URL(string: "whatsapp://calluser/?phone=\(sanitized)"),
-               UIApplication.shared.canOpenURL(whatsAppCallURL) {
-                open(whatsAppCallURL, remindToReturn: true)
-            } else {
+            switch preferredCallMethod {
+            case .whatsapp:
+                // WhatsApp has no documented URL scheme for starting a call
+                // (only for opening a chat), so this undocumented one is
+                // best-effort — fall back to a regular call if it's not
+                // available, same as if the parent had chosen Phone.
+                if let whatsAppCallURL = URL(string: "whatsapp://calluser/?phone=\(sanitized)"),
+                   UIApplication.shared.canOpenURL(whatsAppCallURL) {
+                    open(whatsAppCallURL, remindToReturn: true)
+                } else {
+                    open(URL(string: "tel://\(sanitized)"), remindToReturn: true)
+                }
+            case .phone:
                 open(URL(string: "tel://\(sanitized)"), remindToReturn: true)
             }
             return nil
@@ -71,6 +77,14 @@ enum CommandExecutor {
 
     private static func sanitize(_ phoneNumber: String) -> String {
         phoneNumber.filter { $0.isNumber || $0 == "+" }
+    }
+
+    /// CommandExecutor isn't a View, so it reads the same
+    /// "preferredCallMethod" key directly from UserDefaults rather than
+    /// via @AppStorage — set from onboarding and Setup > Calling.
+    private static var preferredCallMethod: PreferredCallMethod {
+        let raw = UserDefaults.standard.string(forKey: "preferredCallMethod")
+        return raw.flatMap(PreferredCallMethod.init) ?? .whatsapp
     }
 
     /// - Parameter remindToReturn: shows a "tap to come back" — a Live

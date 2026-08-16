@@ -7,6 +7,7 @@ struct OnboardingView: View {
     @AppStorage("parentName") private var storedParentName = ""
     @AppStorage("childName") private var storedChildName = ""
     @AppStorage("childPhoneNumber") private var storedChildPhoneNumber = ""
+    @AppStorage("preferredCallMethod") private var preferredCallMethod = PreferredCallMethod.whatsapp
 
     @State private var step = 0
     @State private var parentName = ""
@@ -25,14 +26,16 @@ struct OnboardingView: View {
                 namesStep
             case 2:
                 consentStep
-            default:
+            case 3:
                 contactsStep
+            default:
+                callMethodStep
             }
 
             Spacer()
 
-            Button(step < 3 ? "Continue" : "Get started") {
-                if step < 3 {
+            Button(step < 4 ? "Continue" : "Get started") {
+                if step < 4 {
                     step += 1
                 } else {
                     finish()
@@ -109,6 +112,28 @@ struct OnboardingView: View {
             }
             .buttonStyle(.bordered)
             Text("You can turn this on later too, from Setup.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private var callMethodStep: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "phone.circle.fill")
+                .font(.system(size: 48))
+                .foregroundStyle(.blue)
+            Text("How should Amma call?")
+                .font(.title2.bold())
+            Text("When you say \"call\" without naming an app, which one should Amma use?")
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+            Picker("Preferred call method", selection: $preferredCallMethod) {
+                ForEach(PreferredCallMethod.allCases) { method in
+                    Text(method.title).tag(method)
+                }
+            }
+            .pickerStyle(.segmented)
+            Text("You can change this later too, from Setup.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
         }

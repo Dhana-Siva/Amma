@@ -12,6 +12,7 @@ struct DevicesView: View {
     @AppStorage("workspaceBorderEnabled") private var workspaceBorderEnabled = false
     @AppStorage("workspaceBorderColorHex") private var workspaceBorderColorHex = "FF2D78"
     @AppStorage("messageStyleColorful") private var messageStyleColorful = true
+    @AppStorage("preferredCallMethod") private var preferredCallMethod = PreferredCallMethod.whatsapp
 
     @State private var languageStatus: String?
     @State private var contactsStatus = ContactsService.shared.authorizationStatus
@@ -147,7 +148,14 @@ struct DevicesView: View {
                     Text("Colorful uses pink and accent colors for the chat bubbles; Plain uses neutral gray.")
                 }
 
-                Section("Calling") {
+                Section {
+                    Picker("Preferred call method", selection: $preferredCallMethod) {
+                        ForEach(PreferredCallMethod.allCases) { method in
+                            Text(method.title).tag(method)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+
                     HStack {
                         Label("WhatsApp", systemImage: "message.fill")
                         Spacer()
@@ -160,6 +168,10 @@ struct DevicesView: View {
                         Text(isConnected ? "Connected" : "Not connected")
                             .foregroundStyle(.secondary)
                     }
+                } header: {
+                    Text("Calling")
+                } footer: {
+                    Text("When you say \"call\" without naming an app, Amma uses this. It'll still fall back to a regular call if WhatsApp isn't available.")
                 }
 
                 Section {

@@ -30,6 +30,7 @@
 		964401713C38A590B877B749 /* BehaviorProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560DA8E2D418C45DBD89C94D /* BehaviorProfile.swift */; };
 		A5D508C78FF4F90E1AB2008C /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3FF6775D877A307C7423243 /* Device.swift */; };
 		A99C0356058B99B3E6295E35 /* ReturnActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E715E4AF6C57108EBB7533D /* ReturnActivityAttributes.swift */; };
+		AB37AB2121AEEBFED1A9BD4C /* CallMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048FC1E6BEA443874590A8BD /* CallMethod.swift */; };
 		AFB7D4409BD4C29CC09FB65D /* HealthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C9C6227861D401A221BF0D8 /* HealthService.swift */; };
 		B828AAEAEF4A5CFCC29140A3 /* AmmaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B91A6BAB06578E8F7A15FF /* AmmaApp.swift */; };
 		BBE34C286A62102C7030F244 /* HomeScreenPicture.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71D4439BDED1A3F2078E80F /* HomeScreenPicture.swift */; };
@@ -71,6 +72,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		048FC1E6BEA443874590A8BD /* CallMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallMethod.swift; sourceTree = "<group>"; };
 		095F66906422EA9023A4C6A1 /* ReturnReminderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnReminderService.swift; sourceTree = "<group>"; };
 		0E715E4AF6C57108EBB7533D /* ReturnActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnActivityAttributes.swift; sourceTree = "<group>"; };
 		1069ECE4686FF5A71303BF47 /* ReturnActivityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnActivityService.swift; sourceTree = "<group>"; };
@@ -244,6 +246,7 @@
 			children = (
 				2F42F3B4A92527CC3EA71019 /* AvatarPreset.swift */,
 				560DA8E2D418C45DBD89C94D /* BehaviorProfile.swift */,
+				048FC1E6BEA443874590A8BD /* CallMethod.swift */,
 				7C8FDF2B7A262EB9EE476519 /* ColorHex.swift */,
 				F79ECB0E6ED32866F8EAB12D /* Command.swift */,
 				E62B058BA0F5CDACAF5FDD79 /* ConsentRecord.swift */,
@@ -389,6 +392,7 @@
 				CE5FDA88FE033A5D274A0DF0 /* AudioRecorderService.swift in Sources */,
 				BBF016DA8517C8C95529E954 /* AvatarPreset.swift in Sources */,
 				964401713C38A590B877B749 /* BehaviorProfile.swift in Sources */,
+				AB37AB2121AEEBFED1A9BD4C /* CallMethod.swift in Sources */,
 				F3257D0D479C4D9DDE5D28D7 /* CastService.swift in Sources */,
 				3E54DB1B6D9E94B26BAA0A66 /* ColorHex.swift in Sources */,
 				2CB11F454645B739D7BBFBF9 /* Command.swift in Sources */,
