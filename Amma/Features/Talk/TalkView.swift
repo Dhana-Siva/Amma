@@ -379,6 +379,12 @@ struct TalkView: View {
                 }
             }
         } catch {
+            // Same pattern as stopRecordingAndSend's catch below — keeps
+            // the user-facing message friendly/generic (could be a real
+            // connection issue, or a backend-side failure like the
+            // Anthropic 502 case) while still logging the real cause for
+            // on-device debugging via console/device log.
+            print("[AmmaDebug] sendInteraction failed: \(error)")
             await MainActor.run {
                 statusMessage = "Couldn't reach Amma — check your connection."
                 phase = .idle

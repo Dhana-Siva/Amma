@@ -302,6 +302,23 @@ def test_state_persists_across_reload(tmp_path, monkeypatch, family_id):
     assert app_module.families[family_id]["child_phone_number"] == "+15551234567"
 
 
+def test_interaction_surfaces_anthropic_failure_as_502(monkeypatch, family_id):
+    # Confirmed live: an unguarded client.messages.create() turned any
+    # Anthropic-side failure (bad/missing key, rate limit, ...) into a
+    # bare, undiagnosable "Internal Server Error" that silently blocked
+    # every conversation. It should come back as a diagnosable 502 with
+    # the real cause in the body instead.
+    def raise_auth_error(**kwargs):
+        raise RuntimeError("Could not resolve authentication method")
+
+    monkeypatch.setattr(app_module.client.messages, "create", raise_auth_error)
+
+    response = client.post("/v1/interactions", json={"family_id": family_id, "transcript": "hello"})
+
+    assert response.status_code == 502
+    assert "Could not resolve authentication method" in response.json()["detail"]
+
+
 def test_consent_flow(family_id):
     response = client.post("/v1/consent", json={"family_id": family_id, "granted": True})
     assert response.status_code == 200

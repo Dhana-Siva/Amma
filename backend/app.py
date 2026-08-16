@@ -390,7 +390,16 @@ def create_interaction(req: InteractionRequest, request: Request) -> Interaction
     )
     if tools:
         create_kwargs["tools"] = tools
-    response = client.messages.create(**create_kwargs)
+    try:
+        response = client.messages.create(**create_kwargs)
+    except Exception as exc:
+        # Previously unguarded — any Anthropic-side failure (missing/
+        # invalid API key, rate limit, network hiccup, ...) surfaced as a
+        # bare, undiagnosable "Internal Server Error", confirmed live to
+        # block every conversation with no way to tell what actually
+        # broke short of reading server logs directly. Surfacing the real
+        # cause here makes it visible in the response itself.
+        raise HTTPException(status_code=502, detail=f"Anthropic request failed: {exc}") from exc
 
     reply_text = next(
         (block.text for block in response.content if block.type == "text"), ""

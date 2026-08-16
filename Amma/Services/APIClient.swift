@@ -117,7 +117,14 @@ final class APIClient {
             InteractionRequestBody(familyId: familyId.uuidString, transcript: transcript, channel: channel.rawValue, heartRate: heartRate, castLinked: castLinked)
         )
 
-        let (data, _) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await URLSession.shared.data(for: request)
+        // Previously skipped this check — a non-2xx response (e.g. the
+        // backend's own 502 when Anthropic itself fails) just failed to
+        // decode as InteractionReply, surfacing as an opaque generic
+        // error client-side with no way to tell what actually happened.
+        if let httpResponse = response as? HTTPURLResponse, !(200...299).contains(httpResponse.statusCode) {
+            throw APIError(statusCode: httpResponse.statusCode, body: String(data: data, encoding: .utf8) ?? "")
+        }
         return try JSONDecoder().decode(InteractionReply.self, from: data)
     }
 
