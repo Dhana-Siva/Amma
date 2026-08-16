@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		003E385FE1A25D03B941C2CF /* AddContactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244D812F92E5629405D01B75 /* AddContactView.swift */; };
 		00B4D05C5A717B8A3F010866 /* ContactsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B875499F781321E04458DB95 /* ContactsService.swift */; };
 		00D7476F32826A2808AA6197 /* CommandExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D92FB1AD40C1BC7EB87E1A3 /* CommandExecutor.swift */; };
 		066B0BFF9A8862B1A1886184 /* TalkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE3A7B5EE60E41865F35561 /* TalkView.swift */; };
@@ -75,6 +76,7 @@
 		1069ECE4686FF5A71303BF47 /* ReturnActivityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnActivityService.swift; sourceTree = "<group>"; };
 		12C312C156A60CE751B810B8 /* Family.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Family.swift; sourceTree = "<group>"; };
 		236C6766CF36828490B7D3BC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		244D812F92E5629405D01B75 /* AddContactView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddContactView.swift; sourceTree = "<group>"; };
 		2C9C6227861D401A221BF0D8 /* HealthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthService.swift; sourceTree = "<group>"; };
 		2F42F3B4A92527CC3EA71019 /* AvatarPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarPreset.swift; sourceTree = "<group>"; };
 		3DF4C5F416AD2578368DF24E /* VoiceSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceSample.swift; sourceTree = "<group>"; };
@@ -228,6 +230,7 @@
 		AAD583335415DC0B91C280DE /* Devices */ = {
 			isa = PBXGroup;
 			children = (
+				244D812F92E5629405D01B75 /* AddContactView.swift */,
 				B6EC2BCB9F7FCA02444AF492 /* ContactsListView.swift */,
 				ABE4E56D0841DBD32A118A6B /* DevicesView.swift */,
 				C9EAF4C6E5326F22E87FDADD /* PhotoCropView.swift */,
@@ -380,6 +383,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				14017419E6278F022631C730 /* APIClient.swift in Sources */,
+				003E385FE1A25D03B941C2CF /* AddContactView.swift in Sources */,
 				B828AAEAEF4A5CFCC29140A3 /* AmmaApp.swift in Sources */,
 				401A06AE5BAC9BA452C2B223 /* AudioPlaybackService.swift in Sources */,
 				CE5FDA88FE033A5D274A0DF0 /* AudioRecorderService.swift in Sources */,

@@ -4,6 +4,7 @@ struct ContactsListView: View {
     @State private var contacts: [ContactSummary] = []
     @State private var isLoading = true
     @State private var searchText = ""
+    @State private var isAddingContact = false
 
     private var filtered: [ContactSummary] {
         guard !searchText.isEmpty else { return contacts }
@@ -15,7 +16,7 @@ struct ContactsListView: View {
             if isLoading {
                 ProgressView("Loading contacts…")
             } else if contacts.isEmpty {
-                Text("No contacts found, or access wasn't granted.\nCheck Settings > Privacy > Contacts > Amma.")
+                Text("No contacts found, or access wasn't granted.\nCheck Settings > Privacy > Contacts > Amma, or tap + to add one.")
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.secondary)
                     .padding()
@@ -34,9 +35,25 @@ struct ContactsListView: View {
             }
         }
         .navigationTitle("Contacts")
-        .task {
-            contacts = await ContactsService.shared.allContacts()
-            isLoading = false
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    isAddingContact = true
+                } label: {
+                    Image(systemName: "person.crop.circle.badge.plus")
+                }
+            }
         }
+        .sheet(isPresented: $isAddingContact) {
+            AddContactView(onSaved: { Task { await reload() } })
+        }
+        .task {
+            await reload()
+        }
+    }
+
+    private func reload() async {
+        contacts = await ContactsService.shared.allContacts()
+        isLoading = false
     }
 }

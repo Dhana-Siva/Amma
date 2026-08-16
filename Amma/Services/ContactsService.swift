@@ -6,6 +6,10 @@ struct ContactSummary: Identifiable {
     let phoneNumbers: [String]
 }
 
+enum ContactsServiceError: Error {
+    case accessDenied
+}
+
 final class ContactsService {
     static let shared = ContactsService()
 
@@ -99,6 +103,30 @@ final class ContactsService {
         let tolerance = max(1, target.count / 3)
         guard bestFuzzyDistance <= tolerance else { return nil }
         return bestFuzzyMatch?.phoneNumbers.first?.value.stringValue
+    }
+
+    /// Creates a new contact directly on the device — lets a parent add a
+    /// family member to call/message by name without leaving Amma for
+    /// the separate Contacts app. Splits `name` on the first space into
+    /// given/family name (a plain heuristic, same as how most contact
+    /// pickers behave for a single free-text name field).
+    func addContact(name: String, phoneNumber: String) async throws {
+        let granted = (try? await CNContactStore().requestAccess(for: .contacts)) ?? false
+        guard granted else { throw ContactsServiceError.accessDenied }
+
+        let trimmedName = name.trimmingCharacters(in: .whitespaces)
+        let parts = trimmedName.split(separator: " ", maxSplits: 1)
+
+        let contact = CNMutableContact()
+        contact.givenName = String(parts.first ?? "")
+        if parts.count > 1 { contact.familyName = String(parts[1]) }
+        contact.phoneNumbers = [
+            CNLabeledValue(label: CNLabelPhoneNumberMobile, value: CNPhoneNumber(stringValue: phoneNumber))
+        ]
+
+        let saveRequest = CNSaveRequest()
+        saveRequest.add(contact, toContainerWithIdentifier: nil)
+        try CNContactStore().execute(saveRequest)
     }
 
     private static func levenshteinDistance(_ a: String, _ b: String) -> Int {
