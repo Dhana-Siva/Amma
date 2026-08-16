@@ -615,6 +615,22 @@ async def transcribe_audio(family_id: str = Form(...), audio: UploadFile = File(
     return {"transcript": transcript}
 
 
+_DIAGNOSTIC_TEST_FAMILY_ID = "00000000-0000-0000-0000-000000000001"
+
+
+@app.post("/v1/admin/cleanup-diagnostic-test-family")
+def cleanup_diagnostic_test_family() -> dict:
+    # One-off: removes the synthetic family this session's live curl
+    # diagnostics created in production while chasing the Anthropic
+    # credit-balance issue. Hardcoded to that exact ID only — not a
+    # general delete-any-family endpoint — and meant to be removed again
+    # right after use, not left as a permanent route.
+    removed = families.pop(_DIAGNOSTIC_TEST_FAMILY_ID, None) is not None
+    conversations.pop(_DIAGNOSTIC_TEST_FAMILY_ID, None)
+    save_state()
+    return {"removed": removed}
+
+
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok"}
