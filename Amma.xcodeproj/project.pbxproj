@@ -16,14 +16,19 @@
 		2CB11F454645B739D7BBFBF9 /* Command.swift in Sources */ = {isa = PBXBuildFile; fileRef = F79ECB0E6ED32866F8EAB12D /* Command.swift */; };
 		32820243DCF976F30A370D58 /* FamilyContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17ED20D5AE5462FE605A246 /* FamilyContext.swift */; };
 		3A0811110F68ACB3B6F2547F /* VoiceSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93FC45E7919E84E3329A402B /* VoiceSetupView.swift */; };
+		3B0DBF2199BF67481B33A3A6 /* AmmaWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F79DE8D99A9287F50E71F1E2 /* AmmaWidgetBundle.swift */; };
 		3E54DB1B6D9E94B26BAA0A66 /* ColorHex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C8FDF2B7A262EB9EE476519 /* ColorHex.swift */; };
+		3F724FEDFBB8BD5C8E4761EF /* AmmaWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7E0FF02DE83D7C372381100D /* AmmaWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		401A06AE5BAC9BA452C2B223 /* AudioPlaybackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BD30F99FA1F7757DED3606 /* AudioPlaybackService.swift */; };
 		40E2A4C857F5096A0B452D5A /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8945E38F255ACC953E8F07FF /* OnboardingView.swift */; };
+		5D2D2E1BB512A402358F8DA2 /* ReturnActivityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1069ECE4686FF5A71303BF47 /* ReturnActivityService.swift */; };
+		7AFA657B222C1FC6B26A2D23 /* ReturnActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E715E4AF6C57108EBB7533D /* ReturnActivityAttributes.swift */; };
 		875655B8775B7F45FA13E48C /* PhotoCropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9EAF4C6E5326F22E87FDADD /* PhotoCropView.swift */; };
 		8AF2E42AB26FE7549BFA809C /* ReturnReminderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 095F66906422EA9023A4C6A1 /* ReturnReminderService.swift */; };
 		8E628BC16C109546F2E4C52E /* ConsentRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62B058BA0F5CDACAF5FDD79 /* ConsentRecord.swift */; };
 		964401713C38A590B877B749 /* BehaviorProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560DA8E2D418C45DBD89C94D /* BehaviorProfile.swift */; };
 		A5D508C78FF4F90E1AB2008C /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3FF6775D877A307C7423243 /* Device.swift */; };
+		A99C0356058B99B3E6295E35 /* ReturnActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E715E4AF6C57108EBB7533D /* ReturnActivityAttributes.swift */; };
 		AFB7D4409BD4C29CC09FB65D /* HealthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C9C6227861D401A221BF0D8 /* HealthService.swift */; };
 		B828AAEAEF4A5CFCC29140A3 /* AmmaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B91A6BAB06578E8F7A15FF /* AmmaApp.swift */; };
 		BBE34C286A62102C7030F244 /* HomeScreenPicture.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71D4439BDED1A3F2078E80F /* HomeScreenPicture.swift */; };
@@ -32,6 +37,7 @@
 		C1E846AF409D9150595FB595 /* TutorialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A64D9A98A8CA635E291B46D /* TutorialView.swift */; };
 		CE5FDA88FE033A5D274A0DF0 /* AudioRecorderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 947E6B852239AD840E1D23BD /* AudioRecorderService.swift */; };
 		D2CADE9C18B2D778E5D4FE9E /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0996CEB183A0C006B535DBF /* ProfileView.swift */; };
+		DCA2C35704152C2B2D820493 /* ReturnLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBA0AA8164E2F8158E33DED6 /* ReturnLiveActivity.swift */; };
 		EA0A81373E56ADF575D6D68C /* ContactsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6EC2BCB9F7FCA02444AF492 /* ContactsListView.swift */; };
 		F077B2D9E15D70F29ECC48D2 /* DevicesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE4E56D0841DBD32A118A6B /* DevicesView.swift */; };
 		F3257D0D479C4D9DDE5D28D7 /* CastService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A714A97324680E628A4C53DB /* CastService.swift */; };
@@ -39,8 +45,34 @@
 		FBDA5C345E3BB791FA94C348 /* Family.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C312C156A60CE751B810B8 /* Family.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		640115AA9F2D55A8D7F04D44 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 476D5026FC2F0812AD83C4C2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F8C14196856012D6B249E532;
+			remoteInfo = AmmaWidget;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		71583EF33ADC04F823F825CF /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				3F724FEDFBB8BD5C8E4761EF /* AmmaWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		095F66906422EA9023A4C6A1 /* ReturnReminderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnReminderService.swift; sourceTree = "<group>"; };
+		0E715E4AF6C57108EBB7533D /* ReturnActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnActivityAttributes.swift; sourceTree = "<group>"; };
+		1069ECE4686FF5A71303BF47 /* ReturnActivityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnActivityService.swift; sourceTree = "<group>"; };
 		12C312C156A60CE751B810B8 /* Family.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Family.swift; sourceTree = "<group>"; };
 		236C6766CF36828490B7D3BC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2C9C6227861D401A221BF0D8 /* HealthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthService.swift; sourceTree = "<group>"; };
@@ -51,6 +83,8 @@
 		560DA8E2D418C45DBD89C94D /* BehaviorProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorProfile.swift; sourceTree = "<group>"; };
 		76DE1E7A9A780BDC3392B96E /* Amma.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Amma.entitlements; sourceTree = "<group>"; };
 		7C8FDF2B7A262EB9EE476519 /* ColorHex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorHex.swift; sourceTree = "<group>"; };
+		7E0FF02DE83D7C372381100D /* AmmaWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = AmmaWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		87B1B25FA87F27FF353F844C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8945E38F255ACC953E8F07FF /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		93FC45E7919E84E3329A402B /* VoiceSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceSetupView.swift; sourceTree = "<group>"; };
 		947E6B852239AD840E1D23BD /* AudioRecorderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderService.swift; sourceTree = "<group>"; };
@@ -63,6 +97,7 @@
 		ABE4E56D0841DBD32A118A6B /* DevicesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicesView.swift; sourceTree = "<group>"; };
 		B6EC2BCB9F7FCA02444AF492 /* ContactsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsListView.swift; sourceTree = "<group>"; };
 		B875499F781321E04458DB95 /* ContactsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsService.swift; sourceTree = "<group>"; };
+		BBA0AA8164E2F8158E33DED6 /* ReturnLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnLiveActivity.swift; sourceTree = "<group>"; };
 		C98334855666D63E01D8F658 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		C9EAF4C6E5326F22E87FDADD /* PhotoCropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCropView.swift; sourceTree = "<group>"; };
 		CEF26EF59CD92BB8C0DEDBDD /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
@@ -71,6 +106,7 @@
 		E62B058BA0F5CDACAF5FDD79 /* ConsentRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsentRecord.swift; sourceTree = "<group>"; };
 		F0F53ACDF9E19FB89007EED5 /* Amma.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Amma.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F3FF6775D877A307C7423243 /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
+		F79DE8D99A9287F50E71F1E2 /* AmmaWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmmaWidgetBundle.swift; sourceTree = "<group>"; };
 		F79ECB0E6ED32866F8EAB12D /* Command.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Command.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -98,6 +134,7 @@
 				B875499F781321E04458DB95 /* ContactsService.swift */,
 				A17ED20D5AE5462FE605A246 /* FamilyContext.swift */,
 				2C9C6227861D401A221BF0D8 /* HealthService.swift */,
+				1069ECE4686FF5A71303BF47 /* ReturnActivityService.swift */,
 				095F66906422EA9023A4C6A1 /* ReturnReminderService.swift */,
 			);
 			path = Services;
@@ -132,6 +169,7 @@
 			isa = PBXGroup;
 			children = (
 				F0F53ACDF9E19FB89007EED5 /* Amma.app */,
+				7E0FF02DE83D7C372381100D /* AmmaWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -144,6 +182,16 @@
 			path = VoiceSetup;
 			sourceTree = "<group>";
 		};
+		6E1C50A00B88E297BFC78095 /* AmmaWidget */ = {
+			isa = PBXGroup;
+			children = (
+				F79DE8D99A9287F50E71F1E2 /* AmmaWidgetBundle.swift */,
+				87B1B25FA87F27FF353F844C /* Info.plist */,
+				BBA0AA8164E2F8158E33DED6 /* ReturnLiveActivity.swift */,
+			);
+			path = AmmaWidget;
+			sourceTree = "<group>";
+		};
 		8FE8AF1D7AAA177C222B053F /* Amma */ = {
 			isa = PBXGroup;
 			children = (
@@ -154,6 +202,7 @@
 				C66FE9DEFEC2F072408901D1 /* Models */,
 				3A3134296C88AC6F179CCCF4 /* Resources */,
 				16E6FFE534F69EBE22A4C914 /* Services */,
+				D696E590BBC11B55771B1812 /* Shared */,
 			);
 			path = Amma;
 			sourceTree = "<group>";
@@ -170,6 +219,7 @@
 			isa = PBXGroup;
 			children = (
 				8FE8AF1D7AAA177C222B053F /* Amma */,
+				6E1C50A00B88E297BFC78095 /* AmmaWidget */,
 				9B631D23990A138BD71F8CB6 /* Frameworks */,
 				5F4ACEAA6A50D88D3308ABCC /* Products */,
 			);
@@ -202,6 +252,14 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		D696E590BBC11B55771B1812 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				0E715E4AF6C57108EBB7533D /* ReturnActivityAttributes.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
 		D8CCB119937659C69A689EF2 /* Features */ = {
 			isa = PBXGroup;
 			children = (
@@ -231,10 +289,12 @@
 				590611EE9A5351214E1F5B1D /* Sources */,
 				7DFAE1754B63E0986BB15C2C /* Resources */,
 				3A71106168A277D143316E31 /* Frameworks */,
+				71583EF33ADC04F823F825CF /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				B680EDEB48DAC3E726E73AF4 /* PBXTargetDependency */,
 			);
 			name = Amma;
 			packageProductDependencies = (
@@ -243,6 +303,23 @@
 			productName = Amma;
 			productReference = F0F53ACDF9E19FB89007EED5 /* Amma.app */;
 			productType = "com.apple.product-type.application";
+		};
+		F8C14196856012D6B249E532 /* AmmaWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A8B828C3549827653526CF94 /* Build configuration list for PBXNativeTarget "AmmaWidget" */;
+			buildPhases = (
+				65B7541E7D422E2629AB5C62 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AmmaWidget;
+			packageProductDependencies = (
+			);
+			productName = AmmaWidget;
+			productReference = 7E0FF02DE83D7C372381100D /* AmmaWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -254,6 +331,10 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					50B135409FE91CFBB4BE9C85 = {
+						DevelopmentTeam = H72SV43N57;
+						ProvisioningStyle = Automatic;
+					};
+					F8C14196856012D6B249E532 = {
 						DevelopmentTeam = H72SV43N57;
 						ProvisioningStyle = Automatic;
 					};
@@ -277,6 +358,7 @@
 			projectRoot = "";
 			targets = (
 				50B135409FE91CFBB4BE9C85 /* Amma */,
+				F8C14196856012D6B249E532 /* AmmaWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -319,6 +401,8 @@
 				40E2A4C857F5096A0B452D5A /* OnboardingView.swift in Sources */,
 				875655B8775B7F45FA13E48C /* PhotoCropView.swift in Sources */,
 				D2CADE9C18B2D778E5D4FE9E /* ProfileView.swift in Sources */,
+				A99C0356058B99B3E6295E35 /* ReturnActivityAttributes.swift in Sources */,
+				5D2D2E1BB512A402358F8DA2 /* ReturnActivityService.swift in Sources */,
 				8AF2E42AB26FE7549BFA809C /* ReturnReminderService.swift in Sources */,
 				066B0BFF9A8862B1A1886184 /* TalkView.swift in Sources */,
 				C1E846AF409D9150595FB595 /* TutorialView.swift in Sources */,
@@ -327,7 +411,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		65B7541E7D422E2629AB5C62 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3B0DBF2199BF67481B33A3A6 /* AmmaWidgetBundle.swift in Sources */,
+				7AFA657B222C1FC6B26A2D23 /* ReturnActivityAttributes.swift in Sources */,
+				DCA2C35704152C2B2D820493 /* ReturnLiveActivity.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B680EDEB48DAC3E726E73AF4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F8C14196856012D6B249E532 /* AmmaWidget */;
+			targetProxy = 640115AA9F2D55A8D7F04D44 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		26D2B89BE5C5A2D11D1D6165 /* Release */ = {
@@ -408,6 +510,27 @@
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
+		};
+		9C70131CC783B82D084ED700 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = H72SV43N57;
+				INFOPLIST_FILE = AmmaWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dhana.amma.AmmaWidget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
 		};
 		A4555323D241C488D189EFB2 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -495,9 +618,39 @@
 			};
 			name = Debug;
 		};
+		D008C7A221156C8363728C6E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = H72SV43N57;
+				INFOPLIST_FILE = AmmaWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dhana.amma.AmmaWidget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		A8B828C3549827653526CF94 /* Build configuration list for PBXNativeTarget "AmmaWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9C70131CC783B82D084ED700 /* Debug */,
+				D008C7A221156C8363728C6E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		DAAE2584AF8404BE3B38766C /* Build configuration list for PBXProject "Amma" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

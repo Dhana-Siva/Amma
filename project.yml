@@ -15,6 +15,7 @@ schemes:
     build:
       targets:
         Amma: all
+        AmmaWidget: all
     run:
       config: Debug
     archive:
@@ -29,6 +30,8 @@ targets:
     dependencies:
       - package: GoogleCast
       - sdk: HealthKit.framework
+      - target: AmmaWidget
+        embed: true
     entitlements:
       path: Amma/Amma.entitlements
       properties:
@@ -58,6 +61,9 @@ targets:
         # Amma never writes to Health — this is only required by Apple's
         # validator because the HealthKit capability is enabled at all.
         NSHealthUpdateUsageDescription: "Amma does not write anything to Health. This permission is requested only because HealthKit is enabled for reading your heart rate."
+        # Required for ReturnActivityService's Activity.request(...) to
+        # succeed — without it, starting a Live Activity throws at runtime.
+        NSSupportsLiveActivities: true
         NSBonjourServices:
           - _googlecast._tcp
           - _592BF965._googlecast._tcp
@@ -80,3 +86,31 @@ targets:
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: H72SV43N57
+
+  # Renders the "return to Amma" Live Activity (Dynamic Island / Lock
+  # Screen) started by ReturnActivityService in the main app. Shares
+  # ReturnActivityAttributes.swift with the Amma target — see its sources
+  # below — since ActivityKit requires the same attributes type to be
+  # visible to both the starter and the renderer.
+  AmmaWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: AmmaWidget
+      - path: Amma/Shared/ReturnActivityAttributes.swift
+    info:
+      path: AmmaWidget/Info.plist
+      properties:
+        CFBundleDisplayName: "Amma"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.dhana.amma.AmmaWidget
+        SWIFT_VERSION: "5.0"
+        TARGETED_DEVICE_FAMILY: "1"
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: H72SV43N57
+        SKIP_INSTALL: true

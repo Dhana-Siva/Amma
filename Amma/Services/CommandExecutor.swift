@@ -73,15 +73,20 @@ enum CommandExecutor {
         phoneNumber.filter { $0.isNumber || $0 == "+" }
     }
 
-    /// - Parameter remindToReturn: schedules a "tap to come back" local
-    ///   notification, but only once we know the handoff actually
-    ///   happened (the completion handler's `success`) — never fires for
-    ///   a URL that silently failed to open.
+    /// - Parameter remindToReturn: shows a "tap to come back" — a Live
+    ///   Activity when the system allows it (persists in the Dynamic
+    ///   Island / Lock Screen for as long as the parent is away), falling
+    ///   back to a plain notification otherwise — but only once we know
+    ///   the handoff actually happened (the completion handler's
+    ///   `success`), never for a URL that silently failed to open.
     private static func open(_ url: URL?, remindToReturn: Bool = false) {
         guard let url, UIApplication.shared.canOpenURL(url) else { return }
         UIApplication.shared.open(url) { success in
-            if success && remindToReturn {
-                ReturnReminderService.scheduleReturnReminder()
+            guard success, remindToReturn else { return }
+            Task { @MainActor in
+                if !ReturnActivityService.start() {
+                    ReturnReminderService.scheduleReturnReminder()
+                }
             }
         }
     }

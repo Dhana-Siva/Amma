@@ -14,6 +14,8 @@ struct AmmaApp: App {
         CastService.configure(receiverApplicationID: castReceiverApplicationID)
     }
 
+    @Environment(\.scenePhase) private var scenePhase
+
     var body: some Scene {
         WindowGroup {
             if !onboardingComplete {
@@ -22,7 +24,19 @@ struct AmmaApp: App {
                 TutorialView(onComplete: { hasSeenTutorial = true })
             } else {
                 RootTabView()
+                    // Tapping the Dynamic Island / Lock Screen "return to
+                    // Amma" activity opens the app via this URL, but
+                    // reopening any other way (home screen icon, app
+                    // switcher) should end it too — either way, the
+                    // parent is back, so its job is done.
+                    .onOpenURL { url in
+                        guard url.scheme == "amma" else { return }
+                        ReturnActivityService.end()
+                    }
             }
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { ReturnActivityService.end() }
         }
     }
 }
@@ -54,7 +68,9 @@ struct RootTabView: View {
         .onAppear {
             UIApplication.shared.isIdleTimerDisabled = true
             // Best-effort — needed for the "tap to return to Amma" nudge
-            // after a WhatsApp/Phone handoff; only prompts the first time.
+            // after a WhatsApp/Phone handoff, when Live Activities aren't
+            // available and it falls back to a notification; only
+            // prompts the first time.
             ReturnReminderService.requestAuthorizationIfNeeded()
         }
         .onDisappear { UIApplication.shared.isIdleTimerDisabled = false }

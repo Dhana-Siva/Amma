@@ -54,6 +54,8 @@
 	<string>Amma looks for your TV and speakers on your home network so it can cast for you.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Amma listens when you tap to talk, so it can send your message.</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

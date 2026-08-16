@@ -21,6 +21,20 @@
                ReferencedContainer = "container:Amma.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "F8C14196856012D6B249E532"
+               BuildableName = "AmmaWidget.appex"
+               BlueprintName = "AmmaWidget"
+               ReferencedContainer = "container:Amma.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
