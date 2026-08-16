@@ -161,7 +161,7 @@ final class APIClient {
         return try JSONDecoder().decode(VoiceSampleResponse.self, from: data).voiceId
     }
 
-    func transcribeAudio(fileURL: URL) async throws -> String {
+    func transcribeAudio(familyId: UUID, fileURL: URL) async throws -> String {
         let url = baseURL.appendingPathComponent("v1/transcribe")
         let boundary = UUID().uuidString
         var request = URLRequest(url: url)
@@ -169,6 +169,14 @@ final class APIClient {
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
 
         var body = Data()
+        // Lets the backend hint the transcription language from the
+        // family's own Setup preference, instead of relying only on
+        // auto-detection (which can confuse Tamil for a related script
+        // like Malayalam — confirmed live).
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"family_id\"\r\n\r\n".data(using: .utf8)!)
+        body.append("\(familyId.uuidString)\r\n".data(using: .utf8)!)
+
         let audioData = try Data(contentsOf: fileURL)
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"audio\"; filename=\"recording.m4a\"\r\n".data(using: .utf8)!)

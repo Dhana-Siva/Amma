@@ -304,7 +304,7 @@ struct TalkView: View {
         phase = .transcribing
         Task {
             do {
-                let transcript = try await APIClient.shared.transcribeAudio(fileURL: fileURL)
+                let transcript = try await APIClient.shared.transcribeAudio(familyId: familyId, fileURL: fileURL)
                 await MainActor.run { phase = .sending }
                 await send(transcript: transcript)
             } catch {

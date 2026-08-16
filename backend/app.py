@@ -575,15 +575,27 @@ async def upload_voice_sample(family_id: str = Form(...), audio: UploadFile = Fi
 
 
 @app.post("/v1/transcribe")
-async def transcribe_audio(audio: UploadFile = File(...)) -> dict:
+async def transcribe_audio(family_id: str = Form(...), audio: UploadFile = File(...)) -> dict:
     if not ELEVENLABS_API_KEY:
         raise HTTPException(status_code=503, detail="ELEVENLABS_API_KEY is not configured on the server")
 
     audio_bytes = await audio.read()
+    data = {"model_id": "scribe_v1"}
+    # Without a hint, Scribe's own language auto-detection can confuse
+    # Tamil for a closely related script like Malayalam — confirmed live
+    # (gibberish transcript + a nonsense reply following from it). The
+    # family's own language preference (Setup/onboarding) is a far
+    # stronger signal than blind auto-detect, so lock to it whenever
+    # known. Our internal codes ("ta"/"en") already match ElevenLabs'
+    # ISO-639-1 language_code values, so no mapping table is needed.
+    language = families.get(family_id, {}).get("language")
+    if language:
+        data["language_code"] = language
+
     response = requests.post(
         f"{ELEVENLABS_BASE}/speech-to-text",
         headers={"xi-api-key": ELEVENLABS_API_KEY},
-        data={"model_id": "scribe_v1"},
+        data=data,
         files={"file": (audio.filename or "recording.m4a", audio_bytes, audio.content_type or "audio/m4a")},
         timeout=60,
     )
