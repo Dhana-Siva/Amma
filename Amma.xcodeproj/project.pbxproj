@@ -28,6 +28,7 @@
 		8AF2E42AB26FE7549BFA809C /* ReturnReminderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 095F66906422EA9023A4C6A1 /* ReturnReminderService.swift */; };
 		8E628BC16C109546F2E4C52E /* ConsentRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62B058BA0F5CDACAF5FDD79 /* ConsentRecord.swift */; };
 		964401713C38A590B877B749 /* BehaviorProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560DA8E2D418C45DBD89C94D /* BehaviorProfile.swift */; };
+		A33917E8AD5D2F2554090C59 /* ContactPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDB4791AA240CE4855731D1E /* ContactPicker.swift */; };
 		A5D508C78FF4F90E1AB2008C /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3FF6775D877A307C7423243 /* Device.swift */; };
 		A99C0356058B99B3E6295E35 /* ReturnActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E715E4AF6C57108EBB7533D /* ReturnActivityAttributes.swift */; };
 		AB37AB2121AEEBFED1A9BD4C /* CallMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048FC1E6BEA443874590A8BD /* CallMethod.swift */; };
@@ -112,6 +113,7 @@
 		F3FF6775D877A307C7423243 /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
 		F79DE8D99A9287F50E71F1E2 /* AmmaWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmmaWidgetBundle.swift; sourceTree = "<group>"; };
 		F79ECB0E6ED32866F8EAB12D /* Command.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Command.swift; sourceTree = "<group>"; };
+		FDB4791AA240CE4855731D1E /* ContactPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactPicker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -233,6 +235,7 @@
 			isa = PBXGroup;
 			children = (
 				244D812F92E5629405D01B75 /* AddContactView.swift */,
+				FDB4791AA240CE4855731D1E /* ContactPicker.swift */,
 				B6EC2BCB9F7FCA02444AF492 /* ContactsListView.swift */,
 				ABE4E56D0841DBD32A118A6B /* DevicesView.swift */,
 				C9EAF4C6E5326F22E87FDADD /* PhotoCropView.swift */,
@@ -398,6 +401,7 @@
 				2CB11F454645B739D7BBFBF9 /* Command.swift in Sources */,
 				00D7476F32826A2808AA6197 /* CommandExecutor.swift in Sources */,
 				8E628BC16C109546F2E4C52E /* ConsentRecord.swift in Sources */,
+				A33917E8AD5D2F2554090C59 /* ContactPicker.swift in Sources */,
 				EA0A81373E56ADF575D6D68C /* ContactsListView.swift in Sources */,
 				00B4D05C5A717B8A3F010866 /* ContactsService.swift in Sources */,
 				A5D508C78FF4F90E1AB2008C /* Device.swift in Sources */,
