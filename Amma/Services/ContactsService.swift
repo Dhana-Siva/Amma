@@ -11,6 +11,22 @@ final class ContactsService {
 
     private init() {}
 
+    /// Current system permission state, for a status row in Setup — read
+    /// fresh each time rather than cached, since it can change out from
+    /// under the app in Settings.
+    var authorizationStatus: CNAuthorizationStatus {
+        CNContactStore.authorizationStatus(for: .contacts)
+    }
+
+    /// Explicitly triggers the system permission prompt (used from
+    /// onboarding and Setup, ahead of any actual lookup). Safe to call
+    /// even when already determined — `requestAccess` just returns the
+    /// existing answer without re-prompting in that case.
+    @discardableResult
+    func requestAccessIfNeeded() async -> Bool {
+        (try? await CNContactStore().requestAccess(for: .contacts)) ?? false
+    }
+
     /// All contacts with at least one phone number, for the in-app browser —
     /// lets the parent see exactly what Amma sees (e.g. to check how a name
     /// or number is actually saved after a failed lookup).

@@ -1,3 +1,4 @@
+import Contacts
 import SwiftUI
 
 struct DevicesView: View {
@@ -10,8 +11,10 @@ struct DevicesView: View {
     @AppStorage("childPhoneNumber") private var storedChildPhoneNumber = ""
     @AppStorage("workspaceBorderEnabled") private var workspaceBorderEnabled = false
     @AppStorage("workspaceBorderColorHex") private var workspaceBorderColorHex = "FF2D78"
+    @AppStorage("messageStyleColorful") private var messageStyleColorful = true
 
     @State private var languageStatus: String?
+    @State private var contactsStatus = ContactsService.shared.authorizationStatus
 
     private var isConnected: Bool { !storedChildPhoneNumber.isEmpty }
 
@@ -132,6 +135,18 @@ struct DevicesView: View {
                     Text("Adds a colored frame around the Talk screen.")
                 }
 
+                Section {
+                    Picker("Message style", selection: $messageStyleColorful) {
+                        Text("Colorful").tag(true)
+                        Text("Plain").tag(false)
+                    }
+                    .pickerStyle(.segmented)
+                } header: {
+                    Text("Message style")
+                } footer: {
+                    Text("Colorful uses pink and accent colors for the chat bubbles; Plain uses neutral gray.")
+                }
+
                 Section("Calling") {
                     HStack {
                         Label("WhatsApp", systemImage: "message.fill")
@@ -145,15 +160,51 @@ struct DevicesView: View {
                         Text(isConnected ? "Connected" : "Not connected")
                             .foregroundStyle(.secondary)
                     }
+                }
+
+                Section {
+                    switch contactsStatus {
+                    case .authorized, .limited:
+                        HStack {
+                            Label("Contacts access", systemImage: "person.crop.circle.badge.checkmark")
+                            Spacer()
+                            Text("On").foregroundStyle(.secondary)
+                        }
+                    case .denied, .restricted:
+                        Button("Turn on in Settings") {
+                            if let url = URL(string: UIApplication.openSettingsURLString) {
+                                UIApplication.shared.open(url)
+                            }
+                        }
+                        Text("Amma can still call or message using the child's saved number, but can't look up anyone else by name until this is turned back on.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    default:
+                        Button("Allow Contacts access") {
+                            Task {
+                                await ContactsService.shared.requestAccessIfNeeded()
+                                await MainActor.run { contactsStatus = ContactsService.shared.authorizationStatus }
+                            }
+                        }
+                        Text("Lets Amma look up a number when you say a name, like \"call Geetha\", instead of a saved number only.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
 
                     NavigationLink("View phone contacts") {
                         ContactsListView()
                     }
+                } header: {
+                    Text("Contacts")
                 }
             }
             .navigationTitle("Setup")
             .onAppear {
                 if !castService.isConnected { castService.startDiscovery() }
+                // Re-read in case the parent granted/revoked access in the
+                // Settings app and came back — not observable, so a plain
+                // re-read on every appearance is the only way to catch it.
+                contactsStatus = ContactsService.shared.authorizationStatus
             }
             .onDisappear { castService.stopDiscovery() }
             .task {

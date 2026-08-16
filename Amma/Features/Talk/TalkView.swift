@@ -12,7 +12,9 @@ struct TalkView: View {
     @AppStorage("parentRelation") private var parentRelation = ""
     @AppStorage("workspaceBorderEnabled") private var workspaceBorderEnabled = false
     @AppStorage("workspaceBorderColorHex") private var workspaceBorderColorHex = "FF2D78"
+    @AppStorage("messageStyleColorful") private var messageStyleColorful = true
     @State private var log: [InteractionLog] = []
+    @State private var showClearConfirmation = false
     @State private var phase: TalkPhase = .idle
     @State private var statusMessage: String?
     @StateObject private var recorder = AudioRecorderService()
@@ -131,9 +133,27 @@ struct TalkView: View {
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .principal) {
-                    AvatarView(size: 36)
+                if !log.isEmpty {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            showClearConfirmation = true
+                        } label: {
+                            Image(systemName: "trash")
+                        }
+                    }
                 }
+            }
+            .confirmationDialog(
+                "Clear this conversation?",
+                isPresented: $showClearConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Clear messages", role: .destructive) {
+                    withAnimation { log.removeAll() }
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This only clears what's shown here — it doesn't affect anything already sent.")
             }
             .task {
                 // Best-effort — only refreshes if the parent already granted
@@ -194,11 +214,11 @@ struct TalkView: View {
                 Spacer(minLength: 48)
                 Text(entry.transcript)
                     .font(.subheadline)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(outgoingBubbleTextColor)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
-                    .background(Color.pink, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-                    .shadow(color: .pink.opacity(0.25), radius: 6, y: 3)
+                    .background(outgoingBubbleColor, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    .shadow(color: outgoingBubbleColor.opacity(messageStyleColorful ? 0.25 : 0.12), radius: 6, y: 3)
             }
 
             if let reply = entry.responseText {
@@ -212,7 +232,7 @@ struct TalkView: View {
                         .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
                         .overlay(
                             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                .stroke(greetingAccentColor.opacity(0.4), lineWidth: 1.5)
+                                .stroke(incomingBubbleBorderColor, lineWidth: 1.5)
                         )
                         .shadow(color: .black.opacity(0.08), radius: 6, y: 3)
                         .overlay(alignment: .topTrailing) {
@@ -227,6 +247,22 @@ struct TalkView: View {
                 }
             }
         }
+    }
+
+    // "Colorful" is the original pink/tinted look; "Plain" swaps in a
+    // neutral gray palette for a quieter conversation panel, set via the
+    // preference in Setup. Same layout and shadows either way — just the
+    // hues change.
+    private var outgoingBubbleColor: Color {
+        messageStyleColorful ? .pink : Color(.systemGray4)
+    }
+
+    private var outgoingBubbleTextColor: Color {
+        messageStyleColorful ? .white : .primary
+    }
+
+    private var incomingBubbleBorderColor: Color {
+        messageStyleColorful ? greetingAccentColor.opacity(0.4) : Color(.systemGray4)
     }
 
     private var talkButton: some View {

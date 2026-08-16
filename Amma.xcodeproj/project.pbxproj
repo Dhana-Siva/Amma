@@ -19,6 +19,8 @@
 		3E54DB1B6D9E94B26BAA0A66 /* ColorHex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C8FDF2B7A262EB9EE476519 /* ColorHex.swift */; };
 		401A06AE5BAC9BA452C2B223 /* AudioPlaybackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BD30F99FA1F7757DED3606 /* AudioPlaybackService.swift */; };
 		40E2A4C857F5096A0B452D5A /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8945E38F255ACC953E8F07FF /* OnboardingView.swift */; };
+		875655B8775B7F45FA13E48C /* PhotoCropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9EAF4C6E5326F22E87FDADD /* PhotoCropView.swift */; };
+		8AF2E42AB26FE7549BFA809C /* ReturnReminderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 095F66906422EA9023A4C6A1 /* ReturnReminderService.swift */; };
 		8E628BC16C109546F2E4C52E /* ConsentRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62B058BA0F5CDACAF5FDD79 /* ConsentRecord.swift */; };
 		964401713C38A590B877B749 /* BehaviorProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560DA8E2D418C45DBD89C94D /* BehaviorProfile.swift */; };
 		A5D508C78FF4F90E1AB2008C /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3FF6775D877A307C7423243 /* Device.swift */; };
@@ -38,6 +40,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		095F66906422EA9023A4C6A1 /* ReturnReminderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnReminderService.swift; sourceTree = "<group>"; };
 		12C312C156A60CE751B810B8 /* Family.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Family.swift; sourceTree = "<group>"; };
 		236C6766CF36828490B7D3BC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2C9C6227861D401A221BF0D8 /* HealthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthService.swift; sourceTree = "<group>"; };
@@ -61,6 +64,7 @@
 		B6EC2BCB9F7FCA02444AF492 /* ContactsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsListView.swift; sourceTree = "<group>"; };
 		B875499F781321E04458DB95 /* ContactsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsService.swift; sourceTree = "<group>"; };
 		C98334855666D63E01D8F658 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		C9EAF4C6E5326F22E87FDADD /* PhotoCropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCropView.swift; sourceTree = "<group>"; };
 		CEF26EF59CD92BB8C0DEDBDD /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		CFE3A7B5EE60E41865F35561 /* TalkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalkView.swift; sourceTree = "<group>"; };
 		D5B91A6BAB06578E8F7A15FF /* AmmaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmmaApp.swift; sourceTree = "<group>"; };
@@ -94,6 +98,7 @@
 				B875499F781321E04458DB95 /* ContactsService.swift */,
 				A17ED20D5AE5462FE605A246 /* FamilyContext.swift */,
 				2C9C6227861D401A221BF0D8 /* HealthService.swift */,
+				095F66906422EA9023A4C6A1 /* ReturnReminderService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -175,6 +180,7 @@
 			children = (
 				B6EC2BCB9F7FCA02444AF492 /* ContactsListView.swift */,
 				ABE4E56D0841DBD32A118A6B /* DevicesView.swift */,
+				C9EAF4C6E5326F22E87FDADD /* PhotoCropView.swift */,
 				A0996CEB183A0C006B535DBF /* ProfileView.swift */,
 			);
 			path = Devices;
@@ -311,7 +317,9 @@
 				AFB7D4409BD4C29CC09FB65D /* HealthService.swift in Sources */,
 				BBE34C286A62102C7030F244 /* HomeScreenPicture.swift in Sources */,
 				40E2A4C857F5096A0B452D5A /* OnboardingView.swift in Sources */,
+				875655B8775B7F45FA13E48C /* PhotoCropView.swift in Sources */,
 				D2CADE9C18B2D778E5D4FE9E /* ProfileView.swift in Sources */,
+				8AF2E42AB26FE7549BFA809C /* ReturnReminderService.swift in Sources */,
 				066B0BFF9A8862B1A1886184 /* TalkView.swift in Sources */,
 				C1E846AF409D9150595FB595 /* TutorialView.swift in Sources */,
 				0A15C2004882E3CF70BC71D5 /* VoiceSample.swift in Sources */,

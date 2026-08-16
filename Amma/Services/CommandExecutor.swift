@@ -17,9 +17,9 @@ enum CommandExecutor {
             // fall back to a regular call if it's not available.
             if let whatsAppCallURL = URL(string: "whatsapp://calluser/?phone=\(sanitized)"),
                UIApplication.shared.canOpenURL(whatsAppCallURL) {
-                open(whatsAppCallURL)
+                open(whatsAppCallURL, remindToReturn: true)
             } else {
-                open(URL(string: "tel://\(sanitized)"))
+                open(URL(string: "tel://\(sanitized)"), remindToReturn: true)
             }
             return nil
 
@@ -29,7 +29,7 @@ enum CommandExecutor {
             }
             let text = command.params["text"] ?? ""
             let encodedText = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-            open(URL(string: "whatsapp://send?phone=\(sanitize(phoneNumber))&text=\(encodedText)"))
+            open(URL(string: "whatsapp://send?phone=\(sanitize(phoneNumber))&text=\(encodedText)"), remindToReturn: true)
             return nil
 
         case .castMedia:
@@ -73,8 +73,16 @@ enum CommandExecutor {
         phoneNumber.filter { $0.isNumber || $0 == "+" }
     }
 
-    private static func open(_ url: URL?) {
+    /// - Parameter remindToReturn: schedules a "tap to come back" local
+    ///   notification, but only once we know the handoff actually
+    ///   happened (the completion handler's `success`) — never fires for
+    ///   a URL that silently failed to open.
+    private static func open(_ url: URL?, remindToReturn: Bool = false) {
         guard let url, UIApplication.shared.canOpenURL(url) else { return }
-        UIApplication.shared.open(url)
+        UIApplication.shared.open(url) { success in
+            if success && remindToReturn {
+                ReturnReminderService.scheduleReturnReminder()
+            }
+        }
     }
 }

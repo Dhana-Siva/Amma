@@ -51,7 +51,12 @@ struct RootTabView: View {
         // confirmed live as the cause of casting silently going dead
         // mid-conversation (session disconnects with "Network not
         // reachable" after enough suspend/resume cycles).
-        .onAppear { UIApplication.shared.isIdleTimerDisabled = true }
+        .onAppear {
+            UIApplication.shared.isIdleTimerDisabled = true
+            // Best-effort — needed for the "tap to return to Amma" nudge
+            // after a WhatsApp/Phone handoff; only prompts the first time.
+            ReturnReminderService.requestAuthorizationIfNeeded()
+        }
         .onDisappear { UIApplication.shared.isIdleTimerDisabled = false }
         .task {
             // Backend family state is in-memory only, so re-send what onboarding

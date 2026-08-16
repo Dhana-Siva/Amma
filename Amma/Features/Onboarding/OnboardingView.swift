@@ -23,14 +23,16 @@ struct OnboardingView: View {
                 welcomeStep
             case 1:
                 namesStep
-            default:
+            case 2:
                 consentStep
+            default:
+                contactsStep
             }
 
             Spacer()
 
-            Button(step < 2 ? "Continue" : "Get started") {
-                if step < 2 {
+            Button(step < 3 ? "Continue" : "Get started") {
+                if step < 3 {
                     step += 1
                 } else {
                     finish()
@@ -89,6 +91,26 @@ struct OnboardingView: View {
             Text("\(childName.isEmpty ? "Your child" : childName) will be asked separately to record voice samples and approve how their voice is used. Nothing is cloned without their consent, and it can be withdrawn at any time.")
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
+        }
+    }
+
+    private var contactsStep: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "person.crop.circle.badge.checkmark")
+                .font(.system(size: 48))
+                .foregroundStyle(.blue)
+            Text("Calling family by name")
+                .font(.title2.bold())
+            Text("Amma can look up a number from your Contacts, so you can just say a name — like \"call Geetha\" — instead of a number. Numbers never leave your phone; only the name you say is sent anywhere.")
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+            Button("Allow Contacts access") {
+                Task { await ContactsService.shared.requestAccessIfNeeded() }
+            }
+            .buttonStyle(.bordered)
+            Text("You can turn this on later too, from Setup.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
         }
     }
 

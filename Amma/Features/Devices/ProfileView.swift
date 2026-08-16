@@ -17,6 +17,14 @@ private enum PhotoTarget: Identifiable {
     var id: Self { self }
 }
 
+/// A photo — from the library or camera — waiting on the crop step
+/// before it's saved to its target slot.
+private struct PendingCrop: Identifiable {
+    let id = UUID()
+    let image: UIImage
+    let target: PhotoTarget
+}
+
 struct ProfileView: View {
     @AppStorage("languageCode") private var storedLanguage = "en"
     @AppStorage("parentName") private var parentName = ""
@@ -46,6 +54,9 @@ struct ProfileView: View {
     @State private var isPhotosPickerPresented = false
     @State private var photosPickerItem: PhotosPickerItem?
     @State private var cameraTarget: PhotoTarget?
+    // A picked/captured photo lands here first, for the "Move and Scale"
+    // crop step, before applyPhoto ever runs.
+    @State private var pendingCrop: PendingCrop?
 
     private let familyId = FamilyContext.shared.familyId
 
@@ -89,8 +100,6 @@ struct ProfileView: View {
                         .keyboardType(.phonePad)
                         .textContentType(.telephoneNumber)
                 }
-            } footer: {
-                Text("Nothing here appears in the Talk greeting — that uses how your child addresses you, set below.")
             }
 
             Section {
@@ -106,7 +115,7 @@ struct ProfileView: View {
             } header: {
                 Text("Avatar")
             } footer: {
-                Text("Shown next to the name at the top of Talk — pick the real photo or a friendly default.")
+                Text("Shown next to Amma's replies in Talk — pick the real photo or a friendly default.")
             }
 
             Section {
@@ -151,7 +160,7 @@ struct ProfileView: View {
             Task {
                 if let data = try? await newItem?.loadTransferable(type: Data.self),
                    let image = UIImage(data: data) {
-                    await MainActor.run { applyPhoto(image, to: target) }
+                    await MainActor.run { pendingCrop = PendingCrop(image: image, target: target) }
                 }
                 await MainActor.run {
                     photosPickerItem = nil
@@ -161,10 +170,20 @@ struct ProfileView: View {
         }
         .fullScreenCover(item: $cameraTarget) { target in
             CameraCapture { image in
-                if let image { applyPhoto(image, to: target) }
+                if let image { pendingCrop = PendingCrop(image: image, target: target) }
                 cameraTarget = nil
             }
             .ignoresSafeArea()
+        }
+        .fullScreenCover(item: $pendingCrop) { crop in
+            PhotoCropView(
+                image: crop.image,
+                onConfirm: { cropped in
+                    applyPhoto(cropped, to: crop.target)
+                    pendingCrop = nil
+                },
+                onCancel: { pendingCrop = nil }
+            )
         }
     }
 
