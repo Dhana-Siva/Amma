@@ -7,6 +7,14 @@ private enum TalkPhase {
     case sending
 }
 
+/// A video queued to play in-app — see InAppVideoPlayerView.swift, shown
+/// when CommandExecutor reports no TV is linked for a cast request.
+private struct PlayingVideo: Identifiable {
+    let videoId: String
+    let title: String?
+    var id: String { videoId }
+}
+
 struct TalkView: View {
     @AppStorage("parentName") private var parentName = ""
     @AppStorage("parentRelation") private var parentRelation = ""
@@ -29,6 +37,7 @@ struct TalkView: View {
     // arrives, then fades — see conversationBubbles and send() below.
     @State private var reactionEmoji = "✨"
     @State private var showReaction = false
+    @State private var playingVideo: PlayingVideo?
 
     private let familyId = FamilyContext.shared.familyId
 
@@ -159,6 +168,9 @@ struct TalkView: View {
                 // Best-effort — only refreshes if the parent already granted
                 // Health access from the Setup tab; never prompts from here.
                 if health.hasRequestedAccess { await health.refresh() }
+            }
+            .fullScreenCover(item: $playingVideo) { video in
+                InAppVideoPlayerView(videoId: video.videoId, title: video.title)
             }
         }
     }
@@ -374,8 +386,13 @@ struct TalkView: View {
                 await playback.play(url: audioURL)
             }
             if let action = reply.action {
-                if let errorMessage = await CommandExecutor.execute(action) {
+                switch await CommandExecutor.execute(action) {
+                case .success:
+                    break
+                case .errorMessage(let errorMessage):
                     await MainActor.run { statusMessage = errorMessage }
+                case .playInAppVideo(let videoId, let title):
+                    await MainActor.run { playingVideo = PlayingVideo(videoId: videoId, title: title) }
                 }
             }
         } catch {

@@ -14,6 +14,7 @@
 		06C0E4AEFD01E0FC4DFE5F7D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 236C6766CF36828490B7D3BC /* Assets.xcassets */; };
 		0A15C2004882E3CF70BC71D5 /* VoiceSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF4C5F416AD2578368DF24E /* VoiceSample.swift */; };
 		14017419E6278F022631C730 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = C98334855666D63E01D8F658 /* APIClient.swift */; };
+		236552DDAC78F4A2F00183E8 /* InAppVideoPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92126FB6814EFA5C78134F13 /* InAppVideoPlayerView.swift */; };
 		2CB11F454645B739D7BBFBF9 /* Command.swift in Sources */ = {isa = PBXBuildFile; fileRef = F79ECB0E6ED32866F8EAB12D /* Command.swift */; };
 		32820243DCF976F30A370D58 /* FamilyContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17ED20D5AE5462FE605A246 /* FamilyContext.swift */; };
 		3A0811110F68ACB3B6F2547F /* VoiceSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93FC45E7919E84E3329A402B /* VoiceSetupView.swift */; };
@@ -91,6 +92,7 @@
 		7E0FF02DE83D7C372381100D /* AmmaWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = AmmaWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		87B1B25FA87F27FF353F844C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8945E38F255ACC953E8F07FF /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		92126FB6814EFA5C78134F13 /* InAppVideoPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppVideoPlayerView.swift; sourceTree = "<group>"; };
 		93FC45E7919E84E3329A402B /* VoiceSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceSetupView.swift; sourceTree = "<group>"; };
 		947E6B852239AD840E1D23BD /* AudioRecorderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderService.swift; sourceTree = "<group>"; };
 		9A64D9A98A8CA635E291B46D /* TutorialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialView.swift; sourceTree = "<group>"; };
@@ -283,6 +285,7 @@
 		D9B3A7DD4C1BEF459ACC534A /* Talk */ = {
 			isa = PBXGroup;
 			children = (
+				92126FB6814EFA5C78134F13 /* InAppVideoPlayerView.swift */,
 				CFE3A7B5EE60E41865F35561 /* TalkView.swift */,
 			);
 			path = Talk;
@@ -410,6 +413,7 @@
 				32820243DCF976F30A370D58 /* FamilyContext.swift in Sources */,
 				AFB7D4409BD4C29CC09FB65D /* HealthService.swift in Sources */,
 				BBE34C286A62102C7030F244 /* HomeScreenPicture.swift in Sources */,
+				236552DDAC78F4A2F00183E8 /* InAppVideoPlayerView.swift in Sources */,
 				40E2A4C857F5096A0B452D5A /* OnboardingView.swift in Sources */,
 				875655B8775B7F45FA13E48C /* PhotoCropView.swift in Sources */,
 				D2CADE9C18B2D778E5D4FE9E /* ProfileView.swift in Sources */,

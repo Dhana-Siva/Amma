@@ -1,15 +1,23 @@
 import UIKit
 
+/// What happened after executing a command — most intents just succeed or
+/// fail with a message, but castMedia has a third case: no TV linked, so
+/// play the video right in the app instead of just reporting failure.
+enum CommandOutcome {
+    case success
+    case errorMessage(String)
+    case playInAppVideo(videoId: String, title: String?)
+}
+
 @MainActor
 enum CommandExecutor {
-    /// Executes the command, returning a user-facing message on failure
-    /// (e.g. contact not found) or nil on success.
+    /// Executes the command and reports what happened.
     @discardableResult
-    static func execute(_ command: Command) async -> String? {
+    static func execute(_ command: Command) async -> CommandOutcome {
         switch command.intent {
         case .placeCall:
             guard let phoneNumber = await resolvePhoneNumber(command) else {
-                return "Couldn't find that contact to call."
+                return .errorMessage("Couldn't find that contact to call.")
             }
             let sanitized = sanitize(phoneNumber)
             switch preferredCallMethod {
@@ -27,40 +35,43 @@ enum CommandExecutor {
             case .phone:
                 open(URL(string: "tel://\(sanitized)"), remindToReturn: true)
             }
-            return nil
+            return .success
 
         case .sendMessage:
             guard let phoneNumber = await resolvePhoneNumber(command) else {
-                return "Couldn't find that contact to message."
+                return .errorMessage("Couldn't find that contact to message.")
             }
             let text = command.params["text"] ?? ""
             let encodedText = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
             open(URL(string: "whatsapp://send?phone=\(sanitize(phoneNumber))&text=\(encodedText)"), remindToReturn: true)
-            return nil
+            return .success
 
         case .castMedia:
             CastService.logDiagnostic("[AmmaCast] CommandExecutor received castMedia, params=\(command.params)")
             guard let videoId = command.params["videoId"], !videoId.isEmpty else {
-                return "Couldn't find that to play."
+                return .errorMessage("Couldn't find that to play.")
             }
             do {
                 try CastService.shared.play(videoId: videoId)
-                return nil
+                return .success
             } catch CastServiceError.notConnected {
-                return "No TV linked yet — go to Setup to link one."
+                // No TV linked — rather than just reporting failure, play
+                // the video right in the app. Casting is a nice-to-have,
+                // not a hard requirement for "play X" to be useful at all.
+                return .playInAppVideo(videoId: videoId, title: command.params["title"])
             } catch {
-                return "Couldn't cast that to the TV right now."
+                return .errorMessage("Couldn't cast that to the TV right now.")
             }
 
         case .stopCast:
             CastService.logDiagnostic("[AmmaCast] CommandExecutor received stopCast")
             do {
                 try CastService.shared.stop()
-                return nil
+                return .success
             } catch CastServiceError.notConnected {
-                return "Nothing's linked to the TV right now."
+                return .errorMessage("Nothing's linked to the TV right now.")
             } catch {
-                return "Couldn't stop the TV right now."
+                return .errorMessage("Couldn't stop the TV right now.")
             }
         }
     }
