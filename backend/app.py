@@ -218,14 +218,18 @@ def system_prompt(
                 ""
                 if cast_linked
                 else (
-                    f" The TV isn't linked right now, so if {parent} asks to "
-                    "watch, play, or listen to something, do NOT use "
-                    "cast_media or stop_cast — instead reply warmly and "
-                    "in-character (in the same language as everything else "
-                    "in this reply) letting them know the TV needs to be "
-                    "linked first, with a casual nudge to check Setup, the "
-                    "same way you'd nudge them to tap the Amma link after "
-                    "a call or message."
+                    f" The TV isn't linked right now, but still use "
+                    f"cast_media if {parent} asks to watch, play, or "
+                    "listen to something — the app plays it right on the "
+                    "phone screen instead of the TV in that case, so it's "
+                    "still worth doing rather than skipping it. Mention "
+                    "warmly, in-character (in the same language as "
+                    "everything else in this reply), that it'll play "
+                    "right here since the TV isn't linked — a casual "
+                    "nudge to link one in Setup for next time is fine, "
+                    "not required. Don't use stop_cast when the TV isn't "
+                    "linked though — there's no TV session to stop, and "
+                    "the in-app video has its own way to close."
                 )
             )
             + " IMPORTANT: your spoken reply text is a completely separate "

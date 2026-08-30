@@ -131,7 +131,10 @@ def test_interaction_omits_heart_rate_context_when_absent(monkeypatch, family_id
     assert "bpm" not in kwargs["system"]
 
 
-def test_interaction_instructs_against_casting_when_tv_not_linked(monkeypatch, family_id):
+def test_interaction_still_encourages_cast_media_when_tv_not_linked(monkeypatch, family_id):
+    # Was "do NOT use cast_media" when unlinked — changed once the iOS
+    # app gained an in-app playback fallback for exactly this case, so
+    # skipping the tool call here would leave that fallback unreachable.
     create_mock = mock_claude_reply(monkeypatch, [text_block("Hi!")])
     mock_elevenlabs_tts(monkeypatch)
 
@@ -142,7 +145,8 @@ def test_interaction_instructs_against_casting_when_tv_not_linked(monkeypatch, f
 
     _, kwargs = create_mock.call_args
     assert "isn't linked" in kwargs["system"]
-    assert "do NOT use cast_media" in kwargs["system"]
+    assert "still use cast_media" in kwargs["system"]
+    assert "do NOT use cast_media" not in kwargs["system"]
 
 
 def test_interaction_omits_cast_link_instruction_when_linked(monkeypatch, family_id):
