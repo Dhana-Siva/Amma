@@ -31,12 +31,14 @@
 		964401713C38A590B877B749 /* BehaviorProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560DA8E2D418C45DBD89C94D /* BehaviorProfile.swift */; };
 		A33917E8AD5D2F2554090C59 /* ContactPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDB4791AA240CE4855731D1E /* ContactPicker.swift */; };
 		A5D508C78FF4F90E1AB2008C /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3FF6775D877A307C7423243 /* Device.swift */; };
+		A703D99A32E0D8394D88FAD6 /* AmmaContactsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC3475A065C2F3CA02CB9426 /* AmmaContactsStore.swift */; };
 		A99C0356058B99B3E6295E35 /* ReturnActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E715E4AF6C57108EBB7533D /* ReturnActivityAttributes.swift */; };
 		AB37AB2121AEEBFED1A9BD4C /* CallMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048FC1E6BEA443874590A8BD /* CallMethod.swift */; };
 		AFB7D4409BD4C29CC09FB65D /* HealthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C9C6227861D401A221BF0D8 /* HealthService.swift */; };
 		B828AAEAEF4A5CFCC29140A3 /* AmmaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B91A6BAB06578E8F7A15FF /* AmmaApp.swift */; };
 		BBE34C286A62102C7030F244 /* HomeScreenPicture.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71D4439BDED1A3F2078E80F /* HomeScreenPicture.swift */; };
 		BBF016DA8517C8C95529E954 /* AvatarPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F42F3B4A92527CC3EA71019 /* AvatarPreset.swift */; };
+		BDDC1212E1DD214F619EF3B1 /* AmmaContact.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02A1B6E41EBA06D9FC180E86 /* AmmaContact.swift */; };
 		BE22299E42B3A63B82A06659 /* GoogleCast in Frameworks */ = {isa = PBXBuildFile; productRef = 03BD25EEA4A7CD925B7D5F8F /* GoogleCast */; };
 		C1E846AF409D9150595FB595 /* TutorialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A64D9A98A8CA635E291B46D /* TutorialView.swift */; };
 		CE5FDA88FE033A5D274A0DF0 /* AudioRecorderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 947E6B852239AD840E1D23BD /* AudioRecorderService.swift */; };
@@ -74,6 +76,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		02A1B6E41EBA06D9FC180E86 /* AmmaContact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmmaContact.swift; sourceTree = "<group>"; };
 		048FC1E6BEA443874590A8BD /* CallMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallMethod.swift; sourceTree = "<group>"; };
 		095F66906422EA9023A4C6A1 /* ReturnReminderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnReminderService.swift; sourceTree = "<group>"; };
 		0E715E4AF6C57108EBB7533D /* ReturnActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnActivityAttributes.swift; sourceTree = "<group>"; };
@@ -105,6 +108,7 @@
 		B6EC2BCB9F7FCA02444AF492 /* ContactsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsListView.swift; sourceTree = "<group>"; };
 		B875499F781321E04458DB95 /* ContactsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsService.swift; sourceTree = "<group>"; };
 		BBA0AA8164E2F8158E33DED6 /* ReturnLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnLiveActivity.swift; sourceTree = "<group>"; };
+		BC3475A065C2F3CA02CB9426 /* AmmaContactsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmmaContactsStore.swift; sourceTree = "<group>"; };
 		C98334855666D63E01D8F658 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		C9EAF4C6E5326F22E87FDADD /* PhotoCropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCropView.swift; sourceTree = "<group>"; };
 		CEF26EF59CD92BB8C0DEDBDD /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
@@ -134,6 +138,7 @@
 		16E6FFE534F69EBE22A4C914 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				BC3475A065C2F3CA02CB9426 /* AmmaContactsStore.swift */,
 				C98334855666D63E01D8F658 /* APIClient.swift */,
 				53BD30F99FA1F7757DED3606 /* AudioPlaybackService.swift */,
 				947E6B852239AD840E1D23BD /* AudioRecorderService.swift */,
@@ -249,6 +254,7 @@
 		C66FE9DEFEC2F072408901D1 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				02A1B6E41EBA06D9FC180E86 /* AmmaContact.swift */,
 				2F42F3B4A92527CC3EA71019 /* AvatarPreset.swift */,
 				560DA8E2D418C45DBD89C94D /* BehaviorProfile.swift */,
 				048FC1E6BEA443874590A8BD /* CallMethod.swift */,
@@ -394,6 +400,8 @@
 				14017419E6278F022631C730 /* APIClient.swift in Sources */,
 				003E385FE1A25D03B941C2CF /* AddContactView.swift in Sources */,
 				B828AAEAEF4A5CFCC29140A3 /* AmmaApp.swift in Sources */,
+				BDDC1212E1DD214F619EF3B1 /* AmmaContact.swift in Sources */,
+				A703D99A32E0D8394D88FAD6 /* AmmaContactsStore.swift in Sources */,
 				401A06AE5BAC9BA452C2B223 /* AudioPlaybackService.swift in Sources */,
 				CE5FDA88FE033A5D274A0DF0 /* AudioRecorderService.swift in Sources */,
 				BBF016DA8517C8C95529E954 /* AvatarPreset.swift in Sources */,

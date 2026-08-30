@@ -76,11 +76,13 @@ enum CommandExecutor {
         }
     }
 
-    /// A named contact (looked up on-device) takes priority; otherwise falls
-    /// back to the default phone number the backend sent (usually the child's).
+    /// A named contact takes priority — looked up in Amma's own curated
+    /// list (AmmaContactsStore), not the full phone Contacts — otherwise
+    /// falls back to the default phone number the backend sent (usually
+    /// the child's).
     private static func resolvePhoneNumber(_ command: Command) async -> String? {
         if let contactName = command.params["contactName"], !contactName.isEmpty {
-            return await ContactsService.shared.phoneNumber(forName: contactName)
+            return AmmaContactsStore.shared.phoneNumber(forName: contactName)
         }
         guard let phoneNumber = command.params["phoneNumber"], !phoneNumber.isEmpty else { return nil }
         return phoneNumber

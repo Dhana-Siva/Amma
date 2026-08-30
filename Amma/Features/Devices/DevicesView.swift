@@ -211,7 +211,7 @@ struct DevicesView: View {
                             .foregroundStyle(.secondary)
                     }
 
-                    NavigationLink("View phone contacts") {
+                    NavigationLink("Amma's Contacts") {
                         ContactsListView()
                     }
                 } header: {

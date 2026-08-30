@@ -1,36 +1,41 @@
+import Contacts
 import SwiftUI
 
+/// Shows Amma's own curated contact list (see AmmaContactsStore) — not
+/// the phone's full Contacts, which was the earlier (wrong) approach:
+/// mirroring the whole phonebook meant "adding" a contact never visibly
+/// changed anything, since everyone was already shown.
 struct ContactsListView: View {
-    @State private var contacts: [ContactSummary] = []
-    @State private var isLoading = true
+    @ObservedObject private var store = AmmaContactsStore.shared
     @State private var searchText = ""
     @State private var isAddingContact = false
     @State private var isPickingFromPhonebook = false
     @State private var confirmationMessage: String?
 
-    private var filtered: [ContactSummary] {
-        guard !searchText.isEmpty else { return contacts }
-        return contacts.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+    private var filtered: [AmmaContact] {
+        guard !searchText.isEmpty else { return store.contacts }
+        return store.contacts.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
     }
 
     var body: some View {
         Group {
-            if isLoading {
-                ProgressView("Loading contacts…")
-            } else if contacts.isEmpty {
-                Text("No contacts found, or access wasn't granted.\nCheck Settings > Privacy > Contacts > Amma, or tap + to add one.")
+            if store.contacts.isEmpty {
+                Text("No contacts added yet.\nTap + to add someone Amma can call or message by name.")
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.secondary)
                     .padding()
             } else {
-                List(filtered) { contact in
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(contact.name)
-                        ForEach(contact.phoneNumbers, id: \.self) { number in
-                            Text(number)
+                List {
+                    ForEach(filtered) { contact in
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(contact.name)
+                            Text(contact.phoneNumber)
                                 .font(.footnote)
                                 .foregroundStyle(.secondary)
                         }
+                    }
+                    .onDelete { offsets in
+                        for index in offsets { store.remove(filtered[index]) }
                     }
                 }
                 .searchable(text: $searchText, prompt: "Search contacts")
@@ -46,13 +51,12 @@ struct ContactsListView: View {
                     .background(.ultraThinMaterial)
             }
         }
-        .navigationTitle("Contacts")
+        .navigationTitle("Amma's Contacts")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
-                    // Primary ask: pick someone already in the phone's
-                    // own Contacts, via Apple's native picker — not a
-                    // typed form.
+                    // Primary path: pick someone already in the phone's
+                    // own Contacts, via Apple's native picker.
                     Button {
                         isPickingFromPhonebook = true
                     } label: {
@@ -69,37 +73,40 @@ struct ContactsListView: View {
             }
         }
         .sheet(isPresented: $isAddingContact) {
-            AddContactView(onSaved: { Task { await reload() } })
+            // AddContactView already saves to the phone's real Contacts
+            // (so it also shows up in the system Contacts app) and to
+            // AmmaContactsStore — this view just needs to be around to
+            // present the sheet; the list updates itself via @ObservedObject.
+            AddContactView(onSaved: {})
         }
         .fullScreenCover(isPresented: $isPickingFromPhonebook) {
             ContactPicker(
                 onPick: { contact in
                     isPickingFromPhonebook = false
                     let name = "\(contact.givenName) \(contact.familyName)".trimmingCharacters(in: .whitespaces)
-                    showConfirmation(for: name.isEmpty ? "That contact" : name)
-                    Task { await reload() }
+                    let displayName = name.isEmpty ? "That contact" : name
+                    // A contact with no phone number at all can still slip
+                    // through the picker's own "enabled" filtering on some
+                    // iOS versions — check for real here rather than
+                    // showing a false-positive success.
+                    guard let phoneNumber = contact.phoneNumbers.first?.value.stringValue else {
+                        confirmationMessage = "\(displayName) doesn't have a phone number saved, so Amma can't call or message them."
+                        return
+                    }
+                    store.add(name: displayName, phoneNumber: phoneNumber)
+                    showConfirmation(for: displayName)
                 },
                 onCancel: { isPickingFromPhonebook = false }
             )
             .ignoresSafeArea()
         }
-        .task {
-            await reload()
-        }
-    }
-
-    private func reload() async {
-        contacts = await ContactsService.shared.allContacts()
-        isLoading = false
     }
 
     private func showConfirmation(for name: String) {
-        confirmationMessage = "\(name) can now be called or messaged by name."
+        confirmationMessage = "\(name) added — Amma can now call or message them by name."
         Task {
             try? await Task.sleep(nanoseconds: 3_000_000_000)
-            await MainActor.run {
-                if confirmationMessage != nil { confirmationMessage = nil }
-            }
+            if confirmationMessage != nil { confirmationMessage = nil }
         }
     }
 }

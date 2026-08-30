@@ -53,6 +53,11 @@ struct AddContactView: View {
             do {
                 try await ContactsService.shared.addContact(name: name, phoneNumber: phoneNumber)
                 await MainActor.run {
+                    // Also saved to the phone's real Contacts above (so it
+                    // shows up there too) — but AmmaContactsStore is what
+                    // actually makes it usable by voice/visible in Amma's
+                    // own list, so both need to happen.
+                    AmmaContactsStore.shared.add(name: name, phoneNumber: phoneNumber)
                     onSaved()
                     dismiss()
                 }
