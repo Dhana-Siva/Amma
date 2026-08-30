@@ -13,6 +13,16 @@ enum ContactsServiceError: Error {
 final class ContactsService {
     static let shared = ContactsService()
 
+    // A single store instance for the app's lifetime — not one per call.
+    // This isn't just efficiency: creating a fresh CNContactStore for
+    // every operation caused a real bug, confirmed live — a contact saved
+    // via one instance's CNSaveRequest wasn't reliably visible yet to a
+    // different, freshly-created instance's enumerateContacts right
+    // after, so the Contacts list looked unchanged even though the save
+    // itself succeeded. Apple's own guidance is to keep one instance
+    // around for exactly this reason.
+    private let store = CNContactStore()
+
     private init() {}
 
     /// Current system permission state, for a status row in Setup — read
@@ -28,14 +38,13 @@ final class ContactsService {
     /// existing answer without re-prompting in that case.
     @discardableResult
     func requestAccessIfNeeded() async -> Bool {
-        (try? await CNContactStore().requestAccess(for: .contacts)) ?? false
+        (try? await store.requestAccess(for: .contacts)) ?? false
     }
 
     /// All contacts with at least one phone number, for the in-app browser —
     /// lets the parent see exactly what Amma sees (e.g. to check how a name
     /// or number is actually saved after a failed lookup).
     func allContacts() async -> [ContactSummary] {
-        let store = CNContactStore()
         let granted = (try? await store.requestAccess(for: .contacts)) ?? false
         guard granted else { return [] }
 
@@ -62,7 +71,6 @@ final class ContactsService {
     /// immediately; otherwise the closest name within an edit-distance
     /// tolerance is used.
     func phoneNumber(forName name: String) async -> String? {
-        let store = CNContactStore()
         let granted = (try? await store.requestAccess(for: .contacts)) ?? false
         guard granted else { return nil }
 
@@ -111,7 +119,7 @@ final class ContactsService {
     /// given/family name (a plain heuristic, same as how most contact
     /// pickers behave for a single free-text name field).
     func addContact(name: String, phoneNumber: String) async throws {
-        let granted = (try? await CNContactStore().requestAccess(for: .contacts)) ?? false
+        let granted = (try? await store.requestAccess(for: .contacts)) ?? false
         guard granted else { throw ContactsServiceError.accessDenied }
 
         let trimmedName = name.trimmingCharacters(in: .whitespaces)
@@ -126,7 +134,7 @@ final class ContactsService {
 
         let saveRequest = CNSaveRequest()
         saveRequest.add(contact, toContainerWithIdentifier: nil)
-        try CNContactStore().execute(saveRequest)
+        try store.execute(saveRequest)
     }
 
     private static func levenshteinDistance(_ a: String, _ b: String) -> Int {
