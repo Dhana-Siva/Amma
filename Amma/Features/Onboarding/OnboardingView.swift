@@ -35,6 +35,18 @@ struct OnboardingView: View {
             Spacer()
 
             Button(step < 4 ? "Continue" : "Get started") {
+                // Apple rejected an earlier build under Guideline 5.1.1 for
+                // a dedicated "Allow Contacts access" button here — its
+                // wording echoed the system dialog's own language closely
+                // enough to read as steering the user toward granting,
+                // rather than presenting a neutral choice. Fix: no custom
+                // button asks for anything — the system's own neutral
+                // Allow/Don't Allow prompt fires as a side effect of the
+                // ordinary "Continue" tap, after contactsStep has already
+                // explained why (which Apple's own guidance says is fine).
+                if step == 3 {
+                    Task { await ContactsService.shared.requestAccessIfNeeded() }
+                }
                 if step < 4 {
                     step += 1
                 } else {
@@ -107,11 +119,7 @@ struct OnboardingView: View {
             Text("Amma can look up a number from your Contacts, so you can just say a name — like \"call Geetha\" — instead of a number. Numbers never leave your phone; only the name you say is sent anywhere.")
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
-            Button("Allow Contacts access") {
-                Task { await ContactsService.shared.requestAccessIfNeeded() }
-            }
-            .buttonStyle(.bordered)
-            Text("You can turn this on later too, from Setup.")
+            Text("Continuing will ask for Contacts access — you can decline it, or change it later from Setup.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
         }

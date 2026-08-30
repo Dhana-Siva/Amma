@@ -192,7 +192,15 @@ struct DevicesView: View {
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     default:
-                        Button("Allow Contacts access") {
+                        // Was "Allow Contacts access" — Apple's Guideline
+                        // 5.1.1 rejection cited this exact phrase for
+                        // echoing the system dialog's own "Allow" wording
+                        // closely enough to read as steering the user
+                        // toward granting. "Turn On" (matching the denied
+                        // case's existing "Turn on in Settings" below)
+                        // still explains what tapping does without
+                        // mirroring the system prompt's own language.
+                        Button("Turn On Contacts Access") {
                             Task {
                                 await ContactsService.shared.requestAccessIfNeeded()
                                 await MainActor.run { contactsStatus = ContactsService.shared.authorizationStatus }
