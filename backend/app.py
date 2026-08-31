@@ -232,16 +232,30 @@ def system_prompt(
                     "the in-app video has its own way to close."
                 )
             )
+            + " You also have web search — use it when they ask something "
+            "that depends on real current information you wouldn't "
+            f"reliably know: today's news, a live score, current weather, "
+            "a price, or anything explicitly asking you to look something "
+            "up. Don't search for things you already know cold (general "
+            "facts, how something works, anything already discussed in "
+            f"this conversation) — only when it's genuinely current. When "
+            f"you do search, still answer the way {child} would: warm, "
+            "brief (the same 1-3 sentence style as everything else you "
+            "say), in the conversation's own language — never read out a "
+            "dry list of headlines or sound like a news broadcast."
             + " IMPORTANT: your spoken reply text is a completely separate "
             "piece of output from any tool call, and must always follow "
             "the language instruction given earlier in this prompt, on "
             "every turn without exception — including when you call "
-            "send_whatsapp_message (which has two fields to fill in) or "
-            "place_call. The ONLY thing ever in Latin/English script "
-            "regardless of reply language is the contact_name parameter "
-            "value itself. That rule applies to contact_name alone — it "
-            "does not carry over to your reply text, and does not carry "
-            "over to the text field of send_whatsapp_message either."
+            "send_whatsapp_message (which has two fields to fill in), "
+            "place_call, or web search (translate what you found into "
+            "the conversation's language rather than repeating it in "
+            "whatever language the source was in). The ONLY thing ever "
+            "in Latin/English script regardless of reply language is the "
+            "contact_name parameter value itself. That rule applies to "
+            "contact_name alone — it does not carry over to your reply "
+            "text, and does not carry over to the text field of "
+            "send_whatsapp_message either."
         )
     return prompt
 
@@ -323,6 +337,15 @@ def build_tools(family: dict) -> list[dict]:
             ),
             "input_schema": {"type": "object", "properties": {}, "required": []},
         },
+        # Anthropic's server-executed web search — runs and resolves
+        # entirely within this one client.messages.create() call (no
+        # extra round-trip on our side, unlike the tools above), so
+        # Claude can answer real "what's in the news today" / "what's the
+        # score" style questions instead of only its training data.
+        # max_uses caps searches (and cost — $10 per 1,000 searches on top
+        # of normal token cost) per single request; a news-brief question
+        # rarely needs more than a couple.
+        {"type": "web_search_20250305", "name": "web_search", "max_uses": 3},
     ]
 
 
@@ -405,8 +428,14 @@ def create_interaction(req: InteractionRequest, request: Request) -> Interaction
         # cause here makes it visible in the response itself.
         raise HTTPException(status_code=502, detail=f"Anthropic request failed: {exc}") from exc
 
-    reply_text = next(
-        (block.text for block in response.content if block.type == "text"), ""
+    # Was `next(...)` — the first text block only. That's fine for a plain
+    # reply, but a web-search turn (see build_tools) comes back as several
+    # text blocks interleaved with the search itself — e.g. "I'll look
+    # that up..." followed later by "Based on that, ..." and the actual
+    # answer. Taking only the first would speak the "I'll look that up"
+    # preamble and silently drop the real answer, so join all of them.
+    reply_text = "".join(
+        block.text for block in response.content if block.type == "text"
     )
     tool_use = next(
         (block for block in response.content if block.type == "tool_use"), None

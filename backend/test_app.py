@@ -70,7 +70,7 @@ def test_health():
 def test_build_tools_always_available():
     # Available even without a child_phone_number on file — a named contact
     # is resolved on-device, so the backend doesn't need one to offer the tool.
-    expected = {"place_call", "send_whatsapp_message", "cast_media", "stop_cast"}
+    expected = {"place_call", "send_whatsapp_message", "cast_media", "stop_cast", "web_search"}
     assert {tool["name"] for tool in app_module.build_tools({})} == expected
     assert {tool["name"] for tool in app_module.build_tools({"child_phone_number": "+15551234567"})} == expected
 
@@ -97,6 +97,25 @@ def test_interaction_uses_cloned_voice_once_set(monkeypatch, family_id):
     client.post("/v1/interactions", json={"family_id": family_id, "transcript": "hi"})
 
     assert "cloned-voice-123" in captured["url"]
+
+
+def test_interaction_joins_all_text_blocks_not_just_first(monkeypatch, family_id):
+    # A web-search turn comes back as several text blocks interleaved with
+    # the search itself (e.g. "I'll look that up..." then, after the
+    # search result, the actual answer) — taking only the first (the old
+    # behavior) would speak the preamble and silently drop the answer.
+    mock_claude_reply(
+        monkeypatch,
+        [
+            text_block("I'll check on that. "),
+            text_block("Looks like it's sunny and 75°F right now."),
+        ],
+    )
+    mock_elevenlabs_tts(monkeypatch)
+
+    response = client.post("/v1/interactions", json={"family_id": family_id, "transcript": "what's the weather"})
+
+    assert response.json()["reply_text"] == "I'll check on that. Looks like it's sunny and 75°F right now."
 
 
 def test_interaction_no_audio_when_elevenlabs_not_configured(monkeypatch, family_id):
