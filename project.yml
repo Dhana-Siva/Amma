@@ -9,6 +9,16 @@ packages:
   GoogleCast:
     url: https://github.com/SRGSSR/google-cast-sdk.git
     from: 4.8.4
+  # Google's own officially-maintained WKWebView + IFrame Player API
+  # wrapper — switched to this after two failed hand-rolled iframe
+  # attempts (raw HTML page, then a custom user agent) both still hit
+  # YouTube's undocumented embedding-client validation ("Video
+  # unavailable, error 152-4") on a real device. A bare iframe is
+  # inherently working around behavior Google hasn't documented; this
+  # library is built specifically to handle that reliably instead.
+  YouTubeiOSPlayerHelper:
+    url: https://github.com/youtube/youtube-ios-player-helper.git
+    from: 1.0.4
 
 schemes:
   Amma:
@@ -29,6 +39,7 @@ targets:
       - path: Amma
     dependencies:
       - package: GoogleCast
+      - package: YouTubeiOSPlayerHelper
       - sdk: HealthKit.framework
       - target: AmmaWidget
         embed: true

@@ -24,6 +24,7 @@
 		401A06AE5BAC9BA452C2B223 /* AudioPlaybackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BD30F99FA1F7757DED3606 /* AudioPlaybackService.swift */; };
 		40E2A4C857F5096A0B452D5A /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8945E38F255ACC953E8F07FF /* OnboardingView.swift */; };
 		5D2D2E1BB512A402358F8DA2 /* ReturnActivityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1069ECE4686FF5A71303BF47 /* ReturnActivityService.swift */; };
+		6813048372A45B7F3CF19592 /* YouTubeiOSPlayerHelper in Frameworks */ = {isa = PBXBuildFile; productRef = 485FC7FF01B1220749D6F185 /* YouTubeiOSPlayerHelper */; };
 		7AFA657B222C1FC6B26A2D23 /* ReturnActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E715E4AF6C57108EBB7533D /* ReturnActivityAttributes.swift */; };
 		875655B8775B7F45FA13E48C /* PhotoCropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9EAF4C6E5326F22E87FDADD /* PhotoCropView.swift */; };
 		8AF2E42AB26FE7549BFA809C /* ReturnReminderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 095F66906422EA9023A4C6A1 /* ReturnReminderService.swift */; };
@@ -128,6 +129,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BE22299E42B3A63B82A06659 /* GoogleCast in Frameworks */,
+				6813048372A45B7F3CF19592 /* YouTubeiOSPlayerHelper in Frameworks */,
 				F652FFD31C6ED05C85CF245C /* HealthKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -317,6 +319,7 @@
 			name = Amma;
 			packageProductDependencies = (
 				03BD25EEA4A7CD925B7D5F8F /* GoogleCast */,
+				485FC7FF01B1220749D6F185 /* YouTubeiOSPlayerHelper */,
 			);
 			productName = Amma;
 			productReference = F0F53ACDF9E19FB89007EED5 /* Amma.app */;
@@ -369,6 +372,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				739AF5BDC016C2026DA6B9B0 /* XCRemoteSwiftPackageReference "google-cast-sdk" */,
+				2E106265A1B9F1FCD68B5E0F /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5F4ACEAA6A50D88D3308ABCC /* Products */;
@@ -696,6 +700,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		2E106265A1B9F1FCD68B5E0F /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/youtube/youtube-ios-player-helper.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.4;
+			};
+		};
 		739AF5BDC016C2026DA6B9B0 /* XCRemoteSwiftPackageReference "google-cast-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SRGSSR/google-cast-sdk.git";
@@ -711,6 +723,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 739AF5BDC016C2026DA6B9B0 /* XCRemoteSwiftPackageReference "google-cast-sdk" */;
 			productName = GoogleCast;
+		};
+		485FC7FF01B1220749D6F185 /* YouTubeiOSPlayerHelper */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2E106265A1B9F1FCD68B5E0F /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */;
+			productName = YouTubeiOSPlayerHelper;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

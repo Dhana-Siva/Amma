@@ -1,5 +1,5 @@
 {
-  "originHash" : "300e6c85ec4fc774ac3f9525fa942dad932d839f3b168ec375a778cc2a715ea6",
+  "originHash" : "393043d74e33ee4ddfbbfadfbf85500f58898744d6e2926a623432d7547dc292",
   "pins" : [
     {
       "identity" : "google-cast-sdk",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "516f7111116bc412230309636842d3bbf77efdd8",
         "version" : "4.8.4"
+      }
+    },
+    {
+      "identity" : "youtube-ios-player-helper",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/youtube/youtube-ios-player-helper.git",
+      "state" : {
+        "revision" : "f57129cd4380ec0a74dd3a59da3270a1d653d59b",
+        "version" : "1.0.4"
       }
     }
   ],
