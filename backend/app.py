@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import uuid
 from collections import defaultdict
 from datetime import datetime, timezone
@@ -434,9 +435,15 @@ def create_interaction(req: InteractionRequest, request: Request) -> Interaction
     # that up..." followed later by "Based on that, ..." and the actual
     # answer. Taking only the first would speak the "I'll look that up"
     # preamble and silently drop the real answer, so join all of them.
-    reply_text = "".join(
+    # Confirmed live: joining with "" ran fragments together with no
+    # space ("for you.Hmm, that search...") whenever a block doesn't
+    # already end in whitespace — join with a space instead, then
+    # collapse the double spaces that appear for the (also real, also
+    # confirmed live) opposite case, where a block already ends in one.
+    reply_text = " ".join(
         block.text for block in response.content if block.type == "text"
     )
+    reply_text = re.sub(r" {2,}", " ", reply_text).strip()
     tool_use = next(
         (block for block in response.content if block.type == "tool_use"), None
     )
@@ -646,37 +653,6 @@ async def transcribe_audio(family_id: str = Form(...), audio: UploadFile = File(
 
     transcript = response.json().get("text", "")
     return {"transcript": transcript}
-
-
-@app.post("/v1/admin/debug-web-search")
-def debug_web_search(transcript: str) -> dict:
-    # One-off diagnostic — no response_model constraint, so this can
-    # return the raw shape of what Claude actually did (block types, any
-    # tool_use/server_tool_use, all text fragments) instead of just the
-    # final reply_text /v1/interactions normally returns. Added because
-    # web_search silently wasn't triggering and there was no way to see
-    # why from the client-facing response alone. Removed again right
-    # after diagnosing, same as the earlier cleanup-endpoint pattern.
-    tools = build_tools({})
-    response = client.messages.create(
-        model=MODEL,
-        max_tokens=300,
-        system=system_prompt("Mom", "Alex", "en", True, None, False),
-        messages=[{"role": "user", "content": transcript}],
-        tools=tools,
-    )
-    return {
-        "stop_reason": response.stop_reason,
-        "blocks": [
-            {
-                "type": block.type,
-                "text": getattr(block, "text", None),
-                "name": getattr(block, "name", None),
-                "input": getattr(block, "input", None),
-            }
-            for block in response.content
-        ],
-    }
 
 
 @app.get("/health")

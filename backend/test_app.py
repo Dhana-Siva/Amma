@@ -118,6 +118,21 @@ def test_interaction_joins_all_text_blocks_not_just_first(monkeypatch, family_id
     assert response.json()["reply_text"] == "I'll check on that. Looks like it's sunny and 75°F right now."
 
 
+def test_interaction_adds_space_between_blocks_missing_one(monkeypatch, family_id):
+    # Confirmed live: some blocks DON'T end in whitespace before the next
+    # one starts (unlike the fixture above) — joining those with "" ran
+    # them together with no space at all ("for you.Hmm, that search...").
+    mock_claude_reply(
+        monkeypatch,
+        [text_block("Let me grab the latest for you."), text_block("Hmm, that didn't turn up much.")],
+    )
+    mock_elevenlabs_tts(monkeypatch)
+
+    response = client.post("/v1/interactions", json={"family_id": family_id, "transcript": "what's the news"})
+
+    assert response.json()["reply_text"] == "Let me grab the latest for you. Hmm, that didn't turn up much."
+
+
 def test_interaction_no_audio_when_elevenlabs_not_configured(monkeypatch, family_id):
     monkeypatch.setattr(app_module, "ELEVENLABS_API_KEY", None)
     mock_claude_reply(monkeypatch, [text_block("Hello")])
