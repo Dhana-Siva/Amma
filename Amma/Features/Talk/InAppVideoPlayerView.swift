@@ -33,23 +33,28 @@ struct InAppVideoPlayerView: View {
 /// a plain iframe just works, and there's no reason to expect the JS API
 /// to behave any better inside a WKWebView here).
 ///
-/// Confirmed live, in two steps:
+/// This has taken a few iterations, each addressing a real but different
+/// failure:
 /// 1. Loading the embed URL *directly* as the WKWebView's top-level page
-///    (`webView.load(URLRequest(url: embedURL))`) produces YouTube's own
-///    "Video configuration error" — its embed validation doesn't get a
-///    real origin/referrer that way at all. Fixed by wrapping the same
-///    iframe inside an actual (tiny, local) HTML page instead.
-/// 2. That page's `baseURL` initially claimed `https://www.youtube.com`
-///    — a common trick for exactly this situation — but that produced a
-///    *different* live error instead ("Video unavailable", error 152-4).
-///    Confirmed via a side-by-side test: the identical iframe HTML,
-///    served from a real but unrelated origin (a plain local HTTP
-///    server, not youtube.com), played the same video with no error at
-///    all. So claiming to *be* youtube.com while obviously not being
-///    served from there looks to be actively flagged rather than
-///    helpful — YouTube's anti-embedding-fraud checks likely catch the
-///    spoofed origin specifically. `baseURL: nil` (an opaque origin,
-///    no claim at all) is what actually works.
+///    produced YouTube's "Video configuration error" — fixed by wrapping
+///    the iframe inside an actual (tiny, local) HTML page instead.
+/// 2. A `baseURL` of `https://www.youtube.com` on that page (a common
+///    trick, claiming an origin the page isn't really served from) led
+///    to "Video unavailable, error 152-4" instead — changed to `nil`
+///    (no origin claim at all).
+/// 3. Still 152-4 on a real device after that. The next most likely
+///    cause, confirmed by many other developers hitting this exact
+///    combination: WKWebView's *default user agent* doesn't fully match
+///    a real mobile Safari, and YouTube's client validation can reject
+///    it outright — hence a fixed numeric error rather than anything
+///    content-specific. Setting `customUserAgent` to a real iOS Safari
+///    UA string is the standard fix.
+/// If this still doesn't resolve it, the reliable fallback is Google's
+/// own `youtube-ios-player-helper` library (a thin, officially
+/// maintained WKWebView + IFrame Player API wrapper) — a bare hand-
+/// rolled iframe is inherently working around something Google hasn't
+/// documented, so there's a real ceiling on how much can be fixed this
+/// way if YouTube's validation keeps moving.
 private struct YouTubeEmbedWebView: UIViewRepresentable {
     let videoId: String
 
@@ -61,6 +66,9 @@ private struct YouTubeEmbedWebView: UIViewRepresentable {
         webView.scrollView.isScrollEnabled = false
         webView.isOpaque = false
         webView.backgroundColor = .black
+        // WKWebView's default UA doesn't fully match real mobile Safari,
+        // and YouTube's client validation can reject that outright.
+        webView.customUserAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1"
         return webView
     }
 
