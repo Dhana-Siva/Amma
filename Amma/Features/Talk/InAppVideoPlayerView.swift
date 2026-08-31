@@ -33,16 +33,23 @@ struct InAppVideoPlayerView: View {
 /// a plain iframe just works, and there's no reason to expect the JS API
 /// to behave any better inside a WKWebView here).
 ///
-/// Confirmed live: loading the embed URL *directly* as the WKWebView's
-/// top-level page (`webView.load(URLRequest(url: embedURL))`) produces
-/// YouTube's own "Video configuration error" — its embed validation
-/// doesn't get a real origin/referrer to check that way. Wrapping the
-/// same iframe inside an actual (tiny, local) HTML page and loading that
-/// via `loadHTMLString(_:baseURL:)`, with baseURL set to youtube.com,
-/// gives it a proper origin to validate against — same fix shape as the
-/// Cast receiver's own iframe embed, just reached the "wrap it in real
-/// HTML" step one layer earlier here since there was no HTML page at all
-/// yet, just a direct URL load.
+/// Confirmed live, in two steps:
+/// 1. Loading the embed URL *directly* as the WKWebView's top-level page
+///    (`webView.load(URLRequest(url: embedURL))`) produces YouTube's own
+///    "Video configuration error" — its embed validation doesn't get a
+///    real origin/referrer that way at all. Fixed by wrapping the same
+///    iframe inside an actual (tiny, local) HTML page instead.
+/// 2. That page's `baseURL` initially claimed `https://www.youtube.com`
+///    — a common trick for exactly this situation — but that produced a
+///    *different* live error instead ("Video unavailable", error 152-4).
+///    Confirmed via a side-by-side test: the identical iframe HTML,
+///    served from a real but unrelated origin (a plain local HTTP
+///    server, not youtube.com), played the same video with no error at
+///    all. So claiming to *be* youtube.com while obviously not being
+///    served from there looks to be actively flagged rather than
+///    helpful — YouTube's anti-embedding-fraud checks likely catch the
+///    spoofed origin specifically. `baseURL: nil` (an opaque origin,
+///    no claim at all) is what actually works.
 private struct YouTubeEmbedWebView: UIViewRepresentable {
     let videoId: String
 
@@ -74,6 +81,6 @@ private struct YouTubeEmbedWebView: UIViewRepresentable {
         </body>
         </html>
         """
-        webView.loadHTMLString(html, baseURL: URL(string: "https://www.youtube.com"))
+        webView.loadHTMLString(html, baseURL: nil)
     }
 }
