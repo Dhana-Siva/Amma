@@ -648,6 +648,37 @@ async def transcribe_audio(family_id: str = Form(...), audio: UploadFile = File(
     return {"transcript": transcript}
 
 
+@app.post("/v1/admin/debug-web-search")
+def debug_web_search(transcript: str) -> dict:
+    # One-off diagnostic — no response_model constraint, so this can
+    # return the raw shape of what Claude actually did (block types, any
+    # tool_use/server_tool_use, all text fragments) instead of just the
+    # final reply_text /v1/interactions normally returns. Added because
+    # web_search silently wasn't triggering and there was no way to see
+    # why from the client-facing response alone. Removed again right
+    # after diagnosing, same as the earlier cleanup-endpoint pattern.
+    tools = build_tools({})
+    response = client.messages.create(
+        model=MODEL,
+        max_tokens=300,
+        system=system_prompt("Mom", "Alex", "en", True, None, False),
+        messages=[{"role": "user", "content": transcript}],
+        tools=tools,
+    )
+    return {
+        "stop_reason": response.stop_reason,
+        "blocks": [
+            {
+                "type": block.type,
+                "text": getattr(block, "text", None),
+                "name": getattr(block, "name", None),
+                "input": getattr(block, "input", None),
+            }
+            for block in response.content
+        ],
+    }
+
+
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok"}
