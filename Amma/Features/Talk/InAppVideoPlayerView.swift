@@ -32,6 +32,17 @@ struct InAppVideoPlayerView: View {
 /// API's ready callback never fired reliably in that embedded context;
 /// a plain iframe just works, and there's no reason to expect the JS API
 /// to behave any better inside a WKWebView here).
+///
+/// Confirmed live: loading the embed URL *directly* as the WKWebView's
+/// top-level page (`webView.load(URLRequest(url: embedURL))`) produces
+/// YouTube's own "Video configuration error" — its embed validation
+/// doesn't get a real origin/referrer to check that way. Wrapping the
+/// same iframe inside an actual (tiny, local) HTML page and loading that
+/// via `loadHTMLString(_:baseURL:)`, with baseURL set to youtube.com,
+/// gives it a proper origin to validate against — same fix shape as the
+/// Cast receiver's own iframe embed, just reached the "wrap it in real
+/// HTML" step one layer earlier here since there was no HTML page at all
+/// yet, just a direct URL load.
 private struct YouTubeEmbedWebView: UIViewRepresentable {
     let videoId: String
 
@@ -47,7 +58,22 @@ private struct YouTubeEmbedWebView: UIViewRepresentable {
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
-        guard let url = URL(string: "https://www.youtube.com/embed/\(videoId)?autoplay=1&playsinline=1") else { return }
-        webView.load(URLRequest(url: url))
+        let html = """
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+          <style>
+            html, body { margin: 0; padding: 0; background: #000; height: 100%; }
+            iframe { position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+          </style>
+        </head>
+        <body>
+          <iframe src="https://www.youtube.com/embed/\(videoId)?autoplay=1&playsinline=1"
+                  allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </body>
+        </html>
+        """
+        webView.loadHTMLString(html, baseURL: URL(string: "https://www.youtube.com"))
     }
 }
