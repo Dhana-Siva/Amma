@@ -25,8 +25,10 @@ struct OnboardingView: View {
             case 1:
                 namesStep
             case 2:
-                consentStep
+                aiDisclosureStep
             case 3:
+                consentStep
+            case 4:
                 contactsStep
             default:
                 callMethodStep
@@ -34,7 +36,7 @@ struct OnboardingView: View {
 
             Spacer()
 
-            Button(step < 4 ? "Continue" : "Get started") {
+            Button(step < 5 ? (step == 2 ? "I Understand, Continue" : "Continue") : "Get started") {
                 // Apple rejected an earlier build under Guideline 5.1.1 for
                 // a dedicated "Allow Contacts access" button here — its
                 // wording echoed the system dialog's own language closely
@@ -44,10 +46,10 @@ struct OnboardingView: View {
                 // Allow/Don't Allow prompt fires as a side effect of the
                 // ordinary "Continue" tap, after contactsStep has already
                 // explained why (which Apple's own guidance says is fine).
-                if step == 3 {
+                if step == 4 {
                     Task { await ContactsService.shared.requestAccessIfNeeded() }
                 }
-                if step < 4 {
+                if step < 5 {
                     step += 1
                 } else {
                     finish()
@@ -93,6 +95,35 @@ struct OnboardingView: View {
                 Text("English").tag("en")
             }
             .pickerStyle(.segmented)
+        }
+    }
+
+    // Added after an Apple App Review rejection: the app sends the
+    // parent's spoken transcript to Anthropic (to generate Amma's reply)
+    // and their audio to ElevenLabs (to transcribe it, and to speak the
+    // reply back) on every single Talk exchange — core functionality,
+    // not optional. Apple's guidance was explicit that a privacy-policy
+    // mention alone isn't sufficient; this needs its own in-app
+    // disclosure naming the specific third parties and what's sent to
+    // each, with an affirmative action (not just passive text) before
+    // any of it can happen — hence "I Understand, Continue" rather than
+    // a plain "Continue" specifically on this step. This is separate
+    // from consentStep below, which is about the optional voice-cloning
+    // feature specifically, not this baseline data flow every message
+    // goes through regardless.
+    private var aiDisclosureStep: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "sparkles")
+                .font(.system(size: 48))
+                .foregroundStyle(.purple)
+            Text("How Amma Works")
+                .font(.title2.bold())
+            Text("Every time you tap and talk, what you say is sent to Anthropic (the company behind Claude, the AI that writes Amma's replies) and to ElevenLabs (which turns your speech into text, and text into Amma's spoken voice). That's how Amma understands you and replies — it happens on every message, not just some.")
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+            Text("See our Privacy Policy for full details on what's shared, with whom, and why.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
         }
     }
 
