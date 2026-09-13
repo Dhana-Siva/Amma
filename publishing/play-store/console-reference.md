@@ -17,7 +17,11 @@ since this was generated)
 - **App icon**: `icon-512x512.png`
 - **Feature graphic**: `feature-graphic-1024x500.png`
 - **Screenshots**: `screenshot-1-talk.png`, `screenshot-2-voice.png`, `screenshot-3-devices.png`
-- **Privacy policy URL**: https://dhana-siva.github.io/amma-cast-receiver/privacy.html
+- **Privacy policy URL**: https://dhana-siva.github.io/Amma/
+  (was `amma-cast-receiver/privacy.html` — that page covered the same
+  Anthropic/ElevenLabs disclosure reasonably well, but consolidated onto
+  one canonical policy shared with iOS, so the two can't drift apart.
+  Update this field in Play Console to match.)
 - **Category**: Communication (or Lifestyle, either fits)
 - **Contact email**: dhanageetha2000@gmail.com
 
