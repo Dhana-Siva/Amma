@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import com.dhana.amma.AmmaApplication
 import com.dhana.amma.R
 import com.dhana.amma.ui.devices.DevicesScreen
+import com.dhana.amma.ui.onboarding.AIDisclosureGateScreen
 import com.dhana.amma.ui.onboarding.OnboardingScreen
 import com.dhana.amma.ui.onboarding.TutorialScreen
 import com.dhana.amma.ui.talk.TalkScreen
@@ -42,10 +43,19 @@ fun AmmaRoot() {
     val application = context.applicationContext as AmmaApplication
 
     var onboardingComplete by remember { mutableStateOf(application.preferences.onboardingComplete) }
+    // Separate from onboardingComplete on purpose — see AmmaPreferences.
+    // onboardingComplete persists forever, so gating this disclosure on it
+    // alone would mean anyone who onboarded before this flag existed
+    // never sees it on any later build.
+    var aiDisclosureAcknowledged by remember { mutableStateOf(application.preferences.aiDisclosureAcknowledged) }
     var hasSeenTutorial by remember { mutableStateOf(application.preferences.hasSeenTutorial) }
 
     when {
         !onboardingComplete -> OnboardingScreen(onComplete = { onboardingComplete = true })
+        !aiDisclosureAcknowledged -> AIDisclosureGateScreen(onAcknowledge = {
+            application.preferences.aiDisclosureAcknowledged = true
+            aiDisclosureAcknowledged = true
+        })
         !hasSeenTutorial -> TutorialScreen(onComplete = { hasSeenTutorial = true })
         else -> MainTabs(application)
     }

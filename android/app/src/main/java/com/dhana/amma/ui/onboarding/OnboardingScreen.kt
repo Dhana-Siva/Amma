@@ -84,7 +84,17 @@ fun OnboardingScreen(onComplete: () -> Unit) {
                     LanguageOption("English", selected = languageCode == "en") { languageCode = "en" }
                 }
             }
-            2 -> {
+            // Added after an Apple App Review rejection (Guideline
+            // 5.1.2(i)/5.1.1(i)) — Amma sends every Talk message to
+            // Anthropic and ElevenLabs, and that has to be disclosed by
+            // name with an affirmative action before it happens, not just
+            // mentioned in the privacy policy. Content lives in
+            // AIDisclosureContent so it can also be shown as a standalone
+            // gate (AIDisclosureGateScreen, wired up in AmmaRoot.kt) to
+            // anyone whose device already has onboardingComplete = true
+            // from before this step existed.
+            2 -> AIDisclosureContent()
+            3 -> {
                 Text(stringResource(R.string.onboarding_calling_app_title), style = MaterialTheme.typography.headlineMedium)
                 Spacer(Modifier.height(8.dp))
                 Text(stringResource(R.string.onboarding_calling_app_body), style = MaterialTheme.typography.bodyMedium)
@@ -93,7 +103,7 @@ fun OnboardingScreen(onComplete: () -> Unit) {
                 CallingAppOption("Viber", selected = callingApp == CallingApp.VIBER) { callingApp = CallingApp.VIBER }
                 CallingAppOption("Telegram", selected = callingApp == CallingApp.TELEGRAM) { callingApp = CallingApp.TELEGRAM }
             }
-            3 -> {
+            4 -> {
                 val name = childName.ifBlank { "your child" }
                 Text(stringResource(R.string.onboarding_consent_title), style = MaterialTheme.typography.headlineMedium)
                 Spacer(Modifier.height(12.dp))
@@ -109,7 +119,10 @@ fun OnboardingScreen(onComplete: () -> Unit) {
         val canContinue = step != 1 || (parentName.isNotBlank() && childName.isNotBlank())
         Button(
             onClick = {
-                if (step < 3) {
+                if (step == 2) {
+                    application.preferences.aiDisclosureAcknowledged = true
+                }
+                if (step < 4) {
                     step += 1
                 } else {
                     application.preferences.apply {
@@ -137,7 +150,12 @@ fun OnboardingScreen(onComplete: () -> Unit) {
             enabled = canContinue,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text(if (step < 3) stringResource(R.string.onboarding_continue) else stringResource(R.string.onboarding_get_started))
+            val label = when {
+                step == 2 -> stringResource(R.string.ai_disclosure_continue)
+                step < 4 -> stringResource(R.string.onboarding_continue)
+                else -> stringResource(R.string.onboarding_get_started)
+            }
+            Text(label)
         }
     }
 }

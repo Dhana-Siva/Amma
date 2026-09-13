@@ -16,6 +16,19 @@
     <string name="onboarding_continue">Continue</string>
     <string name="onboarding_get_started">Get started</string>
 
+    <!-- AI data-sharing disclosure — required after an App Store rejection
+         (Guideline 5.1.2(i)/5.1.1(i)): the core Talk feature sends every
+         message to two third-party AI services, and this must be
+         disclosed by name with an affirmative action before it happens,
+         not just mentioned in the privacy policy. Kept in its own
+         AmmaPreferences flag (see aiDisclosureAcknowledged) so it can also
+         be shown as a standalone gate to anyone who already finished
+         onboarding on a build before this existed. -->
+    <string name="ai_disclosure_title">How Amma Works</string>
+    <string name="ai_disclosure_body">Every time you tap and talk, what you say is sent to Anthropic (the company behind Claude, the AI that writes Amma\'s replies) and to ElevenLabs (which turns your speech into text, and text into Amma\'s spoken voice). That\'s how Amma understands you and replies — it happens on every message, not just some.</string>
+    <string name="ai_disclosure_privacy_link">See our Privacy Policy for full details on what\'s shared, with whom, and why.</string>
+    <string name="ai_disclosure_continue">I Understand, Continue</string>
+
     <!-- Tutorial -->
     <string name="tutorial_page1_title">Tap to talk</string>
     <string name="tutorial_page1_body_en">Tap the mic button and talk to Amma, just like talking to %1$s.</string>

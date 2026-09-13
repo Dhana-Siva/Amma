@@ -13,6 +13,17 @@ class AmmaPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_HAS_SEEN_TUTORIAL, false)
         set(value) = prefs.edit().putBoolean(KEY_HAS_SEEN_TUTORIAL, value).apply()
 
+    // Deliberately separate from onboardingComplete, matching the iOS fix
+    // for the same App Store rejection (Amma sends every Talk message to
+    // Anthropic + ElevenLabs with no disclosure at all before this existed).
+    // onboardingComplete never resets once true, so gating this disclosure
+    // on it alone would mean anyone who onboarded on a build before this
+    // flag existed — including a Play Store reviewer's device — would
+    // never see it on any later build. AmmaRoot checks this independently.
+    var aiDisclosureAcknowledged: Boolean
+        get() = prefs.getBoolean(KEY_AI_DISCLOSURE_ACKNOWLEDGED, false)
+        set(value) = prefs.edit().putBoolean(KEY_AI_DISCLOSURE_ACKNOWLEDGED, value).apply()
+
     var languageCode: String
         get() = prefs.getString(KEY_LANGUAGE_CODE, "en") ?: "en"
         set(value) = prefs.edit().putString(KEY_LANGUAGE_CODE, value).apply()
@@ -55,6 +66,7 @@ class AmmaPreferences(context: Context) {
     private companion object {
         const val KEY_ONBOARDING_COMPLETE = "onboarding_complete"
         const val KEY_HAS_SEEN_TUTORIAL = "has_seen_tutorial"
+        const val KEY_AI_DISCLOSURE_ACKNOWLEDGED = "ai_disclosure_acknowledged"
         const val KEY_LANGUAGE_CODE = "language_code"
         const val KEY_PARENT_NAME = "parent_name"
         const val KEY_CHILD_NAME = "child_name"
