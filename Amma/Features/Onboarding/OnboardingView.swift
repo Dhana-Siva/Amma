@@ -8,6 +8,9 @@ struct OnboardingView: View {
     @AppStorage("childName") private var storedChildName = ""
     @AppStorage("childPhoneNumber") private var storedChildPhoneNumber = ""
     @AppStorage("preferredCallMethod") private var preferredCallMethod = PreferredCallMethod.whatsapp
+    // Set here too so someone who sees this step during onboarding isn't
+    // shown AIDisclosureGateView again right after — see AIDisclosureView.swift.
+    @AppStorage("aiDisclosureAcknowledged") private var aiDisclosureAcknowledged = false
 
     @State private var step = 0
     @State private var parentName = ""
@@ -48,6 +51,9 @@ struct OnboardingView: View {
                 // explained why (which Apple's own guidance says is fine).
                 if step == 4 {
                     Task { await ContactsService.shared.requestAccessIfNeeded() }
+                }
+                if step == 2 {
+                    aiDisclosureAcknowledged = true
                 }
                 if step < 5 {
                     step += 1
@@ -111,26 +117,13 @@ struct OnboardingView: View {
     // from consentStep below, which is about the optional voice-cloning
     // feature specifically, not this baseline data flow every message
     // goes through regardless.
+    // Content lives in AIDisclosureContent so the same disclosure can also
+    // be shown as a standalone gate (AIDisclosureGateView, wired up in
+    // AmmaApp.swift) to anyone whose device already has onboardingComplete
+    // = true from before this step existed — otherwise they'd skip past it
+    // on every build from now on, having already finished onboarding once.
     private var aiDisclosureStep: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "sparkles")
-                .font(.system(size: 48))
-                .foregroundStyle(.purple)
-            Text("How Amma Works")
-                .font(.title2.bold())
-            Text("Every time you tap and talk, what you say is sent to Anthropic (the company behind Claude, the AI that writes Amma's replies) and to ElevenLabs (which turns your speech into text, and text into Amma's spoken voice). That's how Amma understands you and replies — it happens on every message, not just some.")
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-            // Was plain, unlinked Text — Apple's 5.1.2(i)/5.1.1(i) rejection
-            // called out that the policy itself (not just this in-app blurb)
-            // has to spell out the same third-party sharing, and there was
-            // no way to actually reach it from here to check. Now a real,
-            // tappable link to the hosted policy (see
-            // publishing/privacy-policy/index.html, served via GitHub
-            // Pages).
-            Link("See our Privacy Policy for full details on what's shared, with whom, and why.", destination: URL(string: "https://dhana-siva.github.io/Amma/")!)
-                .font(.footnote)
-        }
+        AIDisclosureContent()
     }
 
     private var consentStep: some View {

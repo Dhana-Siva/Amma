@@ -9,6 +9,12 @@ private let castReceiverApplicationID = "592BF965"
 struct AmmaApp: App {
     @AppStorage("onboardingComplete") private var onboardingComplete = false
     @AppStorage("hasSeenTutorial") private var hasSeenTutorial = false
+    // Separate from onboardingComplete on purpose — see AIDisclosureView.swift.
+    // onboardingComplete persists forever, so gating this disclosure on it
+    // alone means anyone who onboarded before this screen existed (including
+    // an App Reviewer's device reused across a resubmission) would never see
+    // it on any later build.
+    @AppStorage("aiDisclosureAcknowledged") private var aiDisclosureAcknowledged = false
 
     init() {
         CastService.configure(receiverApplicationID: castReceiverApplicationID)
@@ -20,6 +26,8 @@ struct AmmaApp: App {
         WindowGroup {
             if !onboardingComplete {
                 OnboardingView(onComplete: { onboardingComplete = true })
+            } else if !aiDisclosureAcknowledged {
+                AIDisclosureGateView(onAcknowledge: { aiDisclosureAcknowledged = true })
             } else if !hasSeenTutorial {
                 TutorialView(onComplete: { hasSeenTutorial = true })
             } else {
