@@ -40,23 +40,8 @@ targets:
     dependencies:
       - package: GoogleCast
       - package: YouTubeiOSPlayerHelper
-      - sdk: HealthKit.framework
       - target: AmmaWidget
         embed: true
-    entitlements:
-      path: Amma/Amma.entitlements
-      properties:
-        com.apple.developer.healthkit: true
-        # Not something the app actually uses (it's for correcting workout/
-        # estimate algorithms) — picked up by accident via Xcode's
-        # "+ Capability" search when adding plain HealthKit. Harmless, but
-        # worth removing via Xcode's Signing & Capabilities UI (not by
-        # editing this file / regenerating) before App Store submission,
-        # since that's the only path that keeps the provisioning profile's
-        # capability registration in sync. Recorded here so a future
-        # `xcodegen generate` doesn't silently drop it and break the
-        # profile that's currently working on-device.
-        com.apple.developer.healthkit.recalibrate-estimates: true
     info:
       path: Amma/Info.plist
       properties:
@@ -68,10 +53,6 @@ targets:
         NSContactsUsageDescription: "Amma looks up phone numbers in your contacts when you ask it to call or message someone by name."
         NSCameraUsageDescription: "Amma can take a photo of your child to show on their profile."
         NSLocalNetworkUsageDescription: "Amma looks for your TV and speakers on your home network so it can cast for you."
-        NSHealthShareUsageDescription: "Amma can read your heart rate from your paired Apple Watch so it can gently check in when it seems elevated."
-        # Amma never writes to Health — this is only required by Apple's
-        # validator because the HealthKit capability is enabled at all.
-        NSHealthUpdateUsageDescription: "Amma does not write anything to Health. This permission is requested only because HealthKit is enabled for reading your heart rate."
         # Required for ReturnActivityService's Activity.request(...) to
         # succeed — without it, starting a Live Activity throws at runtime.
         NSSupportsLiveActivities: true
@@ -91,8 +72,8 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.dhana.amma
         SWIFT_VERSION: "5.0"
         TARGETED_DEVICE_FAMILY: "1"
-        MARKETING_VERSION: "0.1.0"
-        CURRENT_PROJECT_VERSION: "1"
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "10"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         CODE_SIGN_STYLE: Automatic
@@ -120,8 +101,8 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.dhana.amma.AmmaWidget
         SWIFT_VERSION: "5.0"
         TARGETED_DEVICE_FAMILY: "1"
-        MARKETING_VERSION: "0.1.0"
-        CURRENT_PROJECT_VERSION: "1"
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "10"
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: H72SV43N57
         SKIP_INSTALL: true

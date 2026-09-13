@@ -142,29 +142,6 @@ def test_interaction_no_audio_when_elevenlabs_not_configured(monkeypatch, family
     assert response.json()["reply_audio_url"] is None
 
 
-def test_interaction_includes_heart_rate_context_when_provided(monkeypatch, family_id):
-    create_mock = mock_claude_reply(monkeypatch, [text_block("Hi!")])
-    mock_elevenlabs_tts(monkeypatch)
-
-    client.post(
-        "/v1/interactions",
-        json={"family_id": family_id, "transcript": "hi", "heart_rate": 132},
-    )
-
-    _, kwargs = create_mock.call_args
-    assert "132 bpm" in kwargs["system"]
-
-
-def test_interaction_omits_heart_rate_context_when_absent(monkeypatch, family_id):
-    create_mock = mock_claude_reply(monkeypatch, [text_block("Hi!")])
-    mock_elevenlabs_tts(monkeypatch)
-
-    client.post("/v1/interactions", json={"family_id": family_id, "transcript": "hi"})
-
-    _, kwargs = create_mock.call_args
-    assert "bpm" not in kwargs["system"]
-
-
 def test_interaction_still_encourages_cast_media_when_tv_not_linked(monkeypatch, family_id):
     # Was "do NOT use cast_media" when unlinked — changed once the iOS
     # app gained an in-app playback fallback for exactly this case, so

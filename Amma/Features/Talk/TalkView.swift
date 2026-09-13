@@ -27,7 +27,6 @@ struct TalkView: View {
     @State private var statusMessage: String?
     @StateObject private var recorder = AudioRecorderService()
     @StateObject private var playback = AudioPlaybackService()
-    @ObservedObject private var health = HealthService.shared
     @ObservedObject private var castService = CastService.shared
     #if targetEnvironment(simulator)
     @State private var debugTranscript = ""
@@ -163,11 +162,6 @@ struct TalkView: View {
                 Button("Cancel", role: .cancel) {}
             } message: {
                 Text("This only clears what's shown here — it doesn't affect anything already sent.")
-            }
-            .task {
-                // Best-effort — only refreshes if the parent already granted
-                // Health access from the Setup tab; never prompts from here.
-                if health.hasRequestedAccess { await health.refresh() }
             }
             .fullScreenCover(item: $playingVideo) { video in
                 InAppVideoPlayerView(videoId: video.videoId, title: video.title)
@@ -364,7 +358,6 @@ struct TalkView: View {
                 familyId: familyId,
                 transcript: transcript,
                 channel: .voice,
-                heartRate: health.latestBPM,
                 castLinked: castService.isConnected
             )
             await MainActor.run {

@@ -77,10 +77,6 @@ class InteractionRequest(BaseModel):
     channel: str = "tap"
     parent_name: str | None = None
     child_name: str | None = None
-    # Latest heart rate reading from the parent's paired Apple Watch, read
-    # via HealthKit on-device — optional, and absent entirely for anyone
-    # without a watch or who hasn't granted the permission.
-    heart_rate: int | None = None
     # Whether a Chromecast is currently linked, read from CastService on
     # the iOS side. Lets the model explain — warmly, in character, in
     # whatever language the reply is already in — that the TV needs to be
@@ -162,7 +158,6 @@ def system_prompt(
     child_name: str | None,
     language: str | None,
     has_tools: bool,
-    heart_rate: int | None = None,
     cast_linked: bool = False,
 ) -> str:
     parent = parent_name or "your parent"
@@ -175,16 +170,6 @@ def system_prompt(
         "1-3 short sentences. Ask a small follow-up question when it feels "
         f"natural. Never mention that you are an AI. {language_instruction}"
     )
-    if heart_rate:
-        prompt += (
-            f" Background context, not something to always bring up: {parent}'s "
-            f"smartwatch currently reads a heart rate of {heart_rate} bpm. Only "
-            "weave that in if it's clearly elevated (roughly over 100) or "
-            "unusually low (roughly under 50) and it fits naturally as a brief, "
-            "caring, non-alarmist line — never medical advice, never every "
-            "single message. Otherwise say nothing about it and just reply "
-            "normally."
-        )
     if has_tools:
         prompt += (
             " Only use a tool when THIS message is itself a direct, "
@@ -413,7 +398,7 @@ def create_interaction(req: InteractionRequest, request: Request) -> Interaction
     create_kwargs = dict(
         model=MODEL,
         max_tokens=300,
-        system=system_prompt(parent_name, child_name, family.get("language"), bool(tools), req.heart_rate, req.cast_linked),
+        system=system_prompt(parent_name, child_name, family.get("language"), bool(tools), req.cast_linked),
         messages=history[-MAX_HISTORY_TURNS:],
     )
     if tools:
