@@ -2,7 +2,6 @@ package com.dhana.amma.ui.talk
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -38,8 +37,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -47,6 +44,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dhana.amma.AmmaApplication
 import com.dhana.amma.models.InteractionLog
 import com.dhana.amma.R
+import com.dhana.amma.ui.theme.AvatarView
+import com.dhana.amma.ui.theme.HomeScreenPictureView
+import java.util.Calendar
 
 @Composable
 fun TalkScreen() {
@@ -69,8 +69,9 @@ fun TalkScreen() {
         if (results[Manifest.permission.RECORD_AUDIO] == true) viewModel.onMicTap()
     }
 
-    val photoPath = application.preferences.childPhotoPath
     val childName = application.preferences.childName
+    val parentName = application.preferences.parentName
+    val parentRelation = application.preferences.parentRelation
 
     Scaffold { padding ->
         Column(
@@ -82,18 +83,8 @@ fun TalkScreen() {
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                val bitmap = remember(photoPath) {
-                    photoPath.takeIf { it.isNotBlank() }?.let { BitmapFactory.decodeFile(it) }
-                }
-                if (bitmap != null) {
-                    Image(
-                        bitmap = bitmap.asImageBitmap(),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.size(36.dp).clip(CircleShape),
-                    )
-                    Spacer(Modifier.size(12.dp))
-                }
+                AvatarView(size = 36.dp)
+                Spacer(Modifier.size(12.dp))
                 Text(
                     childName.ifBlank { "Amma" },
                     style = MaterialTheme.typography.headlineMedium,
@@ -105,12 +96,27 @@ fun TalkScreen() {
                     modifier = Modifier.weight(1f).fillMaxWidth(),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(
-                        text = stringResource(R.string.talk_empty_state),
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(horizontal = 32.dp),
+                    ) {
+                        HomeScreenPictureView(size = 140.dp)
+                        Spacer(Modifier.size(20.dp))
+                        Text(
+                            text = greeting(parentName, parentRelation),
+                            style = MaterialTheme.typography.titleLarge,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        )
+                        Spacer(Modifier.size(12.dp))
+                        Text(
+                            text = stringResource(R.string.talk_empty_state),
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        )
+                    }
                 }
             } else {
+                HomeScreenPictureView(size = 64.dp)
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth().weight(1f),
                     contentPadding = PaddingValues(16.dp),
@@ -172,6 +178,28 @@ fun TalkScreen() {
             }
         }
     }
+}
+
+// A time-of-day greeting with the parent's name/relation and a matching
+// emoji -- shown on the empty Talk screen, i.e. exactly the moment the
+// app opens (or a fresh tab, after backgrounding). Mirrors iOS's
+// TalkView.greeting.
+private fun greeting(parentName: String, parentRelation: String): String {
+    val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+    val (text, emoji) = when (hour) {
+        in 5..11 -> "Good morning" to "☀️"
+        in 12..16 -> "Good afternoon" to "🌤️"
+        in 17..20 -> "Good evening" to "🌆"
+        else -> "Hello" to "🌙"
+    }
+    // Prefer how the child actually addresses the parent (Amma, Mom,
+    // Appa, ...) set in Edit Profile -- reads far more like the child
+    // themselves greeting them than a first name would. Falls back to
+    // the parent's name, then to nothing, if relation isn't set.
+    val relation = parentRelation.trim()
+    val name = parentName.trim()
+    val addressee = relation.ifBlank { name }
+    return if (addressee.isBlank()) "$text! $emoji" else "$text, $addressee! $emoji"
 }
 
 @Composable
