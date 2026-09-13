@@ -1,0 +1,313 @@
+<title>Amma Privacy Policy</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap');
+
+  :root{
+    --bg:#faf6f0;
+    --paper:#ffffff;
+    --ink:#2a2420;
+    --ink-soft:#54493f;
+    --muted:#8a8072;
+    --rule:#e6ddd0;
+    --callout:#f4ece1;
+    --rose:#b5486b;
+    --rose-soft:#f2e2e7;
+    --violet:#6b5b95;
+    --violet-soft:#e9e4f2;
+    --blue:#3b6ea5;
+    --blue-soft:#e2ebf4;
+    --mono-ink:#5c4f3f;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#1c1815;
+      --paper:#242019;
+      --ink:#ece5db;
+      --ink-soft:#c9beae;
+      --muted:#948a7a;
+      --rule:#3a332b;
+      --callout:#2c2620;
+      --rose:#e08aa4;
+      --rose-soft:#3a232b;
+      --violet:#b3a3d6;
+      --violet-soft:#2b2740;
+      --blue:#8fb4dd;
+      --blue-soft:#1f2c3a;
+      --mono-ink:#c9beae;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#1c1815;
+    --paper:#242019;
+    --ink:#ece5db;
+    --ink-soft:#c9beae;
+    --muted:#948a7a;
+    --rule:#3a332b;
+    --callout:#2c2620;
+    --rose:#e08aa4;
+    --rose-soft:#3a232b;
+    --violet:#b3a3d6;
+    --violet-soft:#2b2740;
+    --blue:#8fb4dd;
+    --blue-soft:#1f2c3a;
+    --mono-ink:#c9beae;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Public Sans', ui-sans-serif, system-ui, sans-serif;
+    line-height:1.6;
+  }
+  .page{
+    max-width:700px;
+    margin:0 auto;
+    padding:64px 24px 96px;
+  }
+  .mark{
+    width:40px; height:40px;
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:20px;
+  }
+  .mark svg{ width:32px; height:32px; }
+
+  h1,h2{
+    font-family:'Fraunces', Georgia, serif;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  h1{
+    font-size:clamp(1.9rem, 4vw, 2.5rem);
+    font-weight:700;
+    margin:0 0 6px;
+    letter-spacing:-0.01em;
+  }
+  .subtitle{
+    color:var(--muted);
+    font-size:0.95rem;
+    margin:0 0 40px;
+  }
+  .subtitle strong{ color:var(--ink-soft); font-weight:600; }
+
+  h2{
+    font-size:1.3rem;
+    font-weight:600;
+    margin:0 0 14px;
+    padding-top:8px;
+  }
+  section{
+    padding:36px 0;
+    border-top:1px solid var(--rule);
+  }
+  section:first-of-type{ border-top:none; padding-top:0; }
+
+  p{ margin:0 0 14px; color:var(--ink-soft); }
+  p:last-child{ margin-bottom:0; }
+  a{ color:var(--blue); text-decoration-thickness:1px; text-underline-offset:2px; }
+  a:hover{ color:var(--rose); }
+
+  .eyebrow{
+    display:inline-block;
+    font-family:'IBM Plex Mono', ui-monospace, monospace;
+    font-size:0.7rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:8px;
+  }
+
+  .summary{
+    background:var(--callout);
+    border-radius:14px;
+    padding:24px 26px;
+    margin:0 0 8px;
+  }
+  .summary h2{ margin-top:0; }
+  .summary ul{ margin:0; padding-left:1.15em; }
+  .summary li{ margin-bottom:10px; color:var(--ink-soft); }
+  .summary li:last-child{ margin-bottom:0; }
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:6px;
+    font-size:0.92rem;
+  }
+  th{
+    text-align:left;
+    font-family:'IBM Plex Mono', ui-monospace, monospace;
+    font-size:0.68rem;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-weight:500;
+    padding:0 12px 10px 0;
+    border-bottom:1px solid var(--rule);
+  }
+  td{
+    padding:14px 12px 14px 0;
+    border-bottom:1px solid var(--rule);
+    vertical-align:top;
+    color:var(--ink-soft);
+  }
+  tr:last-child td{ border-bottom:none; }
+  td.data-name{ color:var(--ink); font-weight:600; }
+  .tag{
+    display:inline-block;
+    font-family:'IBM Plex Mono', ui-monospace, monospace;
+    font-size:0.72rem;
+    padding:2px 8px;
+    border-radius:6px;
+    white-space:nowrap;
+  }
+  .tag.anthropic{ background:var(--violet-soft); color:var(--violet); }
+  .tag.elevenlabs{ background:var(--blue-soft); color:var(--blue); }
+  .tag.ondevice{ background:var(--rose-soft); color:var(--rose); }
+  .tag.ourserver{ background:var(--callout); color:var(--mono-ink); }
+
+  .tw{ overflow-x:auto; }
+
+  .not-collected{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:4px;
+  }
+  .not-collected span{
+    font-size:0.85rem;
+    padding:6px 12px;
+    border-radius:20px;
+    border:1px solid var(--rule);
+    color:var(--muted);
+  }
+
+  .callout-line{
+    border-left:3px solid var(--rose);
+    padding:2px 0 2px 16px;
+    margin:18px 0;
+  }
+  .callout-line p{ margin:0; color:var(--ink-soft); }
+
+  footer{
+    margin-top:40px;
+    padding-top:28px;
+    border-top:1px solid var(--rule);
+    color:var(--muted);
+    font-size:0.85rem;
+  }
+</style>
+
+<div class="page">
+
+  <div class="mark" aria-hidden="true">
+    <svg viewBox="0 0 32 32" fill="none">
+      <circle cx="16" cy="16" r="15" stroke="var(--rose)" stroke-width="1.4"/>
+      <path d="M16 22c-4-3.2-6.5-5.9-6.5-8.9C9.5 10.4 11.4 9 13.2 9c1.2 0 2.3.6 2.8 1.6C16.5 9.6 17.6 9 18.8 9c1.8 0 3.7 1.4 3.7 4.1 0 3-2.5 5.7-6.5 8.9z" fill="var(--rose)"/>
+    </svg>
+  </div>
+
+  <h1>Amma Privacy Policy</h1>
+  <p class="subtitle">Effective <strong>September 13, 2026</strong> &nbsp;·&nbsp; Applies to Amma on iOS and Android, for families using either the Amma or Appa persona.</p>
+
+  <section>
+    <div class="summary">
+      <span class="eyebrow">Plain-language summary</span>
+      <h2>The short version</h2>
+      <ul>
+        <li>Every time you tap and talk, what you say is sent to <strong>Anthropic</strong> (the AI that writes Amma's replies) and to <strong>ElevenLabs</strong> (which turns your speech into text, and text into Amma's spoken voice). This is core to how Amma works, and happens on every message.</li>
+        <li>We keep your family's setup info (names, optional phone number, language) and your conversation history on our own server, so Amma can remember context between messages.</li>
+        <li>Recording a voice sample so Amma can reply in a familiar voice is entirely optional, asked for separately, and can be withdrawn at any time.</li>
+        <li>Contact numbers stay on your phone. Only the name you say out loud — never the number itself — is sent anywhere.</li>
+        <li>We don't sell data, show ads, or track you across other companies' apps or websites.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>What happens when you talk to Amma</h2>
+    <p>Talking to Amma is the app's core feature, and it works by sending your voice and words to two outside companies that specialize in AI. Here's exactly what goes where:</p>
+    <div class="tw">
+    <table>
+      <tr><th>Data</th><th>Sent to</th><th>Why</th><th>Kept afterward?</th></tr>
+      <tr>
+        <td class="data-name">Your voice recording</td>
+        <td><span class="tag elevenlabs">ElevenLabs</span></td>
+        <td>Transcribed into text ("speech-to-text"), using your family's language setting to transcribe accurately</td>
+        <td>No — the recording is discarded once we get the text back</td>
+      </tr>
+      <tr>
+        <td class="data-name">The text of what you said</td>
+        <td><span class="tag anthropic">Anthropic</span></td>
+        <td>Given to Claude, the AI model that writes Amma's reply, along with recent conversation history for context</td>
+        <td><span class="tag ourserver">Our server</span> — saved as conversation history, so Amma remembers earlier messages</td>
+      </tr>
+      <tr>
+        <td class="data-name">Amma's written reply</td>
+        <td><span class="tag elevenlabs">ElevenLabs</span></td>
+        <td>Converted into spoken audio ("text-to-speech") so Amma can talk back</td>
+        <td>No — the audio is streamed to your device and not stored by us</td>
+      </tr>
+    </table>
+    </div>
+    <div class="callout-line">
+      <p>Anthropic's and ElevenLabs' own privacy practices govern how they handle what we send them. You can read <a href="https://www.anthropic.com/legal/privacy" target="_blank" rel="noopener">Anthropic's privacy policy</a> and <a href="https://elevenlabs.io/privacy-policy" target="_blank" rel="noopener">ElevenLabs' privacy policy</a> for their own details.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Your family's account information</h2>
+    <p>When you set up Amma, the parent's name, the child's name, an optional phone number for the child, and a language preference are stored on our server. This lets Amma greet the right people, call the right number when asked, and reply in the right language — it isn't shared with Anthropic or ElevenLabs beyond what's needed for the specific reply being generated (for example, the name used in a greeting).</p>
+  </section>
+
+  <section>
+    <h2>Optional: a voice sample, so Amma sounds familiar</h2>
+    <p>If you choose to, you can record about 30 seconds of your voice so Amma can reply using a custom voice instead of a default one. This is entirely separate from the core Talk feature described above:</p>
+    <ul>
+      <li>It's off unless you explicitly turn on the consent toggle in Voice Setup.</li>
+      <li>Your recording is uploaded to <span class="tag elevenlabs">ElevenLabs</span>, which uses it to create a synthetic voice.</li>
+      <li>You can withdraw this consent at any time from the same screen, which stops the custom voice from being used going forward.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Calling family by name</h2>
+    <p>Amma can look up a phone number from your phone's Contacts app so you can say a name — like "call Geetha" — instead of a number. This lookup happens <span class="tag ondevice">entirely on your device</span>. Only the name you say is ever sent to Anthropic as part of your message; the phone numbers in your Contacts never leave your phone.</p>
+  </section>
+
+  <section>
+    <h2>What we don't collect</h2>
+    <div class="not-collected">
+      <span>Location</span>
+      <span>Financial information</span>
+      <span>Browsing history</span>
+      <span>Health data</span>
+      <span>Advertising identifiers</span>
+    </div>
+    <p style="margin-top:16px;">We don't use your data for advertising, and we don't track you across other companies' apps or websites.</p>
+  </section>
+
+  <section>
+    <h2>Your choices</h2>
+    <ul>
+      <li><strong>Voice cloning consent</strong> can be granted or withdrawn any time from Voice Setup.</li>
+      <li><strong>Contacts access</strong> can be granted or revoked any time from your device's Settings, or declined during onboarding.</li>
+      <li><strong>Deleting your data:</strong> to request deletion of your family's conversation history and account information from our server, contact us using the details below.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Families with children</h2>
+    <p>Amma is designed to be used together, with a parent setting up the family and a child using the Talk feature to stay in touch. The same data practices described above apply regardless of the child's age. If you're a parent or guardian with questions about a child's data, or want it removed, contact us below — we'll act on that request directly.</p>
+  </section>
+
+  <section>
+    <h2>Changes to this policy</h2>
+    <p>If how Amma handles data changes — for example, adding a new third-party service — we'll update this page and the date at the top, and call out material changes in the app itself.</p>
+  </section>
+
+  <footer>
+    Questions about this policy or your family's data? Contact us at <a href="mailto:privacy@ammaapp.example">privacy@ammaapp.example</a>.
+  </footer>
+
+</div>

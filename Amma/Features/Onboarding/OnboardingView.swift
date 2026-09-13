@@ -121,9 +121,15 @@ struct OnboardingView: View {
             Text("Every time you tap and talk, what you say is sent to Anthropic (the company behind Claude, the AI that writes Amma's replies) and to ElevenLabs (which turns your speech into text, and text into Amma's spoken voice). That's how Amma understands you and replies — it happens on every message, not just some.")
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
-            Text("See our Privacy Policy for full details on what's shared, with whom, and why.")
+            // Was plain, unlinked Text — Apple's 5.1.2(i)/5.1.1(i) rejection
+            // called out that the policy itself (not just this in-app blurb)
+            // has to spell out the same third-party sharing, and there was
+            // no way to actually reach it from here to check. Now a real,
+            // tappable link to the hosted policy (see
+            // publishing/privacy-policy/index.html, served via GitHub
+            // Pages).
+            Link("See our Privacy Policy for full details on what's shared, with whom, and why.", destination: URL(string: "https://dhana-siva.github.io/Amma/")!)
                 .font(.footnote)
-                .foregroundStyle(.secondary)
         }
     }
 

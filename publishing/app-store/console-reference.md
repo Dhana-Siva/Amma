@@ -27,15 +27,37 @@ app actually does:
 | Contact Info (parent/child names) | Yes | Yes | No | App Functionality |
 | Other User Content (conversation transcripts, contact names mentioned in speech) | Yes | Yes | No | App Functionality |
 | User ID (the app-generated family identifier) | Yes | Yes | No | App Functionality |
-| Health and Fitness (heart rate, from a paired Apple Watch) | **Yes** | Yes | No | App Functionality — sent with each Talk interaction so Amma can gently mention it if elevated/low; optional, only if the parent connects an Apple Watch in Setup |
 | Contacts (actual phone numbers) | **No** | — | — | Resolved entirely on-device via the Contacts framework, never transmitted. (v1.1 also added writing a new contact and picking one via Apple's native contact picker — still entirely on-device, nothing about a contact is ever sent to Amma's backend) |
 | Precise/Coarse Location | No | — | — | Not collected |
 | Financial Info, Browsing History | No | — | — | Not collected |
 
-**Note on Health**: this is a real "Yes" answer, not a formality — `heart_rate` is included in the `/v1/interactions` request body whenever a paired Apple Watch is connected (`backend/app.py`'s `system_prompt()` uses it to let Claude mention it only if notably high/low). Answering "No" here would misrepresent the app to Apple's reviewers and to users reading the nutrition label — don't skip this one even though it's easy to miss since HealthKit was added in a later session than the rest of this doc.
+**Health and Fitness — REMOVED (2026-09-05)**: this row used to be a real "Yes" here — heart rate from a paired Apple Watch, sent with each Talk interaction so Amma could gently mention it if elevated/low. Apple rejected the build under Guideline 2.5.1 (HealthKit present without a primary feature that needs it), so the entire feature — `HealthService.swift`, the HealthKit entitlement, the `NSHealthShareUsageDescription`/`NSHealthUpdateUsageDescription` Info.plist keys, and the backend's `heart_rate` handling — was removed. **Action needed in App Store Connect**: go to App Privacy and change "Health and Fitness" from Yes back to "Data Not Collected" before resubmitting — leaving the old "Yes" declaration in place would now be inaccurate, the same kind of mismatch (declared data collection with no matching code) that got this build flagged in the first place.
 
 Answer "No" to the tracking questions (this app doesn't track users
 across other companies' apps/websites for advertising).
+
+## Privacy Policy URL (App Information)
+
+**This field was empty — confirmed the real cause of the 5.1.2(i)/5.1.1(i)
+rejection (2026-09-13).** The in-app AI-disclosure screen added earlier
+(`OnboardingView.swift`'s `aiDisclosureStep`) explained the Anthropic/
+ElevenLabs data flows on-device, but Apple's guidance is explicit that
+disclosure has to *also* live in the actual Privacy Policy — and there
+was no policy document anywhere, in-app or hosted, for App Review to
+check. `Text("See our Privacy Policy...")` in onboarding wasn't even a
+tappable link.
+
+Fixed: `publishing/privacy-policy/index.html` is a real policy that
+names Anthropic and ElevenLabs specifically (what's sent to each, and
+what's retained), served via GitHub Pages at
+**https://dhana-siva.github.io/Amma/** (repo is public, so Pages works
+with no extra hosting). Paste that URL into **App Store Connect → App
+Information → Privacy Policy URL**. The onboarding screen's blurb is now
+a real `Link` to the same URL.
+
+Before resubmitting: replace the placeholder contact address in the
+policy's footer (`privacy@ammaapp.example`) with a real one you'll
+actually monitor.
 
 ## App Review notes (paste into the "Notes" field for reviewers)
 
@@ -49,8 +71,7 @@ cloning flow without context. Suggested note:
 > and speaks it back. The Voice tab lets you optionally record/upload a
 > voice sample to clone (requires explicit in-app consent, can be
 > skipped). The Setup tab supports casting to a Chromecast if one is on
-> the network, connecting an Apple Watch for heart-rate context
-> (optional), choosing a preferred calling app (WhatsApp or Phone), and
+> the network, choosing a preferred calling app (WhatsApp or Phone), and
 > managing on-device Contacts (view, add via the native contact picker,
 > or create a new one) for the "call/message by name" voice command.
 > Saying something like "call [a name in your Contacts]" triggers a
@@ -74,11 +95,6 @@ phrased for Apple's review context if asked:
   choose to — numbers are never transmitted off the device.
 - **Camera**: only to take a profile photo (parent, child, or a Home
   screen picture) — never used for anything else.
-- **HealthKit (read-only)**: only reads heart rate from a paired Apple
-  Watch, and only if the parent explicitly connects it in Setup; never
-  writes to Health. Used to let Amma gently check in if it seems
-  notably elevated or low — see the Health nutrition-label note above,
-  since this value is sent to the backend.
 - **Notifications**: requested best-effort at launch, used only for a
   "tap to return to Amma" reminder after handing off to WhatsApp/Phone
   — falls back to this only when Live Activities aren't available.
