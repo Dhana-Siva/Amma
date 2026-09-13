@@ -27,8 +27,12 @@ find typing or navigating apps difficult. One button. Just talk.
 
 PRIVACY
 
-Voice cloning is entirely optional and requires explicit consent, which
-can be withdrawn at any time. Phone numbers never leave your device —
-only the app's ability to look them up locally is used to place calls or
-send messages. See our privacy policy for full details:
-https://dhana-siva.github.io/amma-cast-receiver/privacy.html
+Every message is sent to Anthropic (which writes Amma's replies) and
+ElevenLabs (which handles speech-to-text and text-to-speech) to make
+Talk work — the app discloses this and asks you to acknowledge it
+before your first conversation. Voice cloning is a separate, entirely
+optional feature that requires its own explicit consent, which can be
+withdrawn at any time. Phone numbers never leave your device — only the
+app's ability to look them up locally is used to place calls or send
+messages. See our privacy policy for full details:
+https://dhana-siva.github.io/Amma/

@@ -7,7 +7,16 @@ submit these on your behalf, but this should make it fast.
 
 `android/app/build/outputs/bundle/release/app-release.aab`
 (rebuild first with `./gradlew bundleRelease` if you've made any code changes
-since this was generated)
+since this was generated — rebuilt 2026-09-13 to include the AI
+disclosure screen below; the one on disk right now already has it)
+
+**2026-09-13**: added an AI data-sharing disclosure step to onboarding
+(`AIDisclosureContent.kt`, shown right after names, before the calling-app
+picker) — Android never had one before, only the narrower voice-cloning
+consent screen. This mirrors a fix already made on iOS after Apple
+rejected a build for exactly this gap (Guideline 5.1.2(i)/5.1.1(i)) —
+doing it proactively here since this is Android's first-ever submission
+and there's no reason to invite the same issue.
 
 ## Store listing
 
@@ -58,7 +67,11 @@ what the app actually does:
 
 ## Restricted permissions justification
 
-Play Console will ask you to justify this one — copy/adapt as needed:
+Play Console will ask you to justify each of these — copy/adapt as
+needed. This is a first submission for Android (unlike iOS, which has
+been through several review rounds already), so nothing here has been
+tested against a real reviewer yet — worth double-checking Play
+Console's own wording hasn't changed by the time you fill this in.
 
 **READ_CONTACTS**: "The app lets a user ask a voice assistant to call or
 message a specific person by name (e.g. 'call my son'). The app looks up
@@ -70,6 +83,23 @@ the device."
 chat directly rather than dialing, since WhatsApp calls are free
 internationally and Android's WhatsApp has no call-initiation intent to
 trigger automatically.)
+
+**SYSTEM_ALERT_WINDOW ("Display over other apps")** — a Google Play
+*Restricted Permission* requiring its own declaration form, separate
+from the manifest permissions list, and sometimes a short screen
+recording demonstrating the feature. Amma uses this for the "return to
+Amma" floating bubble shown after the app hands off to WhatsApp/Phone
+for a call — the iOS equivalent is a Live Activity in the Dynamic
+Island. Suggested justification: "After Amma opens WhatsApp or the
+Phone app to place a call the user asked for by voice, this permission
+shows a small floating bubble so the user can easily return to Amma
+once the call ends — it falls back to a plain notification if this
+permission isn't granted." (`OverlayHelper.kt`/`OverlayService.kt`.)
+
+**CAMERA**: used only for the optional "take a profile photo" button in
+Profile setup (parent's and child's photo) — the photo is stored
+locally on-device (`childPhotoPath`/equivalent in AmmaPreferences) and
+is never uploaded to the backend or any third party.
 
 ## Things only you can do
 
