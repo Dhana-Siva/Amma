@@ -60,11 +60,16 @@ class TalkViewModel(
                 _phase.value = TalkPhase.Transcribing
                 viewModelScope.launch {
                     try {
-                        val transcript = apiClient.transcribeAudio(file)
+                        val transcript = apiClient.transcribeAudio(familyContext.familyId, file)
                         _phase.value = TalkPhase.Sending
                         sendTranscript(transcript)
                     } catch (e: Exception) {
-                        _statusMessage.value = "Couldn't hear that — check your connection and try again."
+                        // Was a blanket "check your connection" for every
+                        // failure -- surface what actually happened, same
+                        // fix as ProfileScreen's setupFamily diagnosability
+                        // gap and the earlier iOS Anthropic-call one.
+                        android.util.Log.e("TalkViewModel", "transcribeAudio failed", e)
+                        _statusMessage.value = "Couldn't hear that: ${e.message ?: e::class.simpleName}"
                         _phase.value = TalkPhase.Idle
                     }
                 }
@@ -104,7 +109,8 @@ class TalkViewModel(
                 }
             }
         } catch (e: Exception) {
-            _statusMessage.value = "Couldn't reach Amma — check your connection."
+            android.util.Log.e("TalkViewModel", "sendInteraction failed", e)
+            _statusMessage.value = "Couldn't reach Amma: ${e.message ?: e::class.simpleName}"
             _phase.value = TalkPhase.Idle
         }
     }

@@ -72,6 +72,11 @@ fun TalkScreen() {
     val childName = application.preferences.childName
     val parentName = application.preferences.parentName
     val parentRelation = application.preferences.parentRelation
+    val childPhotoPath = application.preferences.childPhotoPath
+    val avatarUsesChildPhoto = application.preferences.avatarUsesChildPhoto
+    val avatarPreset = application.preferences.avatarPreset
+    val homeScreenPhotoPath = application.preferences.homeScreenPhotoPath
+    val homeScreenPreset = application.preferences.homeScreenPreset
 
     Scaffold { padding ->
         Column(
@@ -83,7 +88,12 @@ fun TalkScreen() {
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                AvatarView(size = 36.dp)
+                AvatarView(
+                    childPhotoPath = childPhotoPath,
+                    usesChildPhoto = avatarUsesChildPhoto,
+                    avatarPresetRaw = avatarPreset,
+                    size = 36.dp,
+                )
                 Spacer(Modifier.size(12.dp))
                 Text(
                     childName.ifBlank { "Amma" },
@@ -100,7 +110,11 @@ fun TalkScreen() {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.padding(horizontal = 32.dp),
                     ) {
-                        HomeScreenPictureView(size = 140.dp)
+                        HomeScreenPictureView(
+                            photoPath = homeScreenPhotoPath,
+                            homeScreenPresetRaw = homeScreenPreset,
+                            size = 140.dp,
+                        )
                         Spacer(Modifier.size(20.dp))
                         Text(
                             text = greeting(parentName, parentRelation),
@@ -116,7 +130,11 @@ fun TalkScreen() {
                     }
                 }
             } else {
-                HomeScreenPictureView(size = 64.dp)
+                HomeScreenPictureView(
+                    photoPath = homeScreenPhotoPath,
+                    homeScreenPresetRaw = homeScreenPreset,
+                    size = 64.dp,
+                )
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth().weight(1f),
                     contentPadding = PaddingValues(16.dp),

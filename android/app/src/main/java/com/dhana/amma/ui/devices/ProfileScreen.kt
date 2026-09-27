@@ -265,7 +265,12 @@ fun ProfileScreen(onBack: () -> Unit) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(Modifier.height(12.dp))
-            AvatarView(size = 72.dp)
+            AvatarView(
+                childPhotoPath = childPhotoPath,
+                usesChildPhoto = avatarUsesChildPhoto,
+                avatarPresetRaw = avatarPreset,
+                size = 72.dp,
+            )
             Spacer(Modifier.height(12.dp))
             Row(
                 modifier = Modifier.horizontalScroll(rememberScrollState()),
@@ -321,7 +326,11 @@ fun ProfileScreen(onBack: () -> Unit) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(Modifier.height(12.dp))
-            HomeScreenPictureView(size = 100.dp)
+            HomeScreenPictureView(
+                photoPath = homeScreenPhotoPath,
+                homeScreenPresetRaw = homeScreenPreset,
+                size = 100.dp,
+            )
             Spacer(Modifier.height(12.dp))
             Row(
                 modifier = Modifier.horizontalScroll(rememberScrollState()),
@@ -388,7 +397,15 @@ fun ProfileScreen(onBack: () -> Unit) {
                             )
                             "Saved."
                         } catch (e: Exception) {
-                            "Couldn't save — check your connection and try again."
+                            // Was a blanket "check your connection" for
+                            // every failure, including ones that have
+                            // nothing to do with connectivity (a 4xx/5xx
+                            // from the backend, a serialization mismatch,
+                            // ...) -- surface what actually happened,
+                            // same fix as iOS's Anthropic-call
+                            // diagnosability gap.
+                            android.util.Log.e("ProfileScreen", "setupFamily failed", e)
+                            "Couldn't save: ${e.message ?: e::class.simpleName}"
                         }
                     }
                 },

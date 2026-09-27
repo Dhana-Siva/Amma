@@ -25,10 +25,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.dhana.amma.AmmaApplication
 
 /** A small curated set of built-in "no upload needed" pictures for Talk's
  * welcome image, offered alongside letting the parent upload their own.
@@ -52,14 +50,14 @@ enum class HomeScreenPreset(val icon: ImageVector, val tint: Color) {
 /** Renders the parent's chosen "home screen" picture: a custom uploaded
  * photo if one is set, otherwise a chosen preset, otherwise a plain
  * generic placeholder. Used both in Edit Profile's preview and on Talk's
- * welcome state, so both stay in sync automatically -- reads the same
- * AmmaPreferences keys the editor (ProfileScreen) writes to. Mirrors
- * iOS's HomeScreenPictureView. */
+ * welcome state, so both stay in sync automatically. Mirrors iOS's
+ * HomeScreenPictureView -- but see AvatarView's doc comment for why the
+ * caller passes the current values in rather than this composable
+ * reading AmmaPreferences directly (Compose can't tell a plain
+ * SharedPreferences read needs to trigger recomposition). */
 @Composable
-fun HomeScreenPictureView(size: Dp = 132.dp) {
-    val application = LocalContext.current.applicationContext as AmmaApplication
-    val photoPath = application.preferences.homeScreenPhotoPath
-    val preset = HomeScreenPreset.fromRaw(application.preferences.homeScreenPreset)
+fun HomeScreenPictureView(photoPath: String, homeScreenPresetRaw: String, size: Dp = 132.dp) {
+    val preset = HomeScreenPreset.fromRaw(homeScreenPresetRaw)
 
     val bitmap = remember(photoPath) {
         photoPath.takeIf { it.isNotBlank() }?.let { BitmapFactory.decodeFile(it) }

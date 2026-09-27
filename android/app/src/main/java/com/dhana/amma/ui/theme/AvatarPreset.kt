@@ -23,9 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.dhana.amma.AmmaApplication
 
 /** Curated "character" avatars offered as an alternative to a real photo
  * for the small identity shown next to Amma's name/replies in Talk -- for
@@ -50,14 +48,21 @@ enum class AvatarPreset(val title: String, val icon: ImageVector, val tint: Colo
  * uploaded photo (the default) if one is set and selected, otherwise a
  * chosen character preset, otherwise a plain placeholder. Shared between
  * the Edit Profile picker preview and the Talk screen header so both
- * always agree -- reads the same AmmaPreferences keys the editor writes
- * to. Mirrors iOS's AvatarView. */
+ * always agree. Mirrors iOS's AvatarView -- but unlike @AppStorage on
+ * iOS (genuinely reactive), Compose has no way to know a plain
+ * AmmaPreferences read needs to trigger recomposition, so the caller
+ * passes the current values in as parameters (already Compose state it's
+ * tracking) rather than this composable reading SharedPreferences
+ * directly -- otherwise picking a new avatar in ProfileScreen silently
+ * doesn't redraw until the screen is left and reopened. */
 @Composable
-fun AvatarView(size: androidx.compose.ui.unit.Dp = 32.dp) {
-    val application = LocalContext.current.applicationContext as AmmaApplication
-    val childPhotoPath = application.preferences.childPhotoPath
-    val usesChildPhoto = application.preferences.avatarUsesChildPhoto
-    val preset = AvatarPreset.fromRaw(application.preferences.avatarPreset)
+fun AvatarView(
+    childPhotoPath: String,
+    usesChildPhoto: Boolean,
+    avatarPresetRaw: String,
+    size: androidx.compose.ui.unit.Dp = 32.dp,
+) {
+    val preset = AvatarPreset.fromRaw(avatarPresetRaw)
 
     val bitmap = remember(childPhotoPath, usesChildPhoto) {
         if (usesChildPhoto && childPhotoPath.isNotBlank()) BitmapFactory.decodeFile(childPhotoPath) else null
