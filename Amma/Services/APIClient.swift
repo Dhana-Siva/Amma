@@ -87,6 +87,12 @@ private struct FamilySetupRequestBody: Encodable {
     var familyId: String
     var parentName: String
     var childName: String
+    // How the child addresses the parent (e.g. "Amma", "Mom") -- has
+    // been collected in ProfileView for a while (drives the Talk
+    // greeting), but was never actually sent here, so Amma's real
+    // replies always used the parent's literal name regardless of what
+    // was set in Edit Profile.
+    var parentRelation: String?
     var language: String
     var childPhoneNumber: String?
 
@@ -94,6 +100,7 @@ private struct FamilySetupRequestBody: Encodable {
         case familyId = "family_id"
         case parentName = "parent_name"
         case childName = "child_name"
+        case parentRelation = "parent_relation"
         case language
         case childPhoneNumber = "child_phone_number"
     }
@@ -215,13 +222,13 @@ final class APIClient {
         _ = try await URLSession.shared.data(for: request)
     }
 
-    func setupFamily(familyId: UUID, parentName: String, childName: String, language: String, childPhoneNumber: String? = nil) async throws {
+    func setupFamily(familyId: UUID, parentName: String, childName: String, language: String, childPhoneNumber: String? = nil, parentRelation: String? = nil) async throws {
         let url = baseURL.appendingPathComponent("v1/family-setup")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try JSONEncoder().encode(
-            FamilySetupRequestBody(familyId: familyId.uuidString, parentName: parentName, childName: childName, language: language, childPhoneNumber: childPhoneNumber)
+            FamilySetupRequestBody(familyId: familyId.uuidString, parentName: parentName, childName: childName, parentRelation: parentRelation, language: language, childPhoneNumber: childPhoneNumber)
         )
         _ = try await URLSession.shared.data(for: request)
     }

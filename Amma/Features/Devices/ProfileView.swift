@@ -230,12 +230,14 @@ struct ProfileView: View {
         status = nil
         Task {
             do {
+                let trimmedRelation = parentRelation.trimmingCharacters(in: .whitespaces)
                 try await APIClient.shared.setupFamily(
                     familyId: familyId,
                     parentName: parentName,
                     childName: childName,
                     language: storedLanguage,
-                    childPhoneNumber: childPhoneNumber.trimmingCharacters(in: .whitespaces).isEmpty ? nil : childPhoneNumber
+                    childPhoneNumber: childPhoneNumber.trimmingCharacters(in: .whitespaces).isEmpty ? nil : childPhoneNumber,
+                    parentRelation: trimmedRelation.isEmpty ? nil : trimmedRelation
                 )
                 await MainActor.run {
                     status = "Saved."

@@ -88,6 +88,7 @@ private fun MainTabs(application: AmmaApplication) {
                 childName = application.preferences.childName,
                 language = application.preferences.languageCode,
                 childPhoneNumber = application.preferences.childPhoneNumber,
+                parentRelation = application.preferences.parentRelation.trim().ifBlank { null },
             )
         }
     }

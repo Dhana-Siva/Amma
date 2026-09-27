@@ -106,6 +106,7 @@ private fun DevicesMainScreen(onViewContacts: () -> Unit, onEditProfile: () -> U
                     childName = application.preferences.childName,
                     language = code,
                     childPhoneNumber = application.preferences.childPhoneNumber,
+                    parentRelation = application.preferences.parentRelation.trim().ifBlank { null },
                 )
             }
         }

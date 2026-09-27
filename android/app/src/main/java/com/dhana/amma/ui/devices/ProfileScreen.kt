@@ -394,6 +394,7 @@ fun ProfileScreen(onBack: () -> Unit) {
                                 childName = childName,
                                 language = application.preferences.languageCode,
                                 childPhoneNumber = childPhoneNumber.trim().ifBlank { null },
+                                parentRelation = parentRelation.trim().ifBlank { null },
                             )
                             "Saved."
                         } catch (e: Exception) {

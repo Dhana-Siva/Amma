@@ -8,6 +8,7 @@ struct DevicesView: View {
     @AppStorage("parentName") private var storedParentName = ""
     @AppStorage("childName") private var storedChildName = ""
     @AppStorage("childPhoneNumber") private var storedChildPhoneNumber = ""
+    @AppStorage("parentRelation") private var storedParentRelation = ""
     @AppStorage("workspaceBorderEnabled") private var workspaceBorderEnabled = false
     @AppStorage("workspaceBorderColorHex") private var workspaceBorderColorHex = "FF2D78"
     @AppStorage("messageStyleColorful") private var messageStyleColorful = true
@@ -43,7 +44,8 @@ struct DevicesView: View {
                                     parentName: storedParentName,
                                     childName: storedChildName,
                                     language: newValue,
-                                    childPhoneNumber: storedChildPhoneNumber.isEmpty ? nil : storedChildPhoneNumber
+                                    childPhoneNumber: storedChildPhoneNumber.isEmpty ? nil : storedChildPhoneNumber,
+                                    parentRelation: storedParentRelation.isEmpty ? nil : storedParentRelation
                                 )
                                 await MainActor.run { languageStatus = "Saved." }
                             } catch {

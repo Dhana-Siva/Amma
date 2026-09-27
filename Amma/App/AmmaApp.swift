@@ -54,6 +54,7 @@ struct RootTabView: View {
     @AppStorage("parentName") private var storedParentName = ""
     @AppStorage("childName") private var storedChildName = ""
     @AppStorage("childPhoneNumber") private var storedChildPhoneNumber = ""
+    @AppStorage("parentRelation") private var storedParentRelation = ""
 
     var body: some View {
         TabView {
@@ -91,7 +92,8 @@ struct RootTabView: View {
                 parentName: storedParentName,
                 childName: storedChildName,
                 language: storedLanguage,
-                childPhoneNumber: storedChildPhoneNumber.isEmpty ? nil : storedChildPhoneNumber
+                childPhoneNumber: storedChildPhoneNumber.isEmpty ? nil : storedChildPhoneNumber,
+                parentRelation: storedParentRelation.isEmpty ? nil : storedParentRelation
             )
         }
     }

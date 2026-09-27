@@ -101,6 +101,12 @@ class FamilySetupRequest(BaseModel):
     family_id: str
     parent_name: str | None = None
     child_name: str | None = None
+    # How the child addresses the parent (e.g. "Amma", "Mom") -- both
+    # clients have collected this for a while (used for the Talk
+    # greeting), but never actually sent it here, so Amma's real replies
+    # always used the parent's literal name instead, regardless of what
+    # was set in Edit Profile.
+    parent_relation: str | None = None
     language: str = "en"
     child_phone_number: str | None = None
 
@@ -159,8 +165,14 @@ def system_prompt(
     language: str | None,
     has_tools: bool,
     cast_linked: bool = False,
+    parent_relation: str | None = None,
 ) -> str:
-    parent = parent_name or "your parent"
+    # Prefer how the child actually addresses the parent (Amma, Mom,
+    # Appa, ...) over their literal name -- reads far more like the
+    # child themselves talking, which is the whole premise of this
+    # prompt. Falls back to the name, then to nothing, same order the
+    # Talk screen's greeting already uses on both platforms.
+    parent = parent_relation or parent_name or "your parent"
     child = child_name or "their child"
     language_instruction = LANGUAGE_INSTRUCTIONS.get(language or "en", LANGUAGE_INSTRUCTIONS["en"])
     prompt = (
@@ -398,7 +410,7 @@ def create_interaction(req: InteractionRequest, request: Request) -> Interaction
     create_kwargs = dict(
         model=MODEL,
         max_tokens=300,
-        system=system_prompt(parent_name, child_name, family.get("language"), bool(tools), req.cast_linked),
+        system=system_prompt(parent_name, child_name, family.get("language"), bool(tools), req.cast_linked, family.get("parent_relation")),
         messages=history[-MAX_HISTORY_TURNS:],
     )
     if tools:
@@ -511,6 +523,8 @@ def setup_family(req: FamilySetupRequest) -> dict:
         family["parent_name"] = req.parent_name
     if req.child_name:
         family["child_name"] = req.child_name
+    if req.parent_relation:
+        family["parent_relation"] = req.parent_relation
     family["language"] = req.language
     family["child_phone_number"] = req.child_phone_number
     save_state()

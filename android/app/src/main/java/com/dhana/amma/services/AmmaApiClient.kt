@@ -87,12 +87,14 @@ class AmmaApiClient(baseUrl: String = "https://amma-production.up.railway.app/")
         childName: String,
         language: String,
         childPhoneNumber: String? = null,
+        parentRelation: String? = null,
     ) {
         val response = service.setupFamily(
             FamilySetupRequestBody(
                 familyId = familyId.toString(),
                 parentName = parentName,
                 childName = childName,
+                parentRelation = parentRelation,
                 language = language,
                 childPhoneNumber = childPhoneNumber,
             )

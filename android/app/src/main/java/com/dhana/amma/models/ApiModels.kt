@@ -22,6 +22,10 @@ data class FamilySetupRequestBody(
     @SerialName("family_id") val familyId: String,
     @SerialName("parent_name") val parentName: String? = null,
     @SerialName("child_name") val childName: String? = null,
+    // How the child addresses the parent (e.g. "Amma", "Mom") -- was
+    // collected in Edit Profile for a while but never actually sent, so
+    // Amma's real replies always used the literal name regardless.
+    @SerialName("parent_relation") val parentRelation: String? = null,
     val language: String,
     @SerialName("child_phone_number") val childPhoneNumber: String? = null,
 )
