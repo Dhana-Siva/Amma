@@ -50,6 +50,7 @@ private interface AmmaApiService {
     suspend fun transcribeAudio(
         @Part familyId: MultipartBody.Part,
         @Part audio: MultipartBody.Part,
+        @Part language: MultipartBody.Part?,
     ): Response<TranscribeResponse>
 
     @GET("v1/voice-presets")
@@ -142,14 +143,18 @@ class AmmaApiClient(baseUrl: String = "https://amma-production.up.railway.app/")
     // confuse Tamil for a related script like Malayalam) -- iOS already
     // sends this, but the Android side never had it added, which broke
     // every voice message here with a 422 ("family_id: Field required").
-    suspend fun transcribeAudio(familyId: UUID, audioFile: File): String {
+    suspend fun transcribeAudio(familyId: UUID, audioFile: File, language: String?): String {
         val familyIdPart = MultipartBody.Part.createFormData("family_id", familyId.toString())
         val audioPart = MultipartBody.Part.createFormData(
             "audio",
             "recording.m4a",
             audioFile.asRequestBody("audio/m4a".toMediaType()),
         )
-        val response = service.transcribeAudio(familyIdPart, audioPart)
+        // Sent on every call so a backend that just lost its family state
+        // (Railway redeploy) still knows which language to listen for.
+        val languagePart = language?.takeIf { it.isNotBlank() }
+            ?.let { MultipartBody.Part.createFormData("language", it) }
+        val response = service.transcribeAudio(familyIdPart, audioPart, languagePart)
         return response.bodyOrThrow().transcript
     }
 

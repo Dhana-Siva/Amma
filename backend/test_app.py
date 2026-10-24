@@ -342,3 +342,38 @@ def test_consent_flow(family_id):
 
     response = client.post("/v1/consent", json={"family_id": family_id, "granted": False})
     assert response.json()["revoked_at"] is not None
+
+
+def _capture_stt(monkeypatch):
+    captured = {}
+
+    def fake_post(url, headers=None, data=None, files=None, timeout=None):
+        captured["data"] = data
+        return SimpleNamespace(status_code=200, json=lambda: {"text": "vanakkam"}, text="")
+
+    monkeypatch.setattr(app_module.requests, "post", fake_post)
+    return captured
+
+
+def test_transcribe_uses_client_language_when_server_state_is_empty(monkeypatch):
+    captured = _capture_stt(monkeypatch)
+    response = client.post(
+        "/v1/transcribe",
+        data={"family_id": str(uuid.uuid4()), "language": "ta"},
+        files={"audio": ("recording.m4a", b"fake", "audio/m4a")},
+    )
+    assert response.status_code == 200
+    assert captured["data"]["language_code"] == "ta"
+
+
+def test_transcribe_falls_back_to_saved_family_language(monkeypatch):
+    family_id = str(uuid.uuid4())
+    monkeypatch.setitem(app_module.families, family_id, {"language": "ta"})
+    captured = _capture_stt(monkeypatch)
+    response = client.post(
+        "/v1/transcribe",
+        data={"family_id": family_id},
+        files={"audio": ("recording.m4a", b"fake", "audio/m4a")},
+    )
+    assert response.status_code == 200
+    assert captured["data"]["language_code"] == "ta"

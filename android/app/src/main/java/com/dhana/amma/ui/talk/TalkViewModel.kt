@@ -60,7 +60,7 @@ class TalkViewModel(
                 _phase.value = TalkPhase.Transcribing
                 viewModelScope.launch {
                     try {
-                        val transcript = apiClient.transcribeAudio(familyContext.familyId, file)
+                        val transcript = apiClient.transcribeAudio(familyContext.familyId, file, preferences.languageCode)
                         _phase.value = TalkPhase.Sending
                         sendTranscript(transcript)
                     } catch (e: Exception) {

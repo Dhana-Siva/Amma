@@ -623,7 +623,11 @@ async def upload_voice_sample(family_id: str = Form(...), audio: UploadFile = Fi
 
 
 @app.post("/v1/transcribe")
-async def transcribe_audio(family_id: str = Form(...), audio: UploadFile = File(...)) -> dict:
+async def transcribe_audio(
+    family_id: str = Form(...),
+    audio: UploadFile = File(...),
+    language: str | None = Form(None),
+) -> dict:
     if not ELEVENLABS_API_KEY:
         raise HTTPException(status_code=503, detail="ELEVENLABS_API_KEY is not configured on the server")
 
@@ -636,7 +640,10 @@ async def transcribe_audio(family_id: str = Form(...), audio: UploadFile = File(
     # stronger signal than blind auto-detect, so lock to it whenever
     # known. Our internal codes ("ta"/"en") already match ElevenLabs'
     # ISO-639-1 language_code values, so no mapping table is needed.
-    language = families.get(family_id, {}).get("language")
+    # The client's own copy wins when sent: server family state can be
+    # empty right after a redeploy until the app's launch-time resend
+    # lands, and a missing hint garbles Tamil (confirmed live 2026-10-24).
+    language = language or families.get(family_id, {}).get("language")
     if language:
         data["language_code"] = language
 
