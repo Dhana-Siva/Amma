@@ -64,7 +64,8 @@ def mock_youtube_search(monkeypatch, items):
 def test_health():
     response = client.get("/health")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok"}
+    assert response.json()["status"] == "ok"
+    assert response.json()["started_at"]
 
 
 def test_build_tools_always_available():

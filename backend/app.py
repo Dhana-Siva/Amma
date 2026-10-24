@@ -661,6 +661,11 @@ async def transcribe_audio(
     return {"transcript": transcript}
 
 
+# Lets anyone checking /health tell whether a redeploy has actually
+# rolled out (the payload is otherwise identical across deploys).
+STARTED_AT = datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok"}
+    return {"status": "ok", "started_at": STARTED_AT}
