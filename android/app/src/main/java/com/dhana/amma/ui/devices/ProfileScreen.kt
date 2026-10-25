@@ -37,6 +37,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -172,10 +176,52 @@ fun ProfileScreen(onBack: () -> Unit) {
         cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val focusManager = LocalFocusManager.current
+
+    // Shared by the top-bar Save (always visible, even with the keyboard
+    // up) and the original one at the bottom of the form, which sits
+    // below several photo sections and was easy to miss entirely.
+    fun save() {
+        focusManager.clearFocus()
+        application.preferences.apply {
+            this.parentName = parentName
+            this.parentRelation = parentRelation.trim()
+            this.childName = childName
+            this.childPhoneNumber = childPhoneNumber.trim()
+        }
+        scope.launch {
+            saveStatus = try {
+                application.apiClient.setupFamily(
+                    familyId = application.familyContext.familyId,
+                    parentName = parentName,
+                    childName = childName,
+                    language = application.preferences.languageCode,
+                    childPhoneNumber = childPhoneNumber.trim().ifBlank { null },
+                    parentRelation = parentRelation.trim().ifBlank { null },
+                )
+                "Saved."
+            } catch (e: Exception) {
+                // Was a blanket "check your connection" for every failure,
+                // including ones that have nothing to do with connectivity
+                // (a 4xx/5xx from the backend, a serialization mismatch,
+                // ...) -- surface what actually happened, same fix as
+                // iOS's Anthropic-call diagnosability gap.
+                android.util.Log.e("ProfileScreen", "setupFamily failed", e)
+                "Couldn't save: ${e.message ?: e::class.simpleName}"
+            }
+            saveStatus?.let { snackbarHostState.showSnackbar(it) }
+        }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("Profile") },
+                actions = {
+                    TextButton(onClick = { save() }) { Text("Save") }
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -379,37 +425,7 @@ fun ProfileScreen(onBack: () -> Unit) {
             Spacer(Modifier.height(24.dp))
 
             Button(
-                onClick = {
-                    application.preferences.apply {
-                        this.parentName = parentName
-                        this.parentRelation = parentRelation.trim()
-                        this.childName = childName
-                        this.childPhoneNumber = childPhoneNumber.trim()
-                    }
-                    scope.launch {
-                        saveStatus = try {
-                            application.apiClient.setupFamily(
-                                familyId = application.familyContext.familyId,
-                                parentName = parentName,
-                                childName = childName,
-                                language = application.preferences.languageCode,
-                                childPhoneNumber = childPhoneNumber.trim().ifBlank { null },
-                                parentRelation = parentRelation.trim().ifBlank { null },
-                            )
-                            "Saved."
-                        } catch (e: Exception) {
-                            // Was a blanket "check your connection" for
-                            // every failure, including ones that have
-                            // nothing to do with connectivity (a 4xx/5xx
-                            // from the backend, a serialization mismatch,
-                            // ...) -- surface what actually happened,
-                            // same fix as iOS's Anthropic-call
-                            // diagnosability gap.
-                            android.util.Log.e("ProfileScreen", "setupFamily failed", e)
-                            "Couldn't save: ${e.message ?: e::class.simpleName}"
-                        }
-                    }
-                },
+                onClick = { save() },
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Save")
