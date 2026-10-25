@@ -145,6 +145,44 @@ private fun DevicesMainScreen(onViewContacts: () -> Unit, onEditProfile: () -> U
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        // TV status first (it was at the bottom, easy to miss).
+        Text(
+            text = if (isConnected) {
+                stringResource(R.string.devices_connected, connectedDeviceName ?: "TV")
+            } else {
+                stringResource(R.string.devices_not_connected)
+            },
+            style = MaterialTheme.typography.bodyLarge,
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        // MediaRouteButton is a classic View widget — Compose has no
+        // built-in equivalent, and it's what opens Google's own Cast
+        // device picker dialog (device discovery/selection UI is handled
+        // entirely by the system, not custom-built here).
+        AndroidView(
+            factory = { ctx ->
+                val button = MediaRouteButton(ctx)
+                CastButtonFactory.setUpMediaRouteButton(ctx, button)
+                FrameLayout(ctx).apply { addView(button) }
+            },
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        if (isConnected) {
+            Button(
+                onClick = { castService.disconnect() },
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+            ) {
+                Text(stringResource(R.string.devices_disconnect))
+            }
+        }
+
+        Spacer(Modifier.height(24.dp))
+        HorizontalDivider()
+        Spacer(Modifier.height(24.dp))
+
         OutlinedButton(onClick = onEditProfile, modifier = Modifier.fillMaxWidth()) {
             Text("Edit profile")
         }
@@ -265,43 +303,6 @@ private fun DevicesMainScreen(onViewContacts: () -> Unit, onEditProfile: () -> U
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Turn on floating button")
-            }
-        }
-
-        Spacer(Modifier.height(24.dp))
-        HorizontalDivider()
-        Spacer(Modifier.height(24.dp))
-
-        Text(
-            text = if (isConnected) {
-                stringResource(R.string.devices_connected, connectedDeviceName ?: "TV")
-            } else {
-                stringResource(R.string.devices_not_connected)
-            },
-            style = MaterialTheme.typography.bodyLarge,
-        )
-
-        Spacer(Modifier.height(12.dp))
-
-        // MediaRouteButton is a classic View widget — Compose has no
-        // built-in equivalent, and it's what opens Google's own Cast
-        // device picker dialog (device discovery/selection UI is handled
-        // entirely by the system, not custom-built here).
-        AndroidView(
-            factory = { ctx ->
-                val button = MediaRouteButton(ctx)
-                CastButtonFactory.setUpMediaRouteButton(ctx, button)
-                FrameLayout(ctx).apply { addView(button) }
-            },
-            modifier = Modifier.fillMaxWidth(),
-        )
-
-        if (isConnected) {
-            Button(
-                onClick = { castService.disconnect() },
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-            ) {
-                Text(stringResource(R.string.devices_disconnect))
             }
         }
 
