@@ -86,6 +86,7 @@ class TalkViewModel(
                 familyId = familyContext.familyId,
                 transcript = transcript,
                 channel = InteractionChannel.Voice.wireValue,
+                castLinked = castService.isConnected.value,
             )
             _log.value = _log.value + InteractionLog(
                 id = UUID.randomUUID(),

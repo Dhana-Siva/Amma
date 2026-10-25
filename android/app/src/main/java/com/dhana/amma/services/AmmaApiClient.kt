@@ -75,9 +75,15 @@ class AmmaApiClient(baseUrl: String = "https://amma-production.up.railway.app/")
         familyId: UUID,
         transcript: String,
         channel: String,
+        castLinked: Boolean,
     ): InteractionReply {
         val response = service.sendInteraction(
-            InteractionRequestBody(familyId = familyId.toString(), transcript = transcript, channel = channel)
+            InteractionRequestBody(
+                familyId = familyId.toString(),
+                transcript = transcript,
+                channel = channel,
+                castLinked = castLinked,
+            )
         )
         return response.bodyOrThrow()
     }

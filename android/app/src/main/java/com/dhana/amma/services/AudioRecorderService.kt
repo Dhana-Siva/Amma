@@ -42,6 +42,10 @@ class AudioRecorderService(private val context: Context) {
             setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
             setAudioChannels(1)
             setAudioSamplingRate(44100)
+            // Without this MediaRecorder falls back to a ~13 kbps AAC
+            // default (measured on a moto g 5G), muddy enough to hurt
+            // Scribe's Tamil transcripts and voice-clone samples alike.
+            setAudioEncodingBitRate(128_000)
             setOutputFile(file.absolutePath)
             prepare()
             start()

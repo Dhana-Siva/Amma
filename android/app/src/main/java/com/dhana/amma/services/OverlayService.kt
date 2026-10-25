@@ -132,5 +132,9 @@ class OverlayService : Service() {
                 context.startService(intent)
             }
         }
+
+        fun stop(context: Context) {
+            context.stopService(Intent(context, OverlayService::class.java))
+        }
     }
 }

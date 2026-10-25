@@ -27,7 +27,7 @@ object CommandExecutor {
         return when (command.intent) {
             CommandIntent.PlaceCall -> placeCall(command, context, contactsService, preferences.callingApp)
             CommandIntent.SendMessage -> sendMessage(command, context, contactsService)
-            CommandIntent.CastMedia -> castMedia(command, castService)
+            CommandIntent.CastMedia -> castMedia(command, context, castService)
             CommandIntent.StopCast -> stopCast(castService)
         }
     }
@@ -103,16 +103,41 @@ object CommandExecutor {
         }
     }
 
-    private suspend fun castMedia(command: Command, castService: CastService): String? {
+    private suspend fun castMedia(command: Command, context: Context, castService: CastService): String? {
         val videoId = command.params["videoId"]
         if (videoId.isNullOrBlank()) return "Couldn't find that to play."
         return try {
             castService.play(videoId)
             null
         } catch (e: CastService.CastServiceError.NotConnected) {
-            "No TV linked yet — go to Devices to link one."
+            // No TV linked: play it on the phone instead, like iOS does.
+            // Hands off to the YouTube app (preinstalled on Android) rather
+            // than an embedded player, which iOS found YouTube's embed
+            // checks reject on real devices; Back returns to Amma.
+            playOnPhone(videoId, context)
         } catch (e: Exception) {
             "Couldn't cast that — try again."
+        }
+    }
+
+    private fun playOnPhone(videoId: String, context: Context): String? {
+        val appIntent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoId"))
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=$videoId"))
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        return try {
+            context.startActivity(appIntent)
+            OverlayHelper.showReturnToAmma(context, "YouTube")
+            null
+        } catch (e: Exception) {
+            try {
+                context.startActivity(webIntent)
+                OverlayHelper.showReturnToAmma(context, "YouTube")
+                null
+            } catch (e: Exception) {
+                Log.e(TAG, "playOnPhone failed for $videoId", e)
+                "Couldn't play that on the phone."
+            }
         }
     }
 

@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.fragment.app.FragmentActivity
 import com.dhana.amma.services.NotificationHelper
+import com.dhana.amma.services.OverlayService
 import com.dhana.amma.ui.AmmaRoot
 import com.dhana.amma.ui.theme.AmmaTheme
 
@@ -26,5 +27,8 @@ class MainActivity : FragmentActivity() {
         // just switched back manually, being here means they're back —
         // clear it so it doesn't linger after it's served its purpose.
         NotificationHelper.clearReturnToAmma(this)
+        // Same for the floating bubble: coming back by Back/recents
+        // instead of tapping it would otherwise leave it hovering over Amma.
+        OverlayService.stop(this)
     }
 }

@@ -8,6 +8,10 @@ data class InteractionRequestBody(
     @SerialName("family_id") val familyId: String,
     val transcript: String,
     val channel: String,
+    // No default on purpose: kotlinx omits default-valued fields, and the
+    // backend needs this every time to tell Amma whether the video goes
+    // to the TV or plays on the phone.
+    @SerialName("cast_linked") val castLinked: Boolean,
 )
 
 @Serializable
