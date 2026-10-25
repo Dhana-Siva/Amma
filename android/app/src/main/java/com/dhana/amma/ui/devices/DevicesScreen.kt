@@ -8,7 +8,15 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Switch
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -79,6 +87,9 @@ private fun DevicesMainScreen(onViewContacts: () -> Unit, onEditProfile: () -> U
 
     var languageCode by remember { mutableStateOf(application.preferences.languageCode) }
     var callingApp by remember { mutableStateOf(application.preferences.callingApp) }
+    var borderEnabled by remember { mutableStateOf(application.preferences.workspaceBorderEnabled) }
+    var borderColor by remember { mutableStateOf(application.preferences.workspaceBorderColor) }
+    var messageStyleColorful by remember { mutableStateOf(application.preferences.messageStyleColorful) }
     var hasOverlayPermission by remember { mutableStateOf(OverlayHelper.canDrawOverlays(context)) }
 
     // Granting "display over other apps" happens in system settings, not
@@ -180,11 +191,80 @@ private fun DevicesMainScreen(onViewContacts: () -> Unit, onEditProfile: () -> U
         HorizontalDivider()
         Spacer(Modifier.height(24.dp))
 
+        Text("Talk border", style = MaterialTheme.typography.labelLarge, modifier = Modifier.fillMaxWidth())
+        Spacer(Modifier.height(8.dp))
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text("Show border", modifier = Modifier.weight(1f))
+            Switch(
+                checked = borderEnabled,
+                onCheckedChange = {
+                    borderEnabled = it
+                    application.preferences.workspaceBorderEnabled = it
+                },
+            )
+        }
+        // Compose has no stock color picker (iOS uses ColorPicker), so a
+        // row of preset swatches stands in for it.
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        ) {
+            BORDER_SWATCHES.forEach { swatch ->
+                val selected = swatch == borderColor
+                Box(
+                    Modifier
+                        .size(28.dp)
+                        .border(
+                            width = if (selected) 3.dp else 0.dp,
+                            color = if (selected) MaterialTheme.colorScheme.onSurface else Color.Transparent,
+                            shape = CircleShape,
+                        )
+                        .padding(if (selected) 5.dp else 0.dp)
+                        .background(Color(swatch).copy(alpha = if (borderEnabled) 1f else 0.35f), CircleShape)
+                        .clickable(enabled = borderEnabled) {
+                            borderColor = swatch
+                            application.preferences.workspaceBorderColor = swatch
+                        }
+                )
+            }
+        }
+        Text(
+            "Adds a colored frame around the Talk screen.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
+        Spacer(Modifier.height(24.dp))
+        HorizontalDivider()
+        Spacer(Modifier.height(24.dp))
+
+        Text("Message style", style = MaterialTheme.typography.labelLarge, modifier = Modifier.fillMaxWidth())
+        Spacer(Modifier.height(8.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            LanguageOption("Colorful", selected = messageStyleColorful) {
+                messageStyleColorful = true
+                application.preferences.messageStyleColorful = true
+            }
+            LanguageOption("Plain", selected = !messageStyleColorful) {
+                messageStyleColorful = false
+                application.preferences.messageStyleColorful = false
+            }
+        }
+        Text(
+            "Colorful uses pink and accent colors for the chat bubbles; Plain uses neutral gray.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
+        Spacer(Modifier.height(24.dp))
+        HorizontalDivider()
+        Spacer(Modifier.height(24.dp))
+
         Text("Return-to-Amma button", style = MaterialTheme.typography.labelLarge, modifier = Modifier.fillMaxWidth())
         Spacer(Modifier.height(8.dp))
         Text(
             if (hasOverlayPermission) {
-                "On — a floating button appears to bring you back to Amma after a call or message."
+                "On — a floating button appears to bring you back to Amma after a call, message, or video."
             } else {
                 "Off — you'll get a notification instead, which needs an extra swipe-and-tap gesture."
             },
@@ -257,3 +337,14 @@ private fun LanguageOption(label: String, selected: Boolean, onSelect: () -> Uni
         Text(label)
     }
 }
+
+private val BORDER_SWATCHES = listOf(
+    0xFFFF2D78, // pink (iOS default)
+    0xFFFF9800, // orange
+    0xFFFFC107, // gold
+    0xFF4CAF50, // green
+    0xFF009688, // teal
+    0xFF2196F3, // blue
+    0xFF673AB7, // purple
+    0xFF795548, // brown
+)

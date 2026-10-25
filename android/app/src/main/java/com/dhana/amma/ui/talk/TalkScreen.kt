@@ -6,7 +6,11 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
@@ -32,6 +36,11 @@ import androidx.compose.material.icons.outlined.DeleteSweep
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.foundation.layout.offset
+import kotlinx.coroutines.delay
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
@@ -95,6 +104,24 @@ fun TalkScreen() {
     val avatarPreset = application.preferences.avatarPreset
     val homeScreenPhotoPath = application.preferences.homeScreenPhotoPath
     val homeScreenPreset = application.preferences.homeScreenPreset
+    val borderEnabled = application.preferences.workspaceBorderEnabled
+    val borderColor = Color(application.preferences.workspaceBorderColor)
+    val messageStyleColorful = application.preferences.messageStyleColorful
+
+    // A brief emoji "reaction" pops onto the newest reply, then fades
+    // (iOS f82e0f6) -- purely decorative. lastSeenSize starts at the
+    // current count so coming back to this tab doesn't replay it.
+    var reaction by remember { mutableStateOf<String?>(null) }
+    var lastSeenSize by remember { mutableStateOf(log.size) }
+    LaunchedEffect(log.size) {
+        val grew = log.size > lastSeenSize
+        lastSeenSize = log.size
+        if (grew && log.lastOrNull()?.responseText != null) {
+            reaction = REACTION_EMOJI.random()
+            delay(1400)
+            reaction = null
+        }
+    }
 
     Scaffold { padding ->
         Column(
@@ -118,6 +145,18 @@ fun TalkScreen() {
             }
 
             val accent = timeOfDayAccent()
+            val workspaceShape = RoundedCornerShape(24.dp)
+            Column(
+                modifier = Modifier.weight(1f).fillMaxWidth().then(
+                    if (borderEnabled) {
+                        Modifier.padding(horizontal = 12.dp)
+                            .border(3.dp, borderColor, workspaceShape)
+                            .clip(workspaceShape)
+                    } else {
+                        Modifier
+                    }
+                ),
+            ) {
             if (log.isEmpty()) {
                 WelcomeState(
                     accent = accent,
@@ -148,6 +187,8 @@ fun TalkScreen() {
                         TurnBubbles(
                             turn = turn,
                             accent = accent,
+                            colorful = messageStyleColorful,
+                            reaction = reaction.takeIf { turn.id == log.last().id },
                             avatar = {
                                 AvatarView(
                                     childPhotoPath = childPhotoPath,
@@ -159,6 +200,7 @@ fun TalkScreen() {
                         )
                     }
                 }
+            }
             }
 
             statusMessage?.let {
@@ -306,19 +348,33 @@ private fun WelcomeState(
 // Chat bubbles, mirroring iOS a3071b7: the parent's words right-aligned in
 // a filled pink bubble, Amma's reply left-aligned in a bordered bubble
 // tinted with the time-of-day accent, with the chosen avatar beside it.
+private val REACTION_EMOJI = listOf("✨", "💖", "😊", "🎉", "👋", "🌟")
+
+// colorful = the pink / time-of-day tinted look; Plain swaps in neutral
+// grays, same layout and shadows (iOS 88bee2e's message style setting).
 @Composable
-private fun TurnBubbles(turn: InteractionLog, accent: Color, avatar: @Composable () -> Unit) {
+private fun TurnBubbles(
+    turn: InteractionLog,
+    accent: Color,
+    colorful: Boolean,
+    reaction: String?,
+    avatar: @Composable () -> Unit,
+) {
+    val outgoingColor = if (colorful) AmmaPink else MaterialTheme.colorScheme.surfaceVariant
+    val outgoingText = if (colorful) Color.White else MaterialTheme.colorScheme.onSurface
+    val incomingFill = if (colorful) accent.copy(alpha = 0.08f) else MaterialTheme.colorScheme.surface
+    val incomingBorder = if (colorful) accent.copy(alpha = 0.5f) else MaterialTheme.colorScheme.outlineVariant
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             Surface(
                 shape = RoundedCornerShape(18.dp, 18.dp, 4.dp, 18.dp),
-                color = AmmaPink,
+                color = outgoingColor,
                 shadowElevation = 2.dp,
                 modifier = Modifier.padding(start = 48.dp),
             ) {
                 Text(
                     text = turn.transcript,
-                    color = Color.White,
+                    color = outgoingText,
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
                 )
@@ -331,17 +387,31 @@ private fun TurnBubbles(turn: InteractionLog, accent: Color, avatar: @Composable
             ) {
                 avatar()
                 Spacer(Modifier.size(8.dp))
-                Surface(
-                    shape = RoundedCornerShape(18.dp, 18.dp, 18.dp, 4.dp),
-                    color = accent.copy(alpha = 0.08f),
-                    border = BorderStroke(1.dp, accent.copy(alpha = 0.5f)),
-                    shadowElevation = 2.dp,
-                ) {
-                    Text(
-                        text = reply,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
-                    )
+                Box {
+                    Surface(
+                        shape = RoundedCornerShape(18.dp, 18.dp, 18.dp, 4.dp),
+                        color = incomingFill,
+                        border = BorderStroke(1.dp, incomingBorder),
+                        shadowElevation = 2.dp,
+                    ) {
+                        Text(
+                            text = reply,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                        )
+                    }
+                    // Keeps showing the emoji while it fades out after
+                    // reaction goes back to null.
+                    var shownEmoji by remember { mutableStateOf("") }
+                    if (reaction != null) shownEmoji = reaction
+                    androidx.compose.animation.AnimatedVisibility(
+                        visible = reaction != null,
+                        enter = scaleIn(initialScale = 0.3f, animationSpec = spring(dampingRatio = 0.6f)) + fadeIn(),
+                        exit = fadeOut(),
+                        modifier = Modifier.align(Alignment.TopEnd).offset { IntOffset(36, -40) },
+                    ) {
+                        Text(shownEmoji, fontSize = androidx.compose.ui.unit.TextUnit(26f, androidx.compose.ui.unit.TextUnitType.Sp))
+                    }
                 }
             }
         }

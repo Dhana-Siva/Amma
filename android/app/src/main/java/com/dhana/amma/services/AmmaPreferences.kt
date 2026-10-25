@@ -89,6 +89,22 @@ class AmmaPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_AVATAR_USES_CHILD_PHOTO, true)
         set(value) = prefs.edit().putBoolean(KEY_AVATAR_USES_CHILD_PHOTO, value).apply()
 
+    // Talk screen cosmetics, mirroring iOS f82e0f6 / 88bee2e: an optional
+    // colored frame around the Talk content area, and a Colorful (pink /
+    // time-of-day tinted) vs Plain (neutral gray) chat bubble style.
+    var workspaceBorderEnabled: Boolean
+        get() = prefs.getBoolean(KEY_WORKSPACE_BORDER_ENABLED, false)
+        set(value) = prefs.edit().putBoolean(KEY_WORKSPACE_BORDER_ENABLED, value).apply()
+
+    // ARGB, same default pink as iOS's "FF2D78".
+    var workspaceBorderColor: Long
+        get() = prefs.getLong(KEY_WORKSPACE_BORDER_COLOR, 0xFFFF2D78)
+        set(value) = prefs.edit().putLong(KEY_WORKSPACE_BORDER_COLOR, value).apply()
+
+    var messageStyleColorful: Boolean
+        get() = prefs.getBoolean(KEY_MESSAGE_STYLE_COLORFUL, true)
+        set(value) = prefs.edit().putBoolean(KEY_MESSAGE_STYLE_COLORFUL, value).apply()
+
     // One of AvatarPreset's values, meaningful only when
     // avatarUsesChildPhoto is false.
     var avatarPreset: String
@@ -119,6 +135,9 @@ class AmmaPreferences(context: Context) {
         const val KEY_HOME_SCREEN_PRESET = "home_screen_preset"
         const val KEY_AVATAR_USES_CHILD_PHOTO = "avatar_uses_child_photo"
         const val KEY_AVATAR_PRESET = "avatar_preset"
+        const val KEY_WORKSPACE_BORDER_ENABLED = "workspace_border_enabled"
+        const val KEY_WORKSPACE_BORDER_COLOR = "workspace_border_color"
+        const val KEY_MESSAGE_STYLE_COLORFUL = "message_style_colorful"
         const val KEY_VOICE_CONSENT_GRANTED = "voice_consent_granted"
     }
 }
