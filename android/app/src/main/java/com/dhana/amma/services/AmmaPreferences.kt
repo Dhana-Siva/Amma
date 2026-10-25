@@ -41,10 +41,12 @@ class AmmaPreferences(context: Context) {
         set(value) = prefs.edit().putString(KEY_CHILD_PHONE_NUMBER, value).apply()
 
     // One of CallingApp's values below — which app placeCall opens.
-    // Messaging always goes through WhatsApp regardless of this setting,
-    // since Viber/Skype-only calling keeps that behavior simple.
+    // WhatsApp or Phone call. Messaging always goes through WhatsApp
+    // regardless of this setting. Anything else stored here (Viber,
+    // Telegram, Teams were offered once) now reads as WhatsApp.
     var callingApp: String
-        get() = prefs.getString(KEY_CALLING_APP, CallingApp.WHATSAPP) ?: CallingApp.WHATSAPP
+        get() = prefs.getString(KEY_CALLING_APP, CallingApp.WHATSAPP)
+            ?.takeIf { it == CallingApp.PHONE } ?: CallingApp.WHATSAPP
         set(value) = prefs.edit().putString(KEY_CALLING_APP, value).apply()
 
     // Absolute path to a copy of the child's photo in app-private storage
@@ -144,18 +146,10 @@ class AmmaPreferences(context: Context) {
 
 object CallingApp {
     const val WHATSAPP = "whatsapp"
-    const val VIBER = "viber"
-    const val TELEGRAM = "telegram"
 
     // A regular carrier call through the phone's own dialer, for family
     // who'd rather not depend on an internet-calling app (iOS 89abd9c).
     // ACTION_DIAL opens the dialer with the number filled in, so no
     // CALL_PHONE permission is needed.
     const val PHONE = "phone"
-
-    // Experimental — added at the user's request to test whether Teams'
-    // documented l/call deep link (normally used with work emails in
-    // enterprise contexts) also works for a bare phone number on a
-    // personal Teams account. Not confirmed working; drop if it isn't.
-    const val TEAMS = "teams"
 }

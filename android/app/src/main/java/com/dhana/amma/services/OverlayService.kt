@@ -18,7 +18,7 @@ import com.dhana.amma.R
 
 /**
  * Shows a small floating "return to Amma" bubble over whatever app the
- * parent was handed off to (WhatsApp/Viber/Telegram) — a single direct
+ * parent was handed off to (WhatsApp or the phone dialer) — a single direct
  * tap to come back, no swipe-down-then-tap notification gesture needed.
  * Requires SYSTEM_ALERT_WINDOW ("display over other apps"), which can
  * only be granted via a manual trip to system settings — see

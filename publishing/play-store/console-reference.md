@@ -82,8 +82,8 @@ safety form doesn't need to declare contacts access.
 
 `CALL_PHONE` is also not requested. The new "Phone call" calling
 option uses `ACTION_DIAL`, which opens the dialer with the number filled
-in and needs no permission. The other calling options open the contact's
-WhatsApp/Viber/Telegram chat.
+in and needs no permission. The only other option, WhatsApp, opens the
+contact's WhatsApp chat.
 
 **SYSTEM_ALERT_WINDOW ("Display over other apps")** — a Google Play
 *Restricted Permission* requiring its own declaration form, separate

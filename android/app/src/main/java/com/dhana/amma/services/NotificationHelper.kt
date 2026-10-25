@@ -16,7 +16,7 @@ import com.dhana.amma.R
  * Android has no equivalent of iOS's automatic "back to app" pill that
  * appears when one app opens another via a URL scheme — this notification
  * is the closest substitute, giving the parent a real tap target to return
- * to Amma after being handed off to WhatsApp/Viber/Telegram for a call or
+ * to Amma after being handed off to WhatsApp or the phone dialer for a call or
  * message. The backend's system prompt already tells Claude to remind the
  * parent verbally to "tap the small Amma link at the top of the screen" —
  * this notification is what makes that reminder literally true on Android.
@@ -34,7 +34,7 @@ object NotificationHelper {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         // HIGH importance so this actually pops up as a heads-up banner —
         // DEFAULT only lands quietly in the shade, easy to miss entirely
-        // for a parent who's actively over in WhatsApp/Viber/Telegram and
+        // for a parent who's actively over in WhatsApp or the phone dialer and
         // has no reason to think to pull down their notification shade.
         val channel = NotificationChannel(
             CHANNEL_ID,
@@ -70,7 +70,7 @@ object NotificationHelper {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             // Ongoing (not auto-dismissed, can't be swiped away) so it
             // stays as a small icon in the status bar the whole time the
-            // parent is away in WhatsApp/Viber/Telegram, not just for the
+            // parent is away in WhatsApp or the phone dialer, not just for the
             // few seconds a normal heads-up banner shows before dropping
             // into the shade. Cleared explicitly (see clearReturnToAmma)
             // once they actually come back to Amma, not by autoCancel.

@@ -105,8 +105,6 @@ fun OnboardingScreen(onComplete: () -> Unit) {
                 Text(stringResource(R.string.onboarding_calling_app_body), style = MaterialTheme.typography.bodyMedium)
                 Spacer(Modifier.height(16.dp))
                 CallingAppOption("WhatsApp", selected = callingApp == CallingApp.WHATSAPP) { callingApp = CallingApp.WHATSAPP }
-                CallingAppOption("Viber", selected = callingApp == CallingApp.VIBER) { callingApp = CallingApp.VIBER }
-                CallingAppOption("Telegram", selected = callingApp == CallingApp.TELEGRAM) { callingApp = CallingApp.TELEGRAM }
                 CallingAppOption("Phone call", selected = callingApp == CallingApp.PHONE) { callingApp = CallingApp.PHONE }
             }
             4 -> {

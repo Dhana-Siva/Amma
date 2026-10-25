@@ -170,21 +170,9 @@ private fun DevicesMainScreen(onViewContacts: () -> Unit, onEditProfile: () -> U
             callingApp = CallingApp.WHATSAPP
             application.preferences.callingApp = CallingApp.WHATSAPP
         }
-        LanguageOption("Viber", selected = callingApp == CallingApp.VIBER) {
-            callingApp = CallingApp.VIBER
-            application.preferences.callingApp = CallingApp.VIBER
-        }
-        LanguageOption("Telegram", selected = callingApp == CallingApp.TELEGRAM) {
-            callingApp = CallingApp.TELEGRAM
-            application.preferences.callingApp = CallingApp.TELEGRAM
-        }
         LanguageOption("Phone call", selected = callingApp == CallingApp.PHONE) {
             callingApp = CallingApp.PHONE
             application.preferences.callingApp = CallingApp.PHONE
-        }
-        LanguageOption("Teams (experimental)", selected = callingApp == CallingApp.TEAMS) {
-            callingApp = CallingApp.TEAMS
-            application.preferences.callingApp = CallingApp.TEAMS
         }
 
         Spacer(Modifier.height(24.dp))

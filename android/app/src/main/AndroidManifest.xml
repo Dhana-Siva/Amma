@@ -17,16 +17,9 @@
     <queries>
         <package android:name="com.whatsapp" />
         <package android:name="com.whatsapp.w4b" />
-        <package android:name="com.viber.voip" />
-        <package android:name="org.telegram.messenger" />
-        <package android:name="com.microsoft.teams" />
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="https" />
-        </intent>
-        <intent>
-            <action android:name="android.intent.action.VIEW" />
-            <data android:scheme="viber" />
         </intent>
     </queries>
 
@@ -54,7 +47,7 @@
         </activity>
 
         <!-- Shows a small floating "return to Amma" bubble over whatever
-             app the parent gets handed off to (WhatsApp/Viber/Telegram),
+             app the parent gets handed off to (WhatsApp or the phone dialer),
              so getting back is a single direct tap instead of needing to
              know the swipe-down-then-tap notification gesture. specialUse
              is the correct foregroundServiceType here — none of the other

@@ -58,19 +58,13 @@ object CommandExecutor {
             ?: return "Couldn't find that contact to call."
         val withoutPlus = sanitize(number).removePrefix("+")
 
-        // None of these apps expose a call-initiation intent to third-party
-        // apps on Android — each opens the contact's chat/profile page,
-        // one tap away from starting a free call, which matters for
-        // international calling (e.g. calling family in India) where a
-        // regular carrier call would cost money. Telegram's phone-number
-        // lookup only resolves if the contact has Telegram installed with
-        // that exact number and allows being found by phone number in
-        // their privacy settings.
+        // WhatsApp exposes no call-initiation intent to third-party apps
+        // on Android, so this opens the contact's chat, one tap away from
+        // a free call (matters for international calling, e.g. family in
+        // India, where a carrier call costs money). Phone call opens the
+        // dialer with the number filled in.
         val (uri, appLabel) = when (callingApp) {
             CallingApp.PHONE -> Uri.parse("tel:${sanitize(number)}") to "Phone"
-            CallingApp.VIBER -> Uri.parse("viber://chat?number=%2B$withoutPlus") to "Viber"
-            CallingApp.TELEGRAM -> Uri.parse("https://t.me/+$withoutPlus") to "Telegram"
-            CallingApp.TEAMS -> Uri.parse("https://teams.microsoft.com/l/call/0/0?users=%2B$withoutPlus") to "Teams"
             else -> Uri.parse("https://wa.me/$withoutPlus") to "WhatsApp"
         }
         val action = if (callingApp == CallingApp.PHONE) Intent.ACTION_DIAL else Intent.ACTION_VIEW
