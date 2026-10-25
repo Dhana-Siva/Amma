@@ -18,6 +18,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -123,7 +124,9 @@ fun TalkScreen() {
         }
     }
 
-    Scaffold { padding ->
+    // MainTabs' Scaffold already pads for the system bars; zero this one's
+    // insets or the status-bar gap shows twice above the welcome picture.
+    Scaffold(contentWindowInsets = WindowInsets(0)) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
