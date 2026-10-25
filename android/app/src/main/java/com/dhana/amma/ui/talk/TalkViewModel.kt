@@ -43,6 +43,12 @@ class TalkViewModel(
     private val _statusMessage = MutableStateFlow<String?>(null)
     val statusMessage: StateFlow<String?> = _statusMessage.asStateFlow()
 
+    /** Clears the on-screen conversation (iOS's clear-conversation button). */
+    fun clearConversation() {
+        _log.value = emptyList()
+        _statusMessage.value = null
+    }
+
     fun onMicTap() {
         when (_phase.value) {
             TalkPhase.Idle -> {

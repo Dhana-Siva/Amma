@@ -67,12 +67,14 @@ object CommandExecutor {
         // that exact number and allows being found by phone number in
         // their privacy settings.
         val (uri, appLabel) = when (callingApp) {
+            CallingApp.PHONE -> Uri.parse("tel:${sanitize(number)}") to "Phone"
             CallingApp.VIBER -> Uri.parse("viber://chat?number=%2B$withoutPlus") to "Viber"
             CallingApp.TELEGRAM -> Uri.parse("https://t.me/+$withoutPlus") to "Telegram"
             CallingApp.TEAMS -> Uri.parse("https://teams.microsoft.com/l/call/0/0?users=%2B$withoutPlus") to "Teams"
             else -> Uri.parse("https://wa.me/$withoutPlus") to "WhatsApp"
         }
-        val intent = Intent(Intent.ACTION_VIEW, uri).apply {
+        val action = if (callingApp == CallingApp.PHONE) Intent.ACTION_DIAL else Intent.ACTION_VIEW
+        val intent = Intent(action, uri).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         return try {
@@ -96,7 +98,7 @@ object CommandExecutor {
         }
         return try {
             context.startActivity(intent)
-            NotificationHelper.showReturnToAmma(context, "WhatsApp")
+            OverlayHelper.showReturnToAmma(context, "WhatsApp")
             null
         } catch (e: Exception) {
             "Couldn't open WhatsApp."

@@ -1,70 +1,106 @@
 package com.dhana.amma.services
 
 import android.content.Context
-import android.content.pm.PackageManager
+import android.net.Uri
 import android.provider.ContactsContract
 import android.util.Log
-import androidx.core.content.ContextCompat
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.util.UUID
 import kotlin.math.max
 import kotlin.math.min
 
-data class ContactSummary(
-    val id: UUID,
+@Serializable
+data class AmmaContact(
+    val id: String = UUID.randomUUID().toString(),
     val name: String,
-    val phoneNumbers: List<String>,
+    val phoneNumber: String,
 )
 
+/**
+ * "Amma's Contacts" — the small, deliberately-chosen list of people Amma
+ * can call or message by voice, mirroring iOS's AmmaContactsStore. This
+ * replaced mirroring the whole phonebook (iOS 32a6542): voice-triggered
+ * calling is scoped to people the family actually added, and adding one
+ * visibly changes the list. People are added through the system contact
+ * picker (which grants one-off access to just the picked contact, so no
+ * READ_CONTACTS permission is needed) or typed in by hand. Numbers stay
+ * on the phone; only the spoken name ever reaches the backend.
+ */
 class ContactsService(private val context: Context) {
 
     private companion object {
         const val TAG = "AmmaContacts"
+        const val PREFS = "amma_contacts"
+        const val KEY_CONTACTS = "contacts"
     }
 
-    private fun hasPermission(): Boolean =
-        ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_CONTACTS) ==
-            PackageManager.PERMISSION_GRANTED
+    private val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    private val json = Json { ignoreUnknownKeys = true }
 
-    suspend fun allContacts(): List<ContactSummary> = withContext(Dispatchers.IO) {
-        if (!hasPermission()) {
-            Log.d(TAG, "allContacts: READ_CONTACTS not granted, returning empty")
-            return@withContext emptyList()
-        }
+    private val _contacts = MutableStateFlow(load())
+    val contacts: StateFlow<List<AmmaContact>> = _contacts.asStateFlow()
 
-        val byName = LinkedHashMap<String, MutableList<String>>()
-        val cursor = context.contentResolver.query(
-            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-            arrayOf(
-                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-                ContactsContract.CommonDataKinds.Phone.NUMBER,
-            ),
-            null,
-            null,
-            "${ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME} ASC",
-        )
-        Log.d(TAG, "allContacts: query returned cursor=${cursor != null}, count=${cursor?.count}")
-        cursor?.use {
-            val nameIdx = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
-            val numberIdx = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
-            while (it.moveToNext()) {
-                val name = it.getString(nameIdx) ?: continue
-                val number = it.getString(numberIdx) ?: continue
-                byName.getOrPut(name) { mutableListOf() }.add(number)
+    private fun load(): List<AmmaContact> =
+        prefs.getString(KEY_CONTACTS, null)
+            ?.let { runCatching { json.decodeFromString<List<AmmaContact>>(it) }.getOrNull() }
+            ?: emptyList()
+
+    private fun save(list: List<AmmaContact>) {
+        val sorted = list.sortedBy { it.name.lowercase() }
+        prefs.edit().putString(KEY_CONTACTS, json.encodeToString(sorted)).apply()
+        _contacts.value = sorted
+    }
+
+    /** Adds (or updates, matched by name) a contact. Returns false if either field is blank. */
+    fun add(name: String, phoneNumber: String): Boolean {
+        val trimmedName = name.trim()
+        val trimmedNumber = phoneNumber.trim()
+        if (trimmedName.isEmpty() || trimmedNumber.isEmpty()) return false
+        val others = _contacts.value.filterNot { it.name.equals(trimmedName, ignoreCase = true) }
+        save(others + AmmaContact(name = trimmedName, phoneNumber = trimmedNumber))
+        return true
+    }
+
+    fun remove(id: String) {
+        save(_contacts.value.filterNot { it.id == id })
+    }
+
+    /**
+     * Reads the name and number from a contact picked via
+     * Intent.ACTION_PICK on Phone.CONTENT_URI. The picker grants temporary
+     * read access to that one row, so this works without READ_CONTACTS.
+     */
+    suspend fun readPicked(uri: Uri): Pair<String, String>? = withContext(Dispatchers.IO) {
+        runCatching {
+            context.contentResolver.query(
+                uri,
+                arrayOf(
+                    ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                    ContactsContract.CommonDataKinds.Phone.NUMBER,
+                ),
+                null,
+                null,
+                null,
+            )?.use { cursor ->
+                if (!cursor.moveToFirst()) return@use null
+                val name = cursor.getString(0)
+                val number = cursor.getString(1)
+                if (name.isNullOrBlank() || number.isNullOrBlank()) null else name to number
             }
-        }
-        val result = byName.entries
-            .sortedBy { it.key.lowercase() }
-            .map { (name, numbers) -> ContactSummary(id = UUID.randomUUID(), name = name, phoneNumbers = numbers) }
-        Log.d(TAG, "allContacts: resolved ${result.size} distinct names: ${result.take(10).map { it.name }}")
-        result
+        }.onFailure { Log.e(TAG, "readPicked failed for $uri", it) }.getOrNull()
     }
 
-    suspend fun phoneNumber(name: String): String? = withContext(Dispatchers.IO) {
-        val contacts = allContacts()
+    fun phoneNumber(name: String): String? {
+        val contacts = _contacts.value
         Log.d(TAG, "phoneNumber: looking up '$name' among ${contacts.size} contacts")
-        if (contacts.isEmpty()) return@withContext null
+        if (contacts.isEmpty()) return null
 
         val target = name.trim().lowercase()
 
@@ -74,11 +110,11 @@ class ContactsService(private val context: Context) {
         }
         if (exact != null) {
             Log.d(TAG, "phoneNumber: exact match '${exact.name}'")
-            return@withContext exact.phoneNumbers.firstOrNull()
+            return exact.phoneNumber
         }
 
         val tolerance = max(1, target.length / 3)
-        var best: ContactSummary? = null
+        var best: AmmaContact? = null
         var bestDistance = Int.MAX_VALUE
         for (contact in contacts) {
             val distance = levenshtein(target, contact.name.trim().lowercase())
@@ -88,7 +124,7 @@ class ContactsService(private val context: Context) {
             }
         }
         Log.d(TAG, "phoneNumber: best fuzzy match '${best?.name}' distance=$bestDistance tolerance=$tolerance")
-        if (best != null && bestDistance <= tolerance) best.phoneNumbers.firstOrNull() else null
+        return if (best != null && bestDistance <= tolerance) best.phoneNumber else null
     }
 
     private fun levenshtein(a: String, b: String): Int {

@@ -167,6 +167,10 @@ private fun DevicesMainScreen(onViewContacts: () -> Unit, onEditProfile: () -> U
             callingApp = CallingApp.TELEGRAM
             application.preferences.callingApp = CallingApp.TELEGRAM
         }
+        LanguageOption("Phone call", selected = callingApp == CallingApp.PHONE) {
+            callingApp = CallingApp.PHONE
+            application.preferences.callingApp = CallingApp.PHONE
+        }
         LanguageOption("Teams (experimental)", selected = callingApp == CallingApp.TEAMS) {
             callingApp = CallingApp.TEAMS
             application.preferences.callingApp = CallingApp.TEAMS
@@ -238,7 +242,7 @@ private fun DevicesMainScreen(onViewContacts: () -> Unit, onEditProfile: () -> U
         Spacer(Modifier.height(24.dp))
 
         OutlinedButton(onClick = onViewContacts, modifier = Modifier.fillMaxWidth()) {
-            Text("View phone contacts")
+            Text("Amma's Contacts")
         }
     }
 }

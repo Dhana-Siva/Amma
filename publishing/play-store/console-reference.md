@@ -57,7 +57,7 @@ what the app actually does:
 | Voice/audio recordings | Yes | Yes (ElevenLabs — transcription, cloning, TTS) | App functionality |
 | Names (parent/child) | Yes | No | App functionality |
 | Contact names (not numbers) | Yes | Yes (Anthropic — reply generation) | App functionality |
-| Phone numbers | **No** | — | Resolved entirely on-device via Contacts, never transmitted |
+| Phone numbers | **No** | — | Stored only on-device in "Amma's Contacts" (picked via the system contact picker or typed in), never transmitted |
 | App activity (conversation transcripts) | Yes | Yes (Anthropic) | App functionality |
 | Precise/approximate location | No | — | Not collected |
 
@@ -73,16 +73,17 @@ been through several review rounds already), so nothing here has been
 tested against a real reviewer yet — worth double-checking Play
 Console's own wording hasn't changed by the time you fill this in.
 
-**READ_CONTACTS**: "The app lets a user ask a voice assistant to call or
-message a specific person by name (e.g. 'call my son'). The app looks up
-that person's phone number in the device's own Contacts to open a
-WhatsApp chat/call with them — phone numbers are never transmitted off
-the device."
+**No contacts permission any more (2026-10-25).** `READ_CONTACTS` was
+removed: Android now keeps its own short "Amma's Contacts" list (like
+iOS), filled through the system contact picker, which hands over only
+the one picked contact without any permission, or by typing a name and
+number. So there is nothing to justify for contacts, and the Data
+safety form doesn't need to declare contacts access.
 
-(`CALL_PHONE` was removed — calling now opens the contact's WhatsApp
-chat directly rather than dialing, since WhatsApp calls are free
-internationally and Android's WhatsApp has no call-initiation intent to
-trigger automatically.)
+`CALL_PHONE` is also not requested. The new "Phone call" calling
+option uses `ACTION_DIAL`, which opens the dialer with the number filled
+in and needs no permission. The other calling options open the contact's
+WhatsApp/Viber/Telegram chat.
 
 **SYSTEM_ALERT_WINDOW ("Display over other apps")** — a Google Play
 *Restricted Permission* requiring its own declaration form, separate

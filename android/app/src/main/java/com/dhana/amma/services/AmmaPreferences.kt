@@ -128,6 +128,12 @@ object CallingApp {
     const val VIBER = "viber"
     const val TELEGRAM = "telegram"
 
+    // A regular carrier call through the phone's own dialer, for family
+    // who'd rather not depend on an internet-calling app (iOS 89abd9c).
+    // ACTION_DIAL opens the dialer with the number filled in, so no
+    // CALL_PHONE permission is needed.
+    const val PHONE = "phone"
+
     // Experimental — added at the user's request to test whether Teams'
     // documented l/call deep link (normally used with work emails in
     // enterprise contexts) also works for a bare phone number on a
