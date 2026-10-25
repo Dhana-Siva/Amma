@@ -22,7 +22,7 @@ production" form asks for exactly that.
 3. **Play a song:** "Play an Ilaiyaraaja song". It opens on your phone (or your TV if you have a Chromecast). Tap the AAA bubble to come back.
 4. **Call someone:** go to **Devices → AAA Contacts**, add a family member, then say *"call [their name]"*.
 5. **Pick a voice:** in the **Voice** tab, choose the voice AAA replies in.
-6. **Make it yours:** **Devices → Edit profile** for photos, and try the Talk border and message style.
+6. **Make it yours:** the **Profile** tab for photos, and try the Talk border and message style.
 
 **Please tell me** (just message me directly, any time):
 - Anything confusing, broken, or slow
@@ -48,7 +48,7 @@ Please stay in the test for **14 days** and open AAA now and then, two or three 
 3. **பாடல் போடுங்கள்:** "இளையராஜா பாட்டு போடு". உங்கள் போனில் திறக்கும் (Chromecast இருந்தால் டிவியில்). திரும்ப வர AAA பட்டனைத் தட்டுங்கள்.
 4. **அழைப்பு:** **Devices → AAA Contacts**-இல் ஒரு குடும்ப உறுப்பினரைச் சேர்த்து, *"[பெயர்]-க்கு கால் பண்ணு"* என்று சொல்லுங்கள்.
 5. **குரலைத் தேர்வு செய்யுங்கள்:** **Voice** டேபில் AAA பதில் சொல்லும் குரலைத் தேர்ந்தெடுங்கள்.
-6. **உங்களுக்கு ஏற்றபடி:** புகைப்படங்களுக்கு **Devices → Edit profile**, மேலும் Talk border, message style-ஐயும் முயற்சி செய்யுங்கள்.
+6. **உங்களுக்கு ஏற்றபடி:** புகைப்படங்களுக்கு **Profile** டேப், மேலும் Talk border, message style-ஐயும் முயற்சி செய்யுங்கள்.
 
 **எனக்குச் சொல்லுங்கள்** (எப்போது வேண்டுமானாலும் நேரடியாக மெசேஜ் செய்யுங்கள்):
 - குழப்பமாக, வேலை செய்யாமல், அல்லது மெதுவாக இருந்தவை

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -82,7 +83,7 @@ private data class PendingCrop(val bitmap: Bitmap, val target: PhotoTarget)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(onBack: () -> Unit) {
+fun ProfileScreen(onBack: (() -> Unit)? = null) {
     val context = LocalContext.current
     val application = context.applicationContext as AmmaApplication
     val scope = rememberCoroutineScope()
@@ -214,17 +215,24 @@ fun ProfileScreen(onBack: () -> Unit) {
         }
     }
 
+    // As a bottom tab, MainTabs' Scaffold already pads for the system
+    // bars; without zeroing these the status-bar gap appears twice.
     Scaffold(
+        contentWindowInsets = WindowInsets(0),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
+                windowInsets = WindowInsets(0),
                 title = { Text("Profile") },
                 actions = {
                     TextButton(onClick = { save() }) { Text("Save") }
                 },
+                // No back arrow as its own bottom tab; only when pushed.
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    if (onBack != null) {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
                     }
                 },
             )

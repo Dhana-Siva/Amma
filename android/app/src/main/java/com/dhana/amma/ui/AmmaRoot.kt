@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material.icons.filled.Waves
 import androidx.compose.material3.Icon
@@ -29,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import com.dhana.amma.AmmaApplication
 import com.dhana.amma.R
 import com.dhana.amma.ui.devices.DevicesScreen
+import com.dhana.amma.ui.devices.ProfileScreen
 import com.dhana.amma.ui.onboarding.AIDisclosureGateScreen
 import com.dhana.amma.ui.onboarding.OnboardingScreen
 import com.dhana.amma.ui.onboarding.TutorialScreen
@@ -105,7 +108,7 @@ private fun MainTabs(application: AmmaApplication) {
                 NavigationBarItem(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
-                    icon = { Icon(Icons.Filled.Waves, contentDescription = null) },
+                    icon = { Icon(Icons.Filled.RecordVoiceOver, contentDescription = null) },
                     label = { Text(stringResource(R.string.tab_voice)) },
                 )
                 NavigationBarItem(
@@ -113,6 +116,14 @@ private fun MainTabs(application: AmmaApplication) {
                     onClick = { selectedTab = 2 },
                     icon = { Icon(Icons.Filled.Tv, contentDescription = null) },
                     label = { Text(stringResource(R.string.tab_devices)) },
+                )
+                // Its own tab: photos and names are edited often enough that
+                // Devices → Edit profile was one step too many.
+                NavigationBarItem(
+                    selected = selectedTab == 3,
+                    onClick = { selectedTab = 3 },
+                    icon = { Icon(Icons.Filled.Person, contentDescription = null) },
+                    label = { Text(stringResource(R.string.tab_profile)) },
                 )
             }
         }
@@ -122,6 +133,7 @@ private fun MainTabs(application: AmmaApplication) {
                 0 -> TalkScreen()
                 1 -> VoiceSetupScreen()
                 2 -> DevicesScreen()
+                3 -> ProfileScreen()
                 else -> ComingSoon()
             }
         }

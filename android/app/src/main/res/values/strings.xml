@@ -49,8 +49,8 @@
     <string name="tutorial_page6_body_en">In the Voice tab, pick how AAA sounds, or record your son\'s or daughter\'s voice so AAA speaks just like them.</string>
     <string name="tutorial_page6_body_ta">Voice டேபில் AAA எந்தக் குரலில் பேச வேண்டும் என்று தேர்ந்தெடுங்கள், அல்லது உங்கள் மகன்/மகள் குரலைப் பதிவு செய்யுங்கள்.</string>
     <string name="tutorial_page7_title">Set up your profile</string>
-    <string name="tutorial_page7_body_en">Go to Devices → Edit profile to add your picture, your son\'s or daughter\'s picture, and how they address you (Amma, Appa…).</string>
-    <string name="tutorial_page7_body_ta">Devices → Edit profile-இல் உங்கள் புகைப்படம், உங்கள் மகன்/மகள் புகைப்படம், அவர்கள் உங்களை எப்படி அழைப்பார்கள் (அம்மா, அப்பா…) என்பதைச் சேர்க்கவும்.</string>
+    <string name="tutorial_page7_body_en">Open the Profile tab at the bottom to add your picture, your son\'s or daughter\'s picture, and how they address you (Amma, Appa…).</string>
+    <string name="tutorial_page7_body_ta">கீழே உள்ள Profile டேபில் உங்கள் புகைப்படம், உங்கள் மகன்/மகள் புகைப்படம், அவர்கள் உங்களை எப்படி அழைப்பார்கள் (அம்மா, அப்பா…) என்பதைச் சேர்க்கவும்.</string>
     <string name="tutorial_next">Next</string>
     <string name="tutorial_got_it">Got it</string>
 
@@ -63,6 +63,7 @@
     <string name="tab_talk">Talk</string>
     <string name="tab_voice">Voice</string>
     <string name="tab_devices">Devices</string>
+    <string name="tab_profile">Profile</string>
     <string name="coming_soon">Coming soon</string>
 
     <!-- Devices -->

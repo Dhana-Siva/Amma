@@ -59,7 +59,7 @@ import com.dhana.amma.services.OverlayHelper
 import com.google.android.gms.cast.framework.CastButtonFactory
 import kotlinx.coroutines.launch
 
-private enum class DevicesSubscreen { Main, Contacts, Profile }
+private enum class DevicesSubscreen { Main, Contacts }
 
 @Composable
 fun DevicesScreen() {
@@ -67,16 +67,14 @@ fun DevicesScreen() {
 
     when (subscreen) {
         DevicesSubscreen.Contacts -> ContactsListScreen(onBack = { subscreen = DevicesSubscreen.Main })
-        DevicesSubscreen.Profile -> ProfileScreen(onBack = { subscreen = DevicesSubscreen.Main })
         DevicesSubscreen.Main -> DevicesMainScreen(
             onViewContacts = { subscreen = DevicesSubscreen.Contacts },
-            onEditProfile = { subscreen = DevicesSubscreen.Profile },
         )
     }
 }
 
 @Composable
-private fun DevicesMainScreen(onViewContacts: () -> Unit, onEditProfile: () -> Unit) {
+private fun DevicesMainScreen(onViewContacts: () -> Unit) {
     val context = LocalContext.current
     val application = context.applicationContext as AmmaApplication
     val castService = application.castService
@@ -177,14 +175,6 @@ private fun DevicesMainScreen(onViewContacts: () -> Unit, onEditProfile: () -> U
             ) {
                 Text(stringResource(R.string.devices_disconnect))
             }
-        }
-
-        Spacer(Modifier.height(24.dp))
-        HorizontalDivider()
-        Spacer(Modifier.height(24.dp))
-
-        OutlinedButton(onClick = onEditProfile, modifier = Modifier.fillMaxWidth()) {
-            Text("Edit profile")
         }
 
         Spacer(Modifier.height(24.dp))
