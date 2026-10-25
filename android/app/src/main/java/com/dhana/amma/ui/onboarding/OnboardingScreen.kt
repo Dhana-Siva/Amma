@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -44,9 +45,13 @@ fun OnboardingScreen(onComplete: () -> Unit) {
     var languageCode by remember { mutableStateOf("en") }
     var callingApp by remember { mutableStateOf(CallingApp.WHATSAPP) }
 
+    // safeDrawingPadding: targetSdk 36 on Android 15+ draws edge-to-edge,
+    // so without it the bottom button sat behind the 3-button nav bar and
+    // tapping it hit Home/Back instead (looked like a crash).
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .safeDrawingPadding()
             .padding(24.dp),
         verticalArrangement = Arrangement.Center,
     ) {

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -70,7 +71,9 @@ fun PhotoCropScreen(image: Bitmap, onConfirm: (Bitmap) -> Unit, onCancel: () -> 
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().background(Color.Black),
+        // Black fills behind the system bars; content and the bottom
+        // buttons stay clear of them (Android 15+ draws edge-to-edge).
+        modifier = Modifier.fillMaxSize().background(Color.Black).safeDrawingPadding(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(Modifier.height(24.dp))

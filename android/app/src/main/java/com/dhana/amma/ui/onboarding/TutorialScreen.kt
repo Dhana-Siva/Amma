@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -64,7 +65,10 @@ fun TutorialScreen(onComplete: () -> Unit) {
     val pagerState = rememberPagerState(pageCount = { pages.size })
     val scope = rememberCoroutineScope()
 
-    Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
+    // safeDrawingPadding: targetSdk 36 on Android 15+ draws edge-to-edge,
+    // so without it the bottom button sat behind the 3-button nav bar and
+    // tapping it hit Home/Back instead (looked like a crash).
+    Column(modifier = Modifier.fillMaxSize().safeDrawingPadding().padding(24.dp)) {
         HorizontalPager(state = pagerState, modifier = Modifier.weight(1f)) { pageIndex ->
             val page = pages[pageIndex]
             val bodyRes = if (languageCode == "ta") page.bodyResTa else page.bodyResEn
