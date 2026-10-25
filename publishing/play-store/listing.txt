@@ -7,10 +7,10 @@ A warm way to stay close to family, in their own voice.
 
 FULL DESCRIPTION
 -----------------
-Amma is a simple way to stay close to family, built for parents and
+Amma Appa Arugil (AAA) is a simple way to stay close to family, built for parents and
 grandparents who'd rather talk than type.
 
-Just tap the mic and talk, like you're calling your child. Amma listens,
+Just tap the mic and talk, like you're calling your child. AAA listens,
 and replies in a warm, natural voice — even in your child's own cloned
 voice, if they choose to set that up.
 
@@ -18,16 +18,16 @@ FEATURES
 
 • Tap and talk — no typing, no complicated menus
 • Replies in a familiar voice, not a robotic assistant
-• Ask Amma to call or message someone by name, and it's handled
+• Ask AAA to call or message someone by name, and it's handled
 • Cast videos or music to your TV just by asking
 • Works in Tamil and English
 
-Amma is designed to be simple enough for anyone, especially those who
+AAA is designed to be simple enough for anyone, especially those who
 find typing or navigating apps difficult. One button. Just talk.
 
 PRIVACY
 
-Every message is sent to Anthropic (which writes Amma's replies) and
+Every message is sent to Anthropic (which writes AAA's replies) and
 ElevenLabs (which handles speech-to-text and text-to-speech) to make
 Talk work — the app discloses this and asks you to acknowledge it
 before your first conversation. Voice cloning is a separate, entirely

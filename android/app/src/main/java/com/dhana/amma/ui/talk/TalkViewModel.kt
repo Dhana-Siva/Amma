@@ -117,7 +117,7 @@ class TalkViewModel(
             }
         } catch (e: Exception) {
             android.util.Log.e("TalkViewModel", "sendInteraction failed", e)
-            _statusMessage.value = "Couldn't reach Amma: ${e.message ?: e::class.simpleName}"
+            _statusMessage.value = "Couldn't reach AAA: ${e.message ?: e::class.simpleName}"
             _phase.value = TalkPhase.Idle
         }
     }

@@ -260,11 +260,11 @@ private fun DevicesMainScreen(onViewContacts: () -> Unit, onEditProfile: () -> U
         HorizontalDivider()
         Spacer(Modifier.height(24.dp))
 
-        Text("Return-to-Amma button", style = MaterialTheme.typography.labelLarge, modifier = Modifier.fillMaxWidth())
+        Text("Return-to-AAA button", style = MaterialTheme.typography.labelLarge, modifier = Modifier.fillMaxWidth())
         Spacer(Modifier.height(8.dp))
         Text(
             if (hasOverlayPermission) {
-                "On — a floating button appears to bring you back to Amma after a call, message, or video."
+                "On — a floating button appears to bring you back to AAA after a call, message, or video."
             } else {
                 "Off — you'll get a notification instead, which needs an extra swipe-and-tap gesture."
             },
@@ -322,7 +322,7 @@ private fun DevicesMainScreen(onViewContacts: () -> Unit, onEditProfile: () -> U
         Spacer(Modifier.height(24.dp))
 
         OutlinedButton(onClick = onViewContacts, modifier = Modifier.fillMaxWidth()) {
-            Text("Amma's Contacts")
+            Text("AAA Contacts")
         }
     }
 }

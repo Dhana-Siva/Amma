@@ -38,7 +38,7 @@ object NotificationHelper {
         // has no reason to think to pull down their notification shade.
         val channel = NotificationChannel(
             CHANNEL_ID,
-            "Return to Amma",
+            "Return to AAA",
             NotificationManager.IMPORTANCE_HIGH,
         )
         val manager = context.getSystemService(NotificationManager::class.java)
@@ -66,7 +66,7 @@ object NotificationHelper {
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("Done in $appLabel?")
-            .setContentText("Tap to come back to Amma")
+            .setContentText("Tap to come back to AAA")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             // Ongoing (not auto-dismissed, can't be swiped away) so it
             // stays as a small icon in the status bar the whole time the

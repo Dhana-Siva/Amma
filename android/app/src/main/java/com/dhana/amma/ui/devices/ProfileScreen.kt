@@ -306,7 +306,7 @@ fun ProfileScreen(onBack: () -> Unit) {
 
             Text("Avatar", style = MaterialTheme.typography.labelLarge, modifier = Modifier.fillMaxWidth())
             Text(
-                "Shown next to Amma's replies in Talk — pick the real photo or a friendly default.",
+                "Shown next to AAA's replies in Talk — pick the real photo or a friendly default.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

@@ -76,7 +76,7 @@ fun ContactsListScreen(onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Amma's Contacts") },
+                title = { Text("AAA Contacts") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -87,7 +87,7 @@ fun ContactsListScreen(onBack: () -> Unit) {
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
             Text(
-                "The people Amma can call or message when you ask by name. " +
+                "The people AAA can call or message when you ask by name. " +
                     "Their numbers stay on this phone.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,

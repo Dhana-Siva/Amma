@@ -91,7 +91,7 @@ fun VoiceSetupScreen() {
             .padding(24.dp),
     ) {
         Text(
-            "Choose how Amma should sound when it replies — a default voice, " +
+            "Choose how AAA should sound when it replies — a default voice, " +
                 "or your child's own voice.",
             style = MaterialTheme.typography.bodyLarge,
         )

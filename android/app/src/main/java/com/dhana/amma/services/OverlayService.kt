@@ -104,7 +104,7 @@ class OverlayService : Service() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val channel = NotificationChannel(
             FOREGROUND_CHANNEL_ID,
-            "Return to Amma (background)",
+            "Return to AAA (background)",
             NotificationManager.IMPORTANCE_MIN,
         )
         val manager = getSystemService(NotificationManager::class.java)
@@ -114,7 +114,7 @@ class OverlayService : Service() {
     private fun buildForegroundNotification() =
         NotificationCompat.Builder(this, FOREGROUND_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle("Amma")
+            .setContentTitle("AAA")
             .setContentText("Floating return button is active")
             .setPriority(NotificationCompat.PRIORITY_MIN)
             .setOngoing(true)
