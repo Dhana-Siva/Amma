@@ -85,6 +85,24 @@ option uses `ACTION_DIAL`, which opens the dialer with the number filled
 in and needs no permission. The only other option, WhatsApp, opens the
 contact's WhatsApp chat.
 
+**Foreground service permissions (App content form, required).**
+Answer **Yes**, tick only **Special use** (`FOREGROUND_SERVICE_SPECIAL_USE`,
+used by `OverlayService`). Description used:
+
+> Special use: floating "return to app" button. When a parent asks AAA
+> by voice to call or message a family member, or to play a song, AAA
+> hands off to WhatsApp, the phone dialer, or YouTube. A small floating
+> AAA button stays on top of that app so the parent, often an older
+> adult who isn't comfortable with Android navigation gestures, can
+> return to AAA with one tap. The service starts only right after such
+> a hand-off, shows an ongoing notification while active, and stops as
+> soon as the user taps the button or returns to AAA. It does no
+> background processing, tracking, or network activity.
+
+Video: a 20–30s phone screen recording (ask AAA to play a song or call,
+the bubble floats over YouTube/WhatsApp, tap it to return), uploaded to
+YouTube as Unlisted.
+
 **SYSTEM_ALERT_WINDOW ("Display over other apps")** — a Google Play
 *Restricted Permission* requiring its own declaration form, separate
 from the manifest permissions list, and sometimes a short screen
