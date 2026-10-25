@@ -16,7 +16,10 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Contacts
 import androidx.compose.material.icons.filled.GraphicEq
+import androidx.compose.material.icons.filled.RecordVoiceOver
+import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.Button
@@ -43,6 +46,9 @@ private val pages = listOf(
     TutorialPage(Icons.Filled.Mic, R.string.tutorial_page1_title, R.string.tutorial_page1_body_en, R.string.tutorial_page1_body_ta),
     TutorialPage(Icons.Filled.GraphicEq, R.string.tutorial_page2_title, R.string.tutorial_page2_body_en, R.string.tutorial_page2_body_ta),
     TutorialPage(Icons.Filled.Tv, R.string.tutorial_page3_title, R.string.tutorial_page3_body_en, R.string.tutorial_page3_body_ta),
+    TutorialPage(Icons.Filled.Contacts, R.string.tutorial_page4_title, R.string.tutorial_page4_body_en, R.string.tutorial_page4_body_ta),
+    TutorialPage(Icons.Filled.TouchApp, R.string.tutorial_page5_title, R.string.tutorial_page5_body_en, R.string.tutorial_page5_body_ta),
+    TutorialPage(Icons.Filled.RecordVoiceOver, R.string.tutorial_page6_title, R.string.tutorial_page6_body_en, R.string.tutorial_page6_body_ta),
 )
 
 @OptIn(ExperimentalFoundationApi::class)
