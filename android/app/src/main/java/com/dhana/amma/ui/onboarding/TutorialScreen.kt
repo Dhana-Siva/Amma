@@ -71,7 +71,14 @@ fun TutorialScreen(onComplete: () -> Unit) {
     Column(modifier = Modifier.fillMaxSize().safeDrawingPadding().padding(24.dp)) {
         HorizontalPager(state = pagerState, modifier = Modifier.weight(1f)) { pageIndex ->
             val page = pages[pageIndex]
-            val bodyRes = if (languageCode == "ta") page.bodyResTa else page.bodyResEn
+            // Both languages on every page, the chosen one first, so a
+            // Tamil-speaking parent and an English-reading helper setting
+            // the phone up can follow the same screen.
+            val (firstRes, secondRes) = if (languageCode == "ta") {
+                page.bodyResTa to page.bodyResEn
+            } else {
+                page.bodyResEn to page.bodyResTa
+            }
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
@@ -81,7 +88,14 @@ fun TutorialScreen(onComplete: () -> Unit) {
                 Spacer(Modifier.height(16.dp))
                 Text(stringResource(page.titleRes), style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
                 Spacer(Modifier.height(8.dp))
-                Text(stringResource(bodyRes, childName), style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Center)
+                Text(stringResource(firstRes, childName), style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Center)
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    stringResource(secondRes, childName),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
             }
         }
 
