@@ -578,6 +578,15 @@ def select_voice(req: VoiceSelectRequest) -> dict:
     return {"status": "ok"}
 
 
+def elevenlabs_error_status(response) -> str:
+    """ElevenLabs errors look like {"detail": {"status": "...", "message": "..."}}."""
+    try:
+        detail = response.json().get("detail")
+    except ValueError:
+        return ""
+    return detail.get("status", "") if isinstance(detail, dict) else ""
+
+
 @app.post("/v1/voice-samples")
 async def upload_voice_sample(family_id: str = Form(...), audio: UploadFile = File(...)) -> dict:
     family = families.setdefault(family_id, {})
@@ -595,7 +604,17 @@ async def upload_voice_sample(family_id: str = Form(...), audio: UploadFile = Fi
         timeout=60,
     )
     if response.status_code >= 400:
-        raise HTTPException(status_code=502, detail=f"ElevenLabs voice creation failed: {response.text}")
+        # Shown to the user as-is by the apps, so it says what to do rather
+        # than echoing ElevenLabs' raw error. The custom-voice cap (10 on the
+        # current plan) is the failure that actually happens in practice.
+        reason = elevenlabs_error_status(response)
+        print(f"ElevenLabs voice creation failed: HTTP {response.status_code} {reason}", flush=True)
+        if reason == "voice_limit_reached" or "voice_limit" in response.text:
+            raise HTTPException(
+                status_code=503,
+                detail="Custom voices are full right now. Pick one of the preset voices instead, or try again later.",
+            )
+        raise HTTPException(status_code=502, detail="Couldn't create your voice right now. Please try again in a moment.")
 
     voice_id = response.json()["voice_id"]
 

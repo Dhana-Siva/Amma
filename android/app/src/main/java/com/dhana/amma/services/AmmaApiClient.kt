@@ -26,7 +26,13 @@ import java.io.File
 import java.util.UUID
 
 class ApiException(val statusCode: Int, val body: String) :
-    Exception("HTTP $statusCode: $body")
+    Exception("HTTP $statusCode: $body") {
+    /** The backend's `{"detail": "..."}` text, when it sent a plain-string one. */
+    val userMessage: String?
+        get() = runCatching {
+            org.json.JSONObject(body).optString("detail").takeIf { it.isNotBlank() }
+        }.getOrNull()
+}
 
 private interface AmmaApiService {
     @POST("v1/interactions")

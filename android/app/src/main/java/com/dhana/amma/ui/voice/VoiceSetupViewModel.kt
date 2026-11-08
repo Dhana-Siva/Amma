@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.dhana.amma.AmmaApplication
 import com.dhana.amma.models.VoicePreset
 import com.dhana.amma.services.AmmaApiClient
+import com.dhana.amma.services.ApiException
 import com.dhana.amma.services.AmmaPreferences
 import com.dhana.amma.services.AudioRecorderService
 import com.dhana.amma.services.FamilyContext
@@ -96,8 +97,12 @@ class VoiceSetupViewModel(
                 }
                 _selectedPresetId.value = null
                 _status.value = "Uploaded — voice ready ($voiceId)"
+            } catch (e: ApiException) {
+                // The backend's detail is written for the user (e.g. custom
+                // voices full -> pick a preset); fall back if there isn't one.
+                _status.value = e.userMessage ?: "Upload failed — try again."
             } catch (e: Exception) {
-                _status.value = "Upload failed — try again."
+                _status.value = "Upload failed — check your connection and try again."
             } finally {
                 _isUploading.value = false
             }

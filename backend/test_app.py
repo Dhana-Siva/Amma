@@ -1,3 +1,4 @@
+import json
 import uuid
 from types import SimpleNamespace
 from unittest.mock import MagicMock
@@ -378,3 +379,31 @@ def test_transcribe_falls_back_to_saved_family_language(monkeypatch):
     )
     assert response.status_code == 200
     assert captured["data"]["language_code"] == "ta"
+
+
+def _consented_family(monkeypatch, family_id):
+    monkeypatch.setitem(app_module.families, family_id, {"voice_consent_granted_at": "2026-11-08T00:00:00Z"})
+
+
+def _fake_elevenlabs(monkeypatch, status_code, payload):
+    def fake_post(url, headers=None, data=None, files=None, timeout=None):
+        return SimpleNamespace(status_code=status_code, text=json.dumps(payload), json=lambda: payload)
+    monkeypatch.setattr(app_module.requests, "post", fake_post)
+
+
+def test_voice_sample_full_quota_gives_actionable_message(monkeypatch, family_id):
+    _consented_family(monkeypatch, family_id)
+    _fake_elevenlabs(monkeypatch, 400, {"detail": {"status": "voice_limit_reached", "message": "You have reached your maximum amount of custom voices"}})
+    response = client.post("/v1/voice-samples", data={"family_id": family_id},
+                           files={"audio": ("sample.m4a", b"audio", "audio/m4a")})
+    assert response.status_code == 503
+    assert "preset voices" in response.json()["detail"]
+
+
+def test_voice_sample_other_failure_does_not_leak_raw_error(monkeypatch, family_id):
+    _consented_family(monkeypatch, family_id)
+    _fake_elevenlabs(monkeypatch, 500, {"detail": {"status": "internal_error", "message": "secret internals"}})
+    response = client.post("/v1/voice-samples", data={"family_id": family_id},
+                           files={"audio": ("sample.m4a", b"audio", "audio/m4a")})
+    assert response.status_code == 502
+    assert "secret internals" not in response.json()["detail"]
